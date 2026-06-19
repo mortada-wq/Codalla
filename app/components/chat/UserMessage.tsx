@@ -55,7 +55,17 @@ export function UserMessage({ content, parts }: UserMessageProps) {
             <div className="i-ph:user-fill text-accent-500 text-2xl" />
           )}
         </div>
-        <div className="flex flex-col gap-4 p-3 py-3 w-auto rounded-2xl mr-auto" style={{background:'linear-gradient(90deg,rgba(76,165,255,0.12) 0%,rgba(68,181,195,0.144) 60.67%,rgba(63,192,156,0.16) 100%) padding-box,linear-gradient(135deg,#55D9A6 0%,#4672F4 51.92%) border-box',border:'1.5px solid transparent',backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)',boxShadow:'inset 0 1px 0 rgba(255,255,255,0.08)'}}>
+        <div
+          className="flex flex-col gap-4 p-3 py-3 w-auto rounded-2xl mr-auto"
+          style={{
+            background:
+              'linear-gradient(90deg,rgba(76,165,255,0.12) 0%,rgba(68,181,195,0.144) 60.67%,rgba(63,192,156,0.16) 100%) padding-box,linear-gradient(135deg,#55D9A6 0%,#4672F4 51.92%) border-box',
+            border: '1.5px solid transparent',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+          }}
+        >
           {textContent && <Markdown html>{textContent}</Markdown>}
           {images.map((item, index) => (
             <img
@@ -74,7 +84,17 @@ export function UserMessage({ content, parts }: UserMessageProps) {
   const textContent = stripMetadata(content);
 
   return (
-    <div className="flex flex-col px-5 p-3.5 w-auto rounded-2xl ml-auto" style={{background:'linear-gradient(90deg,rgba(76,165,255,0.12) 0%,rgba(68,181,195,0.144) 60.67%,rgba(63,192,156,0.16) 100%) padding-box,linear-gradient(135deg,#55D9A6 0%,#4672F4 51.92%) border-box',border:'1.5px solid transparent',backdropFilter:'blur(12px)',WebkitBackdropFilter:'blur(12px)',boxShadow:'inset 0 1px 0 rgba(255,255,255,0.08)'}}>
+    <div
+      className="flex flex-col px-5 p-3.5 w-auto rounded-2xl ml-auto"
+      style={{
+        background:
+          'linear-gradient(90deg,rgba(76,165,255,0.12) 0%,rgba(68,181,195,0.144) 60.67%,rgba(63,192,156,0.16) 100%) padding-box,linear-gradient(135deg,#55D9A6 0%,#4672F4 51.92%) border-box',
+        border: '1.5px solid transparent',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+      }}
+    >
       <div className="flex gap-3.5 mb-4">
         {images.map((item, index) => (
           <div className="relative flex rounded-lg border border-bolt-elements-borderColor overflow-hidden">

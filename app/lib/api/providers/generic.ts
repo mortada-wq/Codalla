@@ -1,7 +1,9 @@
-// Generic AI provider implementation
-// Path: app/lib/api/providers/generic.ts
+/*
+ * Generic AI provider implementation
+ * Path: app/lib/api/providers/generic.ts
+ */
 
-import type { AiProvider, AiPlanRequest, AiPlanResponse, AiSuggestRequest, AiSuggestResponse } from "../../types/ai.d";
+import type { AiProvider, AiPlanRequest, AiPlanResponse, AiSuggestRequest, AiSuggestResponse } from '~/types/ai.d';
 
 export interface ProviderConfig {
   module: string | null; // optional custom module path
@@ -19,26 +21,31 @@ export function createGenericProvider(config: ProviderConfig): AiProvider {
   async function post<T>(endpoint: string, body: any): Promise<T> {
     const url = `${config.baseUrl}${endpoint}`;
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     };
+
     if (apiKey) {
-      headers["Authorization"] = `Bearer ${apiKey}`;
+      headers.Authorization = `Bearer ${apiKey}`;
     }
+
     try {
       const response = await fetch(url, {
-        method: "POST",
+        method: 'POST',
         headers,
         body: JSON.stringify(body),
       });
+
       if (!response.ok) {
         console.warn(`Generic AI provider received non‑OK status ${response.status} from ${url}`);
         throw new Error(`HTTP ${response.status}`);
       }
+
       return (await response.json()) as T;
     } catch (err) {
       console.error(`Error contacting AI provider at ${url}:`, err);
+
       // Return a mock response so the app stays functional
-      if (endpoint === "/plan") {
+      if (endpoint === '/plan') {
         const mock: AiPlanResponse = { plan: { tasks: [], wireframes: [], accessibility: [] } };
         return mock as unknown as T;
       } else {
@@ -50,10 +57,10 @@ export function createGenericProvider(config: ProviderConfig): AiProvider {
 
   return {
     async generatePlan(request: AiPlanRequest): Promise<AiPlanResponse> {
-      return await post<AiPlanResponse>("/plan", request);
+      return await post<AiPlanResponse>('/plan', request);
     },
     async getSuggestions(request: AiSuggestRequest): Promise<AiSuggestResponse> {
-      return await post<AiSuggestResponse>("/suggest", request);
+      return await post<AiSuggestResponse>('/suggest', request);
     },
   };
 }

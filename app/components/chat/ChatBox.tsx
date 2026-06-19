@@ -274,11 +274,14 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           accept=".json"
           onChange={async (e) => {
             const file = e.target.files?.[0];
+
             if (file && props.importChat) {
               const reader = new FileReader();
+
               reader.onload = async (ev) => {
                 try {
                   const data = JSON.parse(ev.target?.result as string);
+
                   if (Array.isArray(data.messages)) {
                     await props.importChat!(data.description || 'Imported Chat', data.messages);
                   }
@@ -286,6 +289,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               };
               reader.readAsText(file);
             }
+
             e.target.value = '';
           }}
         />
@@ -295,11 +299,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
             <McpTools />
             {/* Import icon with dropdown */}
             <div className="relative">
-              <IconButton
-                title="Import"
-                className="transition-all"
-                onClick={() => setImportMenuOpen(!importMenuOpen)}
-              >
+              <IconButton title="Import" className="transition-all" onClick={() => setImportMenuOpen(!importMenuOpen)}>
                 <div className="i-ph:arrow-square-in text-xl" />
               </IconButton>
               {importMenuOpen && (
@@ -307,7 +307,10 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                   <div className="fixed inset-0 z-40" onClick={() => setImportMenuOpen(false)} />
                   <div className="absolute bottom-9 left-0 bg-bolt-elements-bg-depth-2 border border-bolt-elements-borderColor rounded-xl shadow-lg overflow-hidden z-50 min-w-[170px]">
                     <button
-                      onClick={() => { document.getElementById('chatbox-import')?.click(); setImportMenuOpen(false); }}
+                      onClick={() => {
+                        document.getElementById('chatbox-import')?.click();
+                        setImportMenuOpen(false);
+                      }}
                       className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-bg-depth-3 transition-colors bg-transparent border-0"
                     >
                       <span className="i-ph:upload-simple text-base" />

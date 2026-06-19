@@ -1,10 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import {
-  getAuth,
-  GoogleAuthProvider,
-  GithubAuthProvider,
-  PhoneAuthProvider,
-} from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, GithubAuthProvider, PhoneAuthProvider } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCP6Dmwkye9OJSq7qohkKd2eclTrrCQq2o',
