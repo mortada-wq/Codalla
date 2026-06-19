@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 import { LoadingOverlay } from '~/components/ui/LoadingOverlay';
 
 import { classNames } from '~/utils/classNames';
-import { Button } from '~/components/ui/Button';
 import type { IChatMetadata } from '~/lib/persistence/db';
 import { X, Github, GitBranch } from 'lucide-react';
 

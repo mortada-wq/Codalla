@@ -11,12 +11,13 @@ export function themeIsDark() {
 
 export const DEFAULT_THEME = 'dark';
 
-export const themeStore = atom<Theme>(initStore());
+export const themeStore = atom<Theme>(initStore() as Theme);
 
 function initStore() {
   if (!import.meta.env.SSR) {
     localStorage.setItem(kTheme, 'dark');
     document.querySelector('html')?.setAttribute('data-theme', 'dark');
+
     return 'dark';
   }
 

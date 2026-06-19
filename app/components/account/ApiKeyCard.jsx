@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 export default function ApiKeyCard({ label, keyValue, created }) {
   const [copied, setCopied] = useState(false);
@@ -16,7 +16,7 @@ export default function ApiKeyCard({ label, keyValue, created }) {
       <div className="key-body">
         <code>{keyValue}</code>
         <button className="copy-btn" onClick={copyKey}>
-          {copied ? "✅ Copied" : "Copy"}
+          {copied ? '✅ Copied' : 'Copy'}
         </button>
       </div>
       <div className="key-meta">

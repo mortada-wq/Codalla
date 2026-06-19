@@ -41,12 +41,21 @@ interface GitHubTabProps {
   onClone?: (repoUrl: string) => void;
 }
 
-const IGNORE_PATTERNS = ['node_modules/**', '.git/**', 'dist/**', 'build/**', '.next/**', '**/*.log', '**/.DS_Store', '**/*lock.yaml'];
+const IGNORE_PATTERNS = [
+  'node_modules/**',
+  '.git/**',
+  'dist/**',
+  'build/**',
+  '.next/**',
+  '**/*.log',
+  '**/.DS_Store',
+  '**/*lock.yaml',
+];
 const ig = ignore().add(IGNORE_PATTERNS);
 const MAX_FILE_SIZE = 100 * 1024;
 const MAX_TOTAL_SIZE = 500 * 1024;
 
-export default function GitHubTab({ onClone }: GitHubTabProps = {}) {
+export default function GitHubTab({ onClone: _onClone }: GitHubTabProps = {}) {
   const { connection, isConnected, isLoading, error, testConnection } = useGitHubConnection();
   const importChat = useStore(importChatStore);
   const { ready, gitClone } = useGit();
@@ -59,6 +68,7 @@ export default function GitHubTab({ onClone }: GitHubTabProps = {}) {
 
     try {
       toast.info('Cloning repository…');
+
       const { workdir, data } = await gitClone(repoUrl);
       const filePaths = Object.keys(data).filter((p) => !ig.ignores(p));
       const textDecoder = new TextDecoder('utf-8');
@@ -67,11 +77,25 @@ export default function GitHubTab({ onClone }: GitHubTabProps = {}) {
 
       for (const filePath of filePaths) {
         const { data: content, encoding } = data[filePath];
+
         try {
-          const text = encoding === 'utf8' ? (content as string) : content instanceof Uint8Array ? textDecoder.decode(content) : '';
-          if (!text) continue;
+          const text =
+            encoding === 'utf8'
+              ? (content as string)
+              : content instanceof Uint8Array
+                ? textDecoder.decode(content)
+                : '';
+
+          if (!text) {
+            continue;
+          }
+
           const size = new TextEncoder().encode(text).length;
-          if (size > MAX_FILE_SIZE || totalSize + size > MAX_TOTAL_SIZE) continue;
+
+          if (size > MAX_FILE_SIZE || totalSize + size > MAX_TOTAL_SIZE) {
+            continue;
+          }
+
           totalSize += size;
           fileContents.push({ path: filePath, content: text });
         } catch {}

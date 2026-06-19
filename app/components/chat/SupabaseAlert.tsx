@@ -58,15 +58,19 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
 
       if (!response.ok) {
         let errorMessage = `Supabase query failed with status ${response.status}: ${response.statusText}`;
+
         try {
           // Try to parse a more specific error message from the response body
           const errorData = (await response.json()) as { error?: { message?: string } };
+
           if (errorData.error?.message) {
             errorMessage = `Supabase query failed: ${errorData.error.message}`;
           }
-        } catch (e) {
-          // The response body was not JSON or could not be parsed.
-          // The initial error message is the best we can do.
+        } catch {
+          /*
+           * The response body was not JSON or could not be parsed.
+           * The initial error message is the best we can do.
+           */
         }
         throw new Error(errorMessage);
       }
