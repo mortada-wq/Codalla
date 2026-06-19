@@ -181,4 +181,20 @@
   --bolt-terminal-brightMagenta: #ddd6fe;
   --bolt-terminal-brightCyan: #a5f3fc;
   --bolt-terminal-brightWhite: #FFFFFF;
-}\n\n/* Light theme overrides */\n@media (prefers-color-scheme: light) {\n  :root {\n    --bolt-elements-bg-depth-1: #ffffff;\n    --bolt-elements-bg-depth-2: #f0f5ff;\n    --bolt-elements-bg-depth-3: #e0e0e0;\n    --bolt-elements-bg-depth-4: rgba(0,0,0,0.04);\n    --bolt-elements-textPrimary: #212121;\n    --bolt-elements-textSecondary: #555555;\n    --bolt-elements-textTertiary: #777777;\n    --bolt-elements-sidebar-buttonBackgroundDefault: rgba(70,114,244,0.04);\n    --bolt-elements-sidebar-buttonBackgroundHover: rgba(70,114,244,0.08);\n    --bolt-elements-sidebar-buttonText: #4672F4;\n  }\n}\n
+}
+
+/* Light theme overrides */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bolt-elements-bg-depth-1: #ffffff;
+    --bolt-elements-bg-depth-2: #f0f5ff;
+    --bolt-elements-bg-depth-3: #e0e0e0;
+    --bolt-elements-bg-depth-4: rgba(0, 0, 0, 0.04);
+    --bolt-elements-textPrimary: #212121;
+    --bolt-elements-textSecondary: #555555;
+    --bolt-elements-textTertiary: #777777;
+    --bolt-elements-sidebar-buttonBackgroundDefault: rgba(70, 114, 244, 0.04);
+    --bolt-elements-sidebar-buttonBackgroundHover: rgba(70, 114, 244, 0.08);
+    --bolt-elements-sidebar-buttonText: #4672F4;
+  }
+}
