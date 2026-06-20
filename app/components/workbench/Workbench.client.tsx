@@ -1,5 +1,5 @@
 import { useStore } from '@nanostores/react';
-import { motion, type HTMLMotionProps, type Variants } from 'framer-motion';
+import { motion, type HTMLMotionProps } from 'framer-motion';
 import { computed } from 'nanostores';
 import { memo, useCallback, useEffect, useState, useMemo } from 'react';
 import { toast } from 'react-toastify';
@@ -56,23 +56,6 @@ const sliderOptions: SliderOptions<WorkbenchViewType> = {
     text: 'Preview',
   },
 };
-
-const workbenchVariants = {
-  closed: {
-    width: 0,
-    transition: {
-      duration: 0.2,
-      ease: cubicEasingFn,
-    },
-  },
-  open: {
-    width: 'var(--workbench-width)',
-    transition: {
-      duration: 0.2,
-      ease: cubicEasingFn,
-    },
-  },
-} satisfies Variants;
 
 const FileModifiedDropdown = memo(
   ({
@@ -374,26 +357,29 @@ export const Workbench = memo(
 
     return (
       chatStarted && (
-        <motion.div
-          initial="closed"
-          animate={showWorkbench ? 'open' : 'closed'}
-          variants={workbenchVariants}
-          className="z-workbench"
+        <div
+          className={classNames(
+            'z-workbench min-w-0 shrink-0 transition-[width,opacity] duration-200 bolt-ease-cubic-bezier',
+            {
+              'lg:w-[var(--workbench-width)] lg:opacity-100': showWorkbench,
+              'lg:pointer-events-none lg:w-0 lg:opacity-0': !showWorkbench,
+            },
+          )}
         >
           <div
             className={classNames(
-              'fixed top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0 transition-[left,width] duration-200 bolt-ease-cubic-bezier',
+              'fixed inset-x-0 top-[calc(var(--header-height)+0.85rem)] bottom-3 z-0 px-2 transition-[left,width] duration-200 bolt-ease-cubic-bezier lg:static lg:h-full lg:w-full lg:px-0',
               {
                 'w-full': isSmallViewport,
                 'left-0': showWorkbench && isSmallViewport,
-                'left-[var(--workbench-left)]': showWorkbench,
+                'left-[var(--workbench-left)]': showWorkbench && !isSmallViewport,
                 'left-[100%]': !showWorkbench,
               },
             )}
           >
-            <div className="absolute inset-0 px-2 lg:px-4">
-              <div className="h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-sm rounded-lg overflow-hidden">
-                <div className="flex items-center px-3 py-2 border-b border-bolt-elements-borderColor gap-1.5">
+            <div className="absolute inset-0 lg:static lg:h-full">
+              <div className="flex h-full flex-col overflow-hidden rounded-[22px] border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 shadow-[0_24px_80px_rgba(0,0,0,0.16)]">
+                <div className="flex items-center gap-2 border-b border-bolt-elements-borderColor px-3 py-2.5">
                   <button
                     className={`${showChat ? 'i-ph:sidebar-simple-fill' : 'i-ph:sidebar-simple'} text-lg text-bolt-elements-textSecondary mr-1`}
                     disabled={!canHideChat || isSmallViewport}
@@ -403,6 +389,11 @@ export const Workbench = memo(
                       }
                     }}
                   />
+                  {!isSmallViewport && (
+                    <span className="hidden text-[11px] font-medium uppercase tracking-[0.22em] text-bolt-elements-textTertiary xl:inline">
+                      Workspace
+                    </span>
+                  )}
                   <Slider selected={selectedView} options={sliderOptions} setSelected={setSelectedView} />
                   <div className="ml-auto" />
                   {selectedView === 'code' && (
@@ -508,7 +499,7 @@ export const Workbench = memo(
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )
     );
   },
