@@ -11,7 +11,7 @@
     "email": "maintainers@yallasahib.com"
   },
   "scripts": {
-    "deploy": "npm run build && wrangler pages deploy",
+    "deploy": "pnpm run build && wrangler pages deploy",
     "build": "remix vite:build",
     "update-figma": "node scripts/update-figma-tokens.js",
     "test": "vitest --run",
@@ -28,7 +28,7 @@
     "typecheck": "tsc",
     "typegen": "wrangler types",
     "preview": "pnpm run build && pnpm run start",
-    "prepare": "husky",
+    "prepare": "husky || echo 'Skipping Husky install (not available in this environment)'",
     "dev": "node pre-start.cjs  && remix vite:dev",
     "runpod-deploy": "bash scripts/runpod_deploy.sh",
     "clean": "node scripts/clean.js",

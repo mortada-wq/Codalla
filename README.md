@@ -14,7 +14,7 @@
 | Runs offline | No | No | **Yes (Ollama)** |
 | Desktop app | Yes | No | **Yes (Electron, mac/win/linux)** |
 | Auth | Proprietary | AWS | **Firebase (Google, GitHub, Phone)** |
-| Deploy targets | None | None | **Vercel, Netlify, Docker** |
+| Deploy targets | None | None | **Cloudflare Pages, Vercel, Netlify, Docker** |
 
 The core bet: **bring your own model, run anywhere, own your data.**
 
@@ -85,8 +85,18 @@ pnpm dockerrun                # http://localhost:5173
 ### Cloudflare Pages
 
 ```bash
-pnpm build
-wrangler pages deploy
+pnpm install
+pnpm run deploy
+```
+
+Cloudflare deployment expects these repository secrets (used by GitHub Actions):
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+
+For local/manual deploys, authenticate Wrangler first:
+
+```bash
+pnpm exec wrangler login
 ```
 
 ---

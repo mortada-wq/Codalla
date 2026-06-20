@@ -33,8 +33,6 @@ jobs:
       - name: Setup and Build
         if: steps.check-secrets.outputs.configured == 'true'
         uses: ./.github/actions/setup-and-build
-        env:
-          NODE_ENV: production
 
       - name: Deploy to Cloudflare Pages
         if: steps.check-secrets.outputs.configured == 'true'
