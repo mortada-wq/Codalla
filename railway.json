@@ -1,0 +1,7 @@
+{
+  "build": {
+    "dockerfile": "Dockerfile",
+    "dockerfilePath": "Dockerfile",
+    "dockerTarget": "bolt-ai-production"
+  }
+}
