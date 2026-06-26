@@ -19,6 +19,11 @@ export default defineConfig((config) => {
     build: {
       target: 'esnext',
     },
+    ssr: {
+      // Ensure Node.js built-ins are not polyfilled in SSR context
+      external: ['node:stream', 'stream', 'node:buffer', 'buffer'],
+      noExternal: [],
+    },
     plugins: [
       nodePolyfills({
         include: ['buffer', 'process', 'util', 'stream'],
