@@ -93,9 +93,12 @@ function ModelCard({ model, onUpdate, onDelete }: ModelCardProps) {
           <div className="mt-3 space-y-2">
             <div className="flex justify-between text-xs text-bolt-elements-textSecondary">
               <span>{model.progress.status}</span>
-              <span>{Math.round((model.progress.current / model.progress.total) * 100)}%</span>
+              <span>{model.progress.total > 0 ? Math.round((model.progress.current / model.progress.total) * 100) : 0}%</span>
             </div>
-            <Progress value={Math.round((model.progress.current / model.progress.total) * 100)} className="h-1" />
+            <Progress
+              value={model.progress.total > 0 ? Math.round((model.progress.current / model.progress.total) * 100) : 0}
+              className="h-1"
+            />
           </div>
         )}
       </CardContent>

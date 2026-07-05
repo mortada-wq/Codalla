@@ -22,7 +22,7 @@ const CardHeader = forwardRef<HTMLDivElement, CardProps>(({ className, ...props 
 });
 CardHeader.displayName = 'CardHeader';
 
-const CardTitle = forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+const CardTitle = forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => {
     return (
       <h3

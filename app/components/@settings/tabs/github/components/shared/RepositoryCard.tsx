@@ -187,22 +187,16 @@ export function RepositoryCard({
   }
 
   const Component = onSelect ? 'button' : 'div';
-  const interactiveProps = onSelect
-    ? {
-        onClick: onSelect,
-        className: classNames(
-          'group cursor-pointer hover:border-bolt-elements-borderColorActive dark:hover:border-bolt-elements-borderColorActive transition-all duration-200',
-          className,
-        ),
-      }
-    : { className };
+  const interactiveProps = onSelect ? { onClick: onSelect, className: 'group cursor-pointer' } : {};
 
   return (
     <Component
       {...interactiveProps}
       className={classNames(
         'block p-4 rounded-lg bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor relative',
-        interactiveProps.className,
+        onSelect &&
+          'hover:border-bolt-elements-borderColorActive dark:hover:border-bolt-elements-borderColorActive transition-all duration-200',
+        className,
       )}
     >
       {/* Repository Health Indicator */}
@@ -315,7 +309,7 @@ export function RepositoryCard({
             {repository.size && (
               <span className="flex items-center gap-1" title="Size">
                 <Database className="w-3.5 h-3.5" />
-                {(repository.size / 1024).toFixed(1)}MB
+                {formatSize(repository.size * 1024)}
               </span>
             )}
             <span className="flex items-center gap-1" title="Last Updated">

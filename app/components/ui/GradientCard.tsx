@@ -94,7 +94,13 @@ function getGradientColorFromSeed(seedString?: string): string {
     return GRADIENT_COLORS[0];
   }
 
-  const index = seedString.length % GRADIENT_COLORS.length;
+  let hash = 0;
+
+  for (let i = 0; i < seedString.length; i++) {
+    hash = (hash * 31 + seedString.charCodeAt(i)) | 0;
+  }
+
+  const index = Math.abs(hash) % GRADIENT_COLORS.length;
 
   return GRADIENT_COLORS[index];
 }

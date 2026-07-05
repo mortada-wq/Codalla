@@ -10,7 +10,7 @@ export function RepositoryCard({ repo, onClone }: RepositoryCardProps) {
   return (
     <a
       key={repo.name}
-      href={repo.http_url_to_repo}
+      href={repo.web_url}
       target="_blank"
       rel="noopener noreferrer"
       className="group block p-4 rounded-lg bg-bolt-elements-background-depth-1 border border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive transition-all duration-200"

@@ -12,20 +12,6 @@ export interface GitHubUserResponse {
   updated_at: string;
 }
 
-export interface GitLabProjectInfo {
-  id: string;
-  name: string;
-  full_name: string;
-  html_url: string;
-  description: string;
-  stargazers_count: number;
-  forks_count: number;
-  default_branch: string;
-  updated_at: string;
-  language: string;
-  languages_url: string;
-}
-
 export interface GitHubRepoInfo {
   id: string;
   name: string;

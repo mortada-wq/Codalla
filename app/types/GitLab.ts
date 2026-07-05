@@ -17,6 +17,7 @@ export interface GitLabProjectInfo {
   name: string;
   path_with_namespace: string;
   description: string;
+  web_url: string;
   http_url_to_repo: string;
   star_count: number;
   forks_count: number;
