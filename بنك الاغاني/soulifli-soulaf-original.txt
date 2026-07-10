@@ -1,0 +1,48 @@
+tags: maqam=bayati, iqa=chobi_basta, vocal_ornament=tahrir, gender=female, dialect=baghdadi, era=orchestra70, type=original_composition, mood=playful_mocking
+
+سولفلي سولف — أغنية أصلية (Original). Technical breakdown for the Lyria RAG system:
+
+An original playful, teasing Iraqi folkloric song built entirely on the wordplay of "سالفة" (a tale/gossip). It mocks the gossip-tellers themselves: they gossiped about you, "lent" us the tale, and walked off — a told tale, on loan. The song must feel like a mischievous exchange in a Baghdad courtyard, half-sung, half-laughed, with the whole neighborhood clapping along.
+
+1. Metadata:
+
+  - Artist/Title: أغنية أصلية | سولفلي سولف (Original | Soulifli Soulaf — "Tell Me Tales")
+  - Target Era: 1970s Iraqi Radio & TV Orchestra (الفرقة الموسيقية للإذاعة والتلفزيون) — warm analog tape, wide acoustic room, big communal energy.
+
+2. Maqam & Scale Analysis:
+
+  - Primary Maqam: Maqam Bayati (D - E-half-flat - F - G - A - Bb - C) in its brightest, most festive folkloric form — the same joyful Bayati color as "هلوا واحنه نهل" and "عمي يابو مركب", completely avoiding the melancholic Southern descent.
+  - Melodic Behavior (Sair): Circular, bouncy, and built on tight call-and-response. The lead sings "سُولِفْلِي سُولَفْ" and the choir throws back "يَا مْسُولْفِينَكْ!" like neighbors trading jabs. The melody is staccato and syllabic — the tongue-twister lyrics ARE the rhythm — with the Sair repeatedly teasing up to the 4th degree and tumbling back to the tonic like a punchline. Tahrir is tight, rhythmic, and bouncing (no long sad melismas); the singer should almost break into laughter on "وْمِشَوْا" (and they walked off), with a sly, exaggerated drawn-out mock-sigh on "بْسَلَفْ" (on loan) to land the joke.
+
+3. Rhythm & Tempo (Iqa'):
+
+  - Iqa' Name: Upbeat Iraqi Chobi blended with a fast Basta (rhythmic 4/4, heavily accented off-beats for dancing).
+  - BPM: ~110-115 BPM.
+  - Percussion Texture: Driving and festive: the sharp, snapping crack of the Khashaba (Iraqi wooden drum/Kasar) dominates, with a clay Darbuka giving heavy metallic Teks, a steady Daf on the downbeats, and — essential for the mocking, communal spirit — prominent syncopated Safga (communal handclaps) that answer the vocal phrases like the crowd egging the singer on. A cheeky one-beat percussion stop (سكتة) right before each return of "سُولِفْلِي سُولَفْ" for comic timing.
+
+4. Instrumentation:
+
+  - Lead Instruments: A rapid, staccato acoustic Oud is the star — playful rhythmic plucking that mimics the chatter of gossips, opening the track with a fast iconic-style solo. A vintage Accordion (the 1970s folkloric pop signature) doubles the vocal melody with a wink, and bright Qanun cascades punctuate the end of each phrase like giggles. Orchestral Violins (Kamanjat) play unison lines with the choir refrains.
+  - Ensemble Style: 1970s Iraqi Radio & TV folkloric orchestra — a large acoustic ensemble that sounds like a massive courtyard gathering, with a robust mixed-gender backing choir doing the call-and-response mockery.
+
+5. Vocal Character:
+
+  - Texture: A bright, agile female voice — warm and pure in the middle register with crystal-clear diction (نقاء اللفظ), essential so every syllable of the tongue-twister lands.
+  - Emotional Delivery: دلال ومزاح (coquettish charm and mischief). This is Farah (joy) with a raised eyebrow — teasing, mock-offended, never actually angry. The delivery should feel like the singer is wagging a finger at the gossipers while smiling, with the choir playing the role of the amused neighborhood. High rhythmic flexibility, syllables tossed like dice, and a barely-suppressed laugh in the timbre throughout.
+
+6. Lyrics with Tashkeel:
+
+  - Dialect: بغدادي (Baghdadi folkloric, gossip-culture vocabulary: سالفة، سوالف، سولف).
+
+سُولِفْلِي سُولَفْ
+يَا مْسُولْفِينَكْ
+سُولْفُوكْ وْسَلَّفْتُونَا وْمِشَوْا
+سَالُوفَة مَسْلُوفَة بْسَلَفْ
+
+(Translation context for the AI agent: "Tell me tales, oh you whom they tell tales about! They gossiped about you, lent us the tale, and walked away — a told tale, borrowed on loan." The entire lyric is a tongue-twister built on one root س-ل-ف, mocking gossip culture: the tale itself is second-hand, "on loan," worthless. The humor lives in the repetition and the rhythm of the root.)
+
+  - Structural note: Treat "سُولِفْلِي سُولَفْ" as the lead's recurring hook and "يَا مْسُولْفِينَكْ" as the choir's mocking answer. "سُولْفُوكْ وْسَلَّفْتُونَا وْمِشَوْا" is the verse punchline delivered solo with a percussion stop, and "سَالُوفَة مَسْلُوفَة بْسَلَفْ" is sung by everyone together — lead + choir + Safga claps — as the communal verdict on the gossipers.
+
+7. Technical Lyria Descriptor:
+
+"Late 1970s Iraqi golden age radio broadcast, upbeat 4/4 Iraqi Chobi and Basta rhythm at 112 BPM. A highly festive traditional Iraqi orchestra driven by a rapid, staccato acoustic Oud, a cheeky vintage accordion doubling the melody, bright Qanun cascades between phrases, and a massive percussion section centered on a snapping Khashaba wooden drum, clay Darbuka, steady Daf, and prominent syncopated communal handclaps (Safga) with comic one-beat stops before each refrain. The melody is a bright, festive Maqam Bayati built on tight call-and-response between a playful, agile female lead with crystal-clear diction and a large mixed backing choir that answers her mockingly. The lyrics are a Baghdadi Arabic tongue-twister teasing gossip-tellers, delivered with coquettish charm, rhythmic bouncing Tahrir, and a barely-suppressed laugh. The emotional tone is mischievous, communal, and danceable — a courtyard full of neighbors trading jokes — processed with authentic 1970s analog tape warmth and wide acoustic room reverb."

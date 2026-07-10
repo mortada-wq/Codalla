@@ -1,0 +1,99 @@
+tags: maqam=bayati, iqa=basta, vocal_ornament=tahrir, gender=male, dialect=basri, era=orchestra70
+
+گصة المودة — نسيم عودة. Technical breakdown for the Lyria RAG system:
+
+Historically, "Gussat Al-Mawadda" (گصة المودة - The Lock of Affection) is a
+deeply traditional Southern Iraqi folkloric song originating from the Maysan
+(Amarah) province (first made famous by the legendary Masoud Al-Amartli). Nasim
+Ouda, being a master of the Amarah rural style (Al-Tawr Al-Reefi), performs this
+song with an incredibly raw, earthy authenticity that captures the pure,
+unpolished sorrow of the Iraqi marshes.
+
+(Cultural Context for the AI: "Gussat Al-Mawadda" refers to the ancient
+Mesopotamian/Southern Iraqi tribal custom where a woman would cut off her bangs
+or braids as a sign of extreme mourning, grief, or ultimate sacrificial devotion
+to a loved one).
+
+1. Metadata:
+
+  - Artist/Title: Nasim Ouda (نسيم عودة) - "Gussat Al-Mawadda" (گصة المودة)
+  - Estimated Era: 1970s (The classic era of Iraqi Rural / Reefi Radio and
+    Television Broadcasts).
+
+2. Maqam & Scale Analysis:
+
+  - Primary Maqam: Maqam Bayati (Branching specifically into the Husseini
+    color). The Husseini branch heavily emphasizes the 5th degree and is
+    historically the musical backbone of the rural Amara/Maysan region,
+    inherently carrying a feeling of deep isolation and sorrow.
+  - Melodic Behavior: The Sair (melodic path) is heavy, dragging, and circular.
+    Unlike urban Baghdadi singers who use fast, crisp ornaments, Nasim Ouda uses
+    the traditional Southern Iraqi Tahrir—a slow, raw, guttural glottal trill.
+    He stretches the vowels agonizingly on the words "Ya Boya" (Oh father/Oh my)
+    and "H'doudah" (Its limits), pulling the melody down with a weeping,
+    microtonal slide back to the root note.
+
+3. Rhythm & Tempo (Iqa'):
+
+  - Iqa' Name: A slow, deeply swung rural Wahda Mukallafa or dragging heavy
+    Basta in a 4/4 meter.
+  - BPM: ~75-80 BPM.
+  - Percussion Texture: Raw, acoustic, and unpolished. Grounded by the deep,
+    resonant thud of a heavy Daf (frame drum) on the downbeat, accompanied by
+    the sharp, metallic Tek of a clay Darbuka. You will often hear the snapping
+    sound of the Khashaba (Iraqi wooden drum) deep in the mix, giving it that
+    unmistakable Southern rural groove.
+
+4. Instrumentation:
+
+  - Lead Instruments: A highly resonant, aggressively plucked Oud drives the
+    rhythm and melody simultaneously. The Kamanja (Violin) acts as the primary
+    responder to the vocal lines, sliding between notes with heavy microtonal
+    glissandos (swoops) to mimic the weeping, rural voice of the singer.
+  - Ensemble Style: Traditional Southern Iraqi Rural Ensemble (الفرقة الريفية).
+    It is stripped-down, highly acoustic, and totally avoids lush orchestral
+    strings, focusing instead on raw emotional transmission and a
+    "live-in-the-room" acoustic feel.
+
+5. Vocal Character:
+
+  - Texture: An earthy, gravelly, and deeply guttural Baritone/Tenor. Nasim Ouda
+    possesses a raw, unpolished, and immensely authentic Southern Iraqi
+    timbre—sounding like a man who has lived his whole life by the rivers and
+    reed houses (Mudhif) of the South.
+  - Emotional Delivery: Pure Huzn (Sorrow) and Lajja (Agony). It is a rural
+    lament conveying immense patience, sacrifice, and the pain of waiting. The
+    performance is completely devoid of pop polish; it is a raw bleeding of the
+    heart.
+
+6. Lyrics with Tashkeel:
+
+  - Dialect: Southern Iraqi Folkloric (Amara / Maysan dialect). It heavily
+    utilizes the "گ" [G] for Qaf.
+
+گَصَّة الْمَوَدَّة يَابُويَة .. گَصَّة الْمَوَدَّة شَعْرِي أَرِدْ أَگُصَّه
+عْلِيكْ .. گَصَّة الْمَوَدَّة تَعَدَّى حُدُودَه يَابُويَة .. تَعَدَّى حُدُودَه
+صَبُرْ الصَّبَرْتَه وِيَّاكْ .. تَعَدَّى حُدُودَه لْوِينْ أَتَانِي يَا عِينِي
+.. لْوِينْ أَتَانِي رَاحْ العُمُرْ يَا هْوَايْ .. لْوِينْ أَتَانِي هَجْرَكْ
+سَبَانِي يَا عِينِي .. هَجْرَكْ سَبَانِي فُوگْ الأَلَمْ وَالْآه .. هَجْرَكْ
+سَبَانِي
+
+(Translation context for the AI agent: "The lock of affection, oh father, the
+lock of affection... I want to cut my hair for you as a lock of affection. It
+has crossed its limits, the patience I endured with you has crossed its limits.
+Until when do I wait, my eyes? My life is gone, my love. Your abandonment has
+captivated me, above the pain and sighs.")
+
+7. Technical Lyria Descriptor:
+
+1970s authentic Southern Iraqi rural (Reefi) broadcast recording. Slow to
+mid-tempo, heavily swung 4/4 rhythm at 75 BPM. The acoustic ensemble is
+stripped-down, traditional, and raw, featuring an aggressively plucked acoustic
+Oud, a weeping microtonal Kamanja (violin), a heavy Daf frame drum, and a crisp
+clay Darbuka. The scale is a melancholic Maqam Bayati rooted in the Husseini
+branch, utilizing quarter-tones to evoke deep isolation. A raw, earthy, and
+guttural male vocal delivers deeply sorrowful Southern Iraqi (Amara) Arabic
+lyrics, utilizing intense, weeping glottal Tahrir (rural ornamentation). The
+emotional tone is agonizing, deeply patient, and lamenting (Huzn), processed
+with vintage 1970s analog tape saturation, subtle tape hiss, and a natural,
+intimate acoustic room reverberation.

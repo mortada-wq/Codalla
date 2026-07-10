@@ -1,0 +1,44 @@
+tags: maqam=kurd, iqa=wahda, vocal_ornament=tahrir, gender=male, dialect=baghdadi, era=orchestra70
+
+البنفسج — ياس خضر. Technical breakdown for the Lyria RAG system:
+
+1. Metadata
+
+Artist/Title: Yas Khidr (ياس خضر) – "Al-Banafsaj" (البنفسج)
+Estimated Era: 1970s Golden Age (Specifically released in 1973, typifying the sweeping Iraqi Radio & Television Orchestra era).
+
+2. Maqam & Scale Analysis
+
+Primary Maqam: Maqam Kurd (مقام الكرد), resting on the root of D (Re). Kurd is fundamentally characterized by its minor second interval, immediately evoking a sense of longing, flowing melancholy, and deep introspection.
+
+Melodic Behavior (Sair): The Sair is primarily descending and heavily anchored around the root and minor third, matching the emotional weight of Al-Nawab's poetry. Rather than soaring into high, triumphant registers, the melody circles downward, feeling like a heavy, intimate conversation. Yas Khidr's Tahrir (vocal ornaments) are highly distinct—they are not rapid, melismatic runs, but rather slow, mournful vocal "catches" or "breaks" at the end of sustained notes, emphasizing the pain in specific words like "Thahab" (Gold) or "Kahrab" (Electricity/Amber).
+
+3. Rhythm & Tempo (Iqa')
+
+Iqa' Name: Iraqi Wahda (4/4) in the slower, narrative verses, which seamlessly transitions into a subtle, mid-tempo Maqsum / Iraqi Rumba groove during the instrumental bridges and heightened emotional stanzas.
+
+BPM: Estimated at ~75-80 BPM, possessing a deliberate, walking-pace lament.
+
+Percussion Texture: Grounded but highly textured. The rhythm relies on a deep, resonant Darbuka (tabla) for the foundational Dum, while the continuous, shimmering high-end is provided by a soft Riq (tambourine). During the slightly elevated rhythmic sections, the sharp, snapping backbeat of the Khashaba drives the groove without overwhelming the vocal.
+
+4. Instrumentation
+
+Lead Instruments: The Nay (reed flute) acts as the weeping counter-voice to Khidr, playing breathtaking, breathy solos. The Oud and Qanun provide the melodic framework.
+
+Ensemble Style: Full 1970s Iraqi Orchestra (Firqa Masseyeh). It blends traditional Takht instrumentation with a massive, lush, Western-influenced string section (Kamanjat - Violins, Cellos, Basses), creating a cinematic wall of sound that swells during the interludes and retracts to leave space for the voice.
+
+5. Vocal Character
+
+Texture: Deep, resonant Baritone with a legendary, gravelly rasp (Baha). Yas Khidr's voice sounds physically "wounded" and earth-bound, possessing a gritty, highly textured timbre that is completely unique to him.
+
+Emotional Delivery: Intense Shajan (sorrow/melancholy) and deep Tarab. The delivery feels like a heavy, nocturnal confession. It is less of an outright wailing Abudhiya and more of a deeply internalized, exhausted, yet overwhelmingly affectionate poetic lament.
+
+6. Lyrics with Tashkeel
+
+Dialect: Modern Iraqi Poetic (A sophisticated blend of urban Baghdadi and deep Southern/Rural metaphors, highly characteristic of Mudhaffar Al-Nawab's modernist poetry).
+
+يا طَعْم .. يا ليلَة مِنْ ليْلِ البَنَفْسَجْيا حِلِم .. يا مامِشْ بْمامِشْطَبِعْ گَلْبي مِنْ طِباعَكْ ذَهَبْتِرْخَصْ وَأغَلّيكْ وَأحِبَّكْأنا مِتْعَوِّدْ عَلَيكْ هْوايْيا سولَةْ سَكِتّييا طَواريكْ مِنْ الظُّلْمَة تِجينيچانَتْ ثْيابي عَلَيّ غُرْبَة گَبِلْ جَيَّتَكْومِسْتاحِشْ مِنْ عْيونيوَلَمَّتْني وعلى المامِشْ عَلَّمَتْنيأنا حَبّني الهَوى وگَبْلَكْ ذَوَّبَنيشْلونْ أوْصْفَكْ وإنتَ كَهْرَبْوآنا جَمْرَةْ عَيني دَمْعَتْ ليلْ ظَلْمَةشْلونْ أوْصْفَكْ وإنتَ دَفْتَر وآنا چِلْمَةيالّلي ما جاسَكْ فُگُرْ بالليلْ .. ما جاسَكْ سَهَرْيالّلي بينْ حْواجْبَكْ غَفْوَةْ نَهَرْيالّلي جَرّيتْ السَّما بْعينَكْخافْ أفَزِّزْها واگُلَّكْ أنا أحِبَّكْمامِشْ بْمامِشْ ولِلْمامِشْيا ميزانِ الذَّهَبْ وتْغُشْ وأحِبَّكْوَرْداگ فَرّنْ حُسْنَكْ يا بَنَفْسَجْوإنتَ وَحْدَكْ دَوَّخَتْنيوعلى حُبَّكْ أنا حَبّيتِ الّذي بْحُبْهُم لِمَتْنييا طَعْم يا ليلَة مِنْ ليْلِ البَنَفْسَجْيا عِذِرْ عِذْرينْ يا شِنْهي وأحِبَّكْ
+
+7. Technical Lyria Descriptor
+
+A lush, sorrowful 1970s Golden Age Iraqi orchestral track in Maqam Kurd, featuring a deep, gravelly, and wounded baritone vocal delivering intensely melancholic, poetic Tarab. The instrumentation features a massive cinematic string section (Kamanjat) seamlessly woven with traditional Takht elements, highlighting breathtaking, weeping Nay (reed flute) solos and melodic Oud passages. The rhythm section provides a slow, deliberate 4/4 Iraqi Wahda at approximately 75-80 BPM, driven by the resonant depth of a Darbuka, the shimmering high-end of a soft Riq, and the subtle, snapping backbeat of a Khashaba. The vocal performance is earth-bound and heavy, characterized by signature Iraqi vocal catches (Tahrir) at the end of phrasing, evoking a profound, nocturnal lament over a dense wall of orchestral sound.

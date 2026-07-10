@@ -1,0 +1,107 @@
+We’ll craft a complete technical blueprint for Codalla – your self-hosted, enterprise-grade AI coding platform that connects directly to SiliconFlow, OpenRouter, and any OpenAI-compatible API. This plan is written as a prompt you can hand directly to Replit’s AI Agent or a developer to start building immediately. It covers everything from pulling GitHub repos to live code editing, AI model toggling, cost tracking, and optional Gemma fine-tuning – all while saving you those expensive tool subscriptions.
+
+🧠 COdalla – The Ultimate AI Coding Wrapper
+Prompt for Replit AI Agent: Build This Step-by-Step
+Goal: Create a full-stack web application on Replit (Node.js + React) that acts as an online IDE with integrated AI coding assistants, GitHub repo sync, multi-model AI chat, code fix/diff view, and enterprise-grade features, using only your own API keys (SiliconFlow, OpenRouter, etc.). No recurring tool fees – you pay only for token usage.
+
+1. OVERVIEW & ARCHITECTURE
+Tech Stack (Replit-optimized):
+
+Frontend: React (Vite), TailwindCSS, Monaco Editor (code editor), React Router, React Query
+
+Backend: Express.js (Node.js) or Next.js API routes (if using Next.js for SSR)
+
+Database: SQLite (via better-sqlite3) or Replit Database (key-value) – store user data, projects, API keys, conversation history
+
+Real-time: Socket.IO for live collaboration / streaming AI responses
+
+Git Integration: isomorphic-git + GitHub REST API (for pull, push, commit, branch)
+
+AI Providers:
+
+SiliconFlow API (DeepSeek V3/V4, GPT-120, etc.)
+
+OpenRouter API (any model, including Gemma 26B/32B)
+
+Unified OpenAI-compatible endpoint interface
+
+Authentication (optional enterprise): Passport.js (GitHub OAuth) or simple API key login
+
+Containerization/Sandbox: Replit’s native environment – for running code, use Replit’s Nix modules or Docker (if possible) or just a backend executor with child_process (secured)
+
+Deployment: Within Replit, always-on repl, with secret environment variables for API keys.
+
+2. CORE FEATURES
+Feature	Description
+GitHub Repo Manager	Clone any public/private repo (via personal token), view branches, stage/commit/push, pull, view diffs
+Monaco Code Editor	Full VS Code-like editor with syntax highlighting, intellisense (basic), multi-tab, file tree
+AI Chat Panel	Sidebar chat with streaming responses; select which model to use per message, context-aware (file contents)
+Code Actions	“Fix this file”, “Explain this code”, “Write unit tests”, “Optimize” – buttons that inject selected code + prompt to AI
+Inline Diff View	When AI suggests changes, show side-by-side diff, accept/reject with one click
+Multi-Model Toggle	Dropdown to switch between DeepSeek V3, V4, GPT-120 (SiliconFlow), Gemma 26B/32B (OpenRouter), etc.
+API Key Vault	Securely store multiple provider keys, set usage limits, track spend
+Cost Dashboard	Real-time token usage and cost estimates (pulled from API response headers or calculated)
+Project Context	Automatically send file tree + open file contents as context for AI prompts (optional)
+Fine-tuning Interface (Advanced)	Upload dataset, trigger fine-tune job on Gemma via OpenRouter/SiliconFlow (if supported), manage models
+Collaboration (Enterprise)	Share project with team, simultaneous editing via WebSockets, presence awareness
+Themes	Light/Dark/High-contrast, customisable
+3. DATABASE SCHEMA (SQLite)
+sql
+-- Users (simple auth)
+CREATE TABLE users (
+  id TEXT PRIMARY KEY,
+  username TEXT UNIQUE,
+  email TEXT,
+  github_token TEXT ENCRYPTED,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- API Keys (encrypted)
+CREATE TABLE api_keys (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id),
+  provider TEXT, -- 'siliconflow', 'openrouter', etc.
+  key_value TEXT ENCRYPTED,
+  label TEXT,
+  is_active BOOLEAN DEFAULT 1
+);
+
+-- Projects
+CREATE TABLE projects (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id),
+  name TEXT,
+  local_path TEXT, -- path inside repl filesystem
+  git_remote_url TEXT,
+  current_branch TEXT DEFAULT 'main',
+  last_synced DATETIME
+);
+
+-- AI Conversations
+CREATE TABLE conversations (
+  id TEXT PRIMARY KEY,
+  project_id TEXT REFERENCES projects(id),
+  model_name TEXT,
+  created_at DATETIME
+);
+
+CREATE TABLE messages (
+  id TEXT PRIMARY KEY,
+  conversation_id TEXT REFERENCES conversations(id),
+  role TEXT, -- 'user', 'assistant', 'system'
+  content TEXT,
+  tokens_used INTEGER,
+  cost REAL,
+  timestamp DATETIME
+);
+
+-- Usage log
+CREATE TABLE usage_log (
+  id TEXT PRIMARY KEY,
+  user_id TEXT,
+  model TEXT,
+  prompt_tokens INTEGER,
+  completion_tokens INTEGER,
+  cost REAL,
+  timestamp DATETIME
+);

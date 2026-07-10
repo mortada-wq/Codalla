@@ -1,0 +1,44 @@
+tags: maqam=rast, iqa=wahda, vocal_ornament=tahrir, gender=male, dialect=baghdadi, era=orchestra70
+
+حاسبينك — فاضل عواد. Technical breakdown for the Lyria RAG system:
+
+1. Metadata
+
+Artist/Title: Fadel Awad (فاضل عواد) – "Hasbeenak" (حاسبينك)
+Estimated Era: 1970s Golden Age (Specifically, classic Iraqi Radio/Television Orchestra pop of the 1970s).
+
+2. Maqam & Scale Analysis
+
+Primary Maqam: Rast (starting on C/Do), heavily leaning into the distinct Iraqi flavor of the scale.
+
+Melodic Behavior (Sair): The melody follows a largely grounded and syllabic Sair, heavily anchored around the root (Do) and the microtonal third (Mi half-flat). Rather than wandering aimlessly, the path is highly structured. During the bridges and B-sections, it famously modulates into Maqam Suznak (a branch of Rast that introduces a Hijaz tetrachord on the fifth degree, Sol), raising the emotional tension with a natural/B-flat shift before smoothly resolving back to Rast. The Tahrir (vocal ornaments) are distinctly subtle—Awad uses tight, controlled throat trills at the very end of his phrases rather than relying on overwhelming melisma, prioritizing the rhythmic delivery of the poetry.
+
+3. Rhythm & Tempo (Iqa')
+
+Iqa' Name: Iraqi Wahda / mid-tempo Maqsum variation (4/4 time signature).
+
+BPM: Estimated at ~90-95 BPM. It has a steady, walking-pace groove.
+
+Percussion Texture: A foundational but crisp rhythm section. The signature snap of the Khashaba (the narrow Iraqi tubular drum) drives the groove, layered with a resonant, melodic Darbuka (tabla) playing the Dum and Tak accents, and a subdued Riq (tambourine) shimmering gently on the downbeats.
+
+4. Instrumentation
+
+Lead Instruments: The Oud and Qanun are the melodic anchors, introducing the phrasing and often being doubled or rhythmically answered by the string section.
+
+Ensemble Style: Full 1970s Iraqi Orchestra (Firqa). It perfectly blends the traditional Takht instruments with a grand, Western-influenced sweeping string section (violins, cellos, double basses), giving it that lush, cinematic "Golden Era" density.
+
+5. Vocal Character
+
+Texture: Silky, warm high-baritone/tenor. Awad's voice is incredibly smooth and rounded, lacking the extreme gravelly harshness (Baha) found in more rural Iraqi singing styles.
+
+Emotional Delivery: Deep Tarab soulfulness, but delivered with an academic, urban Baghdadi restraint. It expresses a nostalgic, affectionate lament—not of outright grief (like an Abudhiya), but rather a sweet, earnest yearning (Tarafah).
+
+6. Lyrics with Tashkeel
+
+Dialect: Baghdadi-infused Southern Iraqi. The lyricist, Zamil Saeed Fattah, hailed from southern Iraq, giving the poetry deep rural poetic metaphors (like the soil, water, and birds) delivered in an accessible, polite urban Baghdadi accent.
+
+حاسْبينَكْ .. مِثِلْ رِمْشِ عْيونَّهبْعِشْرِتَكْ لينَه حاسْبينَكْإنتَ كُلْ العُمُرْ وأيّامَه وسْنينَهوَداعْتَكْ .. ذاكْ إنتَ غالي .. حْبَيِّبْ وسَلْوَةْ حَجينَهحاسْبينَكْإنتَ روحي .. روحي چَمْ حُبْ تِدْري بيهاحُبْها لِلْگاعْ وغَرِسْها .. ومايْها .. ومَنْ مِشى عَليهاإنتَ عَلَّمْتِ الشَّفايِفْ ، بِالغِنَه تْصوغِ الكَلايِدْوإنتَ خَلّيتْ السَّوالِفْ ، نابعَه بْروحي قَصايِدْإنتَ ، إنتَ ... شْما تْدورِ الدِّنيَه إنتَ الماي .. ما تْبَدِّلْ أوْصافَهيا طَواريكْ يا روحي مِثِلْ نَسْمَةْ صيفْ مَليانَه تْرافَهعاشْگينْ إحْنَـه وهَـوينَـه ومِثِلْ ما رِدْنَـه لِگينَـهوَداعْتَكْ ذاكْ إنتَ غالي حْبَيِّبْ وسَلْوَةْ حَجينَهحاسْبينَكْمِنْ هَويتَكْ .. لَمِّتْ روحي الما هَوَتْ بِسْنين صِغْريوَمِنْ لِگيتَكْ .. روحي صارَتْ نِذِرْ لأهْلِ الهَوى العُذْرييا غَرامَكْ .. مِثِلْ طَعْمَكْ .. روحي ما شافَتْ سَعادَةالدِّنيَه حَدِّ الشّوگ حِلْوَه .. والگَلُبْ يِنْثُرْ وِدادَهعْيونْكُم تِبْرالي نَجْمَه .. تْدورِ بِيَّ شْما تُريدْطافَتْ بْروحي حَنانْ .. وكَرَّبَتْ مِنّي البَعيدْدِنْيَه حِلْوَه .. ناسْ حِلْوَه .. والوَطَنْ باسِمْ سَعيدْعاشْگينْ إحْنَـه وهَـوينَـه ومِثِلْ ما رِدْنَـه لِگينَـهوَداعْتَكْ ذاكْ إنتَ غالي حْبَيِّبْ وسَلْوَةْ حَجينَهحاسْبينَكْ
+
+7. Technical Lyria Descriptor
+
+A pristine, authentic 1970s Iraqi Golden Age vocal track, featuring a smooth, soulful Baghdadi tenor performing over a rich orchestral arrangement. The composition is rooted in Maqam Rast, occasionally modulating to Suznak for emotional lift, providing an earthy yet structured melodic progression. The rhythm is a steady mid-tempo 4/4 Iraqi Wahda (approx. 90-95 BPM) driven by the distinct, snapping pop of a Khashaba drum and a resonant Darbuka, heavily layered with sweeping, lush string sections (Kamanjat), Oud, and Qanun. The vocal delivery is warm and emotive, laden with subtle microtonal trills (Tahrir) typical of Mesopotamian phrasing, expressing a nostalgic, affectionate yearning without harsh gravelly tones, perfectly blending academic orchestral polish with deep southern poetic roots.

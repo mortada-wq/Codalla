@@ -1,0 +1,4 @@
+- [Codalla platform architecture](codalla-arch.md) — full-stack AI IDE: React+Vite frontend, Express API, Postgres+Drizzle ORM, no auth (personal tool).
+- [Codalla security decisions](codalla-security.md) — git uses spawnSync not execSync; safePath uses separator boundary; githubToken redacted from settings GET; frontend HTML escaped before dangerouslySetInnerHTML.
+- [Codalla API quirks](codalla-api-quirks.md) — three endpoints use query-only params (no path collision): GET/DELETE /file-contents, GET /git-diff. TooltipProvider must wrap the app in App.tsx.
+- [Codalla typographic scale](codalla-type-scale.md) — four-tier scale (Display/Section/Label/Data); 12px hard floor; font-mono only for data surfaces, not reading copy.

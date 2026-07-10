@@ -1,0 +1,62 @@
+tags: maqam=bayati, iqa=basta, vocal_ornament=light_tahrir, gender=male, dialect=baghdadi_southern, era=golden_age_70s
+
+سلامات — حميد منصور. Technical breakdown for the Lyria RAG system:
+
+1. Metadata:
+
+  - Artist/Title: Hamid Mansour – "Salamat" (سلامات)
+  - Estimated Era: 1970s Golden Age (Released circa 1975).
+
+2. Maqam & Scale Analysis:
+
+  - Primary Maqam: Maqam Bayati (مقام بياتي), rooted on D (Bayati Nawa).
+  - Melodic Behavior: The Sair (melodic path) is predominantly undulating and accessible. It starts on the tonic, gracefully ascends to the perfect fourth and fifth, and cascades back down. Unlike the heavy, weeping Abudhiya style of the deep South, the Tahrir (vocal ornamentation) here is highly controlled and light. It uses gentle microtonal trills rather than the guttural Wanna (moan) or Baha (hoarseness), giving the melody a bouncy, syllabic, and optimistic feel.
+
+3. Rhythm & Tempo (Iqa'):
+
+  - Iqa' Name: Iraqi Basta (played as a 4/4 Makhoum or Wahda with a distinct Iraqi swing).
+  - BPM: Estimated tempo is around 90–95 BPM.
+  - Percussion Texture: A crisp, polite, and refined mix. The Khashaba (Iraqi wooden drum) provides a subtle, rolling heartbeat with a slight sixteenth-note swing, without overpowering the track. This is complemented by a metallic Darbuka marking the clear 'Dum' and 'Tak', and a soft Riq (tambourine) adding a shimmering high-end texture.
+
+4. Instrumentation:
+
+  - Lead Instruments: The Qanun and Oud take the melodic lead, often doubling the vocal line, while the Nay provides breathy, warm fills between vocal phrases.
+  - Ensemble Style: 1970s Iraqi Radio Orchestra. It is a hybrid ensemble that expands a traditional small Takht with a lush, Western-influenced string section (violins and cellos), which was the hallmark of the Baghdad broadcasting era.
+
+5. Vocal Character:
+
+  - Emotional Delivery: Upbeat Basta style mixed with warm, polite longing. It is sweet, soothing, and deeply affectionate. It lacks the tragic, tearful soulfulness of deep Tarab or rural lament, instead offering a comforting, nostalgic, and highly accessible Southern warmth.
+
+6. Lyrics with Tashkeel:
+
+  - Dialect: Iraqi Arabic (A refined blend of Baghdadi and polite Southern/Khaleeji-leaning vocabulary, typical of 1970s radio broadcasts aiming for broad appeal).
+
+سَلامات سَلامات أبعَث سَلامات
+وِيَّ الرّايِح وِيَّ الجّاي أبعَث سَلامات
+سَلامات سَلامات
+ريتَك سَلامات صُبُح ومِسا يَهواي
+ريتَك سَلامات
+
+رِدْتَك تِجينا تِجينا .. راحَت وأجَت الأيّام
+رِدْتَك تِجينا
+عَلينا عَلينا .. بَس مُر عَلينا إتوَرِّد الأحلام
+مِن تَمُر عَلينا
+
+المَواويل المَواويل تِحلى المَواويل
+بِحُبَّك يَطيب غِناي تِحلى المَواويل
+القَناديل القَناديل تِضوي القَناديل
+بجَيَّتَك يا ضَيّ العَين تِضوي القَناديل
+
+ألاگيك ألاگيك بَس كون ألاگيه
+وبعَيني أضُم هَواي بَس كون ألاگيه
+تِراضيه وعَيني تِراضيه
+وأرسِم بعَين عتاب وعَين تِراضيه
+
+المَلامات المَلامات لولا المَلامات
+شوگَك بَعَد ما يَعُود لولا المَلامات
+سَلامات سَلامات حُبَّك سَلامات
+يِبقى نَدى ووُرود حُبَّك سَلامات
+
+7. Technical Lyria Descriptor:
+
+Sound Description: "1970s Iraqi Golden Age folk-pop, polite and sweet Southern 'Basta' rhythm in 4/4 time at 95 BPM. Maqam Bayati scale featuring authentic microtonal intervals but maintaining a highly melodic, accessible pop structure. Warm, soothing male lead vocal delivering affectionate, nostalgic lyrics with light, bouncy phrasing and gentle microtonal trills, avoiding heavy tragic ornamentation. Instrumentation features a lush Arabic radio string section (violins, cellos) blended with a traditional Takht: prominent Qanun plucks, Oud, and breathy Nay fills. The percussion is crisp and gentle, driven by a rolling wooden Khashaba with a slight sixteenth-note swing, a metallic Darbuka, and a soft Riq. The overall mood is nostalgic, romantic, rhythmic, and elegantly traditional."

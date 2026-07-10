@@ -1,0 +1,68 @@
+tags: maqam=kurd, iqa=iraqi_rumba, vocal_ornament=subtle_tahrir, gender=female, dialect=baghdadi, era=pop_90s
+
+آسفة — سيناء. Technical breakdown for the Lyria RAG system:
+
+Here is a comprehensive ethnomusicological and technical breakdown of Senaa's "Asefa," specifically tailored to assist your RAG system and the Lyria model in generating authentic 1990s Iraqi music.
+
+1. Metadata
+
+  - Artist/Title: Senaa (سيناء) / Asefa (آسفة - Sorry)
+  - Estimated Era: 1990s Iraqi Pop (Specifically 1993). This era represents a transitional period in Iraqi music, heavily influenced by the economic sanctions (which led to budget constraints and smaller studio ensembles) and the rise of electronic keyboards in Middle Eastern pop.
+
+2. Maqam & Scale Analysis
+
+  - Primary Maqam: Maqam Kurd (مقام كرد). The scale is structured with a minor second (D, Eb, F, G, A, Bb, C), which inherently gives it a melancholic, pleading, and deeply emotional tone.
+  - Melodic Behavior: The Sair (melodic path) is heavily descending, characteristic of lamenting themes in Iraqi music. It often starts in the upper register to express anguish ("Wahasa raji'...") and descends sequentially to resolve heavily on the tonic (Qarar). The Tahrir (vocal ornaments) here are subtle and less melismatic than traditional Tarab; they rely more on sudden dynamic shifts and emotional voice-breaks typical of 90s cassette-tape pop.
+
+3. Rhythm & Tempo (Iqa')
+
+  - Iqa' Name: Iraqi Rumba (رومبا عراقية) mixed with a modernized Maksoom feel. It's a steady 4/4 meter that provides a highly danceable yet grounded backing to the sad lyrics.
+  - BPM: Approximately 95–100 BPM.
+  - Percussion Texture: A distinct 1990s hybrid. The rhythmic foundation is driven by a vintage drum machine (like a Roland or Yamaha) programmed with synthetic kicks and snaps. This is layered with acoustic, mid-range Iraqi Kasur (a shallow drum used in Khashaba music) and bright, metallic Riq (tambourine) accents on the off-beats.
+
+4. Instrumentation
+
+  - Lead Instruments:
+    - Synthesized Oriental Strings (played via a Korg or Yamaha keyboard, providing the main melodic beds and counter-melodies).
+    - Acoustic Oud (providing rhythmic strumming and short, sharp melodic fills during vocal pauses).
+  - Ensemble Style: Modern Electronic Takht hybrid. Due to the 1993 production era, full orchestras were largely replaced by a synthesizer player handling strings and brass, supported by a bassist and 1-2 live percussionists.
+
+5. Vocal Character
+
+  - Texture: Resonant, slightly husky Mezzo-Soprano. Senaa has a warm, chest-dominant tone with a distinct Iraqi "gravel" that adds authenticity and street-level rawness to the track.
+  - Emotional Delivery: Defiant yet pained modern Basta style. It lacks the elongated, improvised wailing of an Abudhiya and instead focuses on rhythmic, radio-friendly storytelling with a sharp, assertive attitude.
+
+6. Lyrics with Tashkeel
+
+  - Dialect: Urban Iraqi / Baghdadi (with some generalized 90s white-Arabic pop inflections for broader appeal).
+
+آسِفَة.. مالَك بِقَلْبِي مَكَان
+نَسِيتُ حُبَّك مِنْ زَمَان
+ضَيَّعْت مِنِّي فُرَص ما أَظُنّ تِجِي
+سِنِين أَنَا بِأَمَل حُبَّك أَرْتَجِي
+وَهَسَّة رَاجِع بَعْد ما فَات الأَوَان؟
+آسِفَة..
+
+خَلَص عُمْرِي وَيَّاك أَوْهَام
+صَارَت أُمْنِيَّتِي عِشْرَتَك ما تَعُود
+أَرِيد أَعِيش لِوَحْدِي بَيْن أَحْلَامِي
+وَأَرُدّ الرَّاح مِنْ أَيَّامِي
+وَأَرُدّ أَحِسّ بِالرَّاحَة وَأَشْعَر بِالأَمَان
+آسِفَة..
+
+ما كُنْت مُوَفِّر لِي حُبّ صَافِي وَصَحِيح
+رَغْم ما كَان القَلْب ما مُسْتَرِيح
+عَانَدْت قَلْبِي وَجَبَرْتُه يُوَالِفَك
+وَغَمَّضْت عَيْنِي عَلَى كُلّ سُوَالِفَك
+رَاح كُلّ شَيْ بَيْنَنَا وَاللِّي كَان..
+آسِفَة..
+
+7. Technical Lyria Descriptor
+
+Use this paragraph directly in your generative pipeline:
+
+"A 1993 Baghdadi pop heartbreak anthem featuring a female vocalist with a resonant, slightly husky mezzo-soprano voice delivering a defiant, emotional performance. The melody is composed in Maqam Kurd, featuring a descending, lamenting melodic path with subtle vocal ornamentation. The rhythm is a steady 4/4 Iraqi Rumba at approximately 95 BPM. The instrumental texture is a 90s hybrid ensemble, driven by vintage electronic drum machines layered with live acoustic Kasur and metallic Riq, accompanied by synthesized oriental keyboard strings, electric bass, and rhythmic acoustic Oud fills."
+
+Senaa - Asefa (1993)
+
+This video provides the exact original 1993 recording, which serves as the perfect reference point for analyzing the unique hybrid of early 90s electronic production and traditional Iraqi melodies.

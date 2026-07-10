@@ -1,0 +1,96 @@
+tags: maqam=bayati, iqa=chobi, vocal_ornament=tahrir, gender=male, dialect=basri, era=orchestra70
+
+على شانه — نسيم عودة. Technical breakdown for the Lyria RAG system:
+
+(Historical Context for the AI: "Ala Shana" is a masterpiece of Iraqi rural
+music. While the 1990s pop star Hatem Al-Iraqi famously covered this song and
+popularized it across the Arab world, the original track entirely belongs to the
+Southern rural maestro Nasim Ouda. Ouda's original version is much rawer,
+earthier, and deeply rooted in the authentic "Reefi" aesthetic rather than
+modern studio pop).
+
+1. Metadata:
+
+  - Artist/Title: Nasim Ouda (نسيم عودة) - "Ala Shana" (على شانه - For His Sake)
+  - Estimated Era: 1980s (Iraqi Rural/Reefi Cassette and Radio Broadcast Era).
+
+2. Maqam & Scale Analysis:
+
+  - Primary Maqam: Maqam Bayati (D - E-half-flat - F - G - A - Bb - C). In this
+    rural context, the Bayati scale is utilized in its brightest, most energetic
+    form, relying on the quarter-flat second degree to maintain an authentic
+    Southern Iraqi flavor without dragging into melancholy.
+  - Melodic Behavior: The Sair (melodic path) is fast, repetitive, and circular.
+    It is structured as an energetic call-and-response between the singer and
+    the instrumental ensemble. Because this is a song of joy, Nasim Ouda
+    abandons the long, weeping melismas typically found in his other works (like
+    Gussat Al-Mawadda). Instead, he employs a tight, bouncy, and rhythmic Tahrir
+    (glottal rural ornamentation) that strictly locks into the groove,
+    propelling the melody forward.
+
+3. Rhythm & Tempo (Iqa'):
+
+  - Iqa' Name: A fast, highly energetic Iraqi Chobi blended with a Basta Reefiya
+    (Rural Basta) in a driving 4/4 meter.
+  - BPM: ~110-115 BPM.
+  - Percussion Texture: Highly percussive, danceable, and driving. The rhythm
+    section is entirely dominated by the rapid, cracking, machine-gun-like snaps
+    of the Khashaba (the traditional Iraqi wooden drum/Kasar). This is anchored
+    by a heavy downbeat from the Daf (frame drum) and tight, syncopated metallic
+    Teks from a clay Darbuka.
+
+4. Instrumentation:
+
+  - Lead Instruments: A traditional, slightly scratchy Kamanja (rural violin)
+    plays rapid unison lines with the voice. The interludes prominently feature
+    the Mutbaq (Iraqi double-reed wind instrument) or a very breathy Nay,
+    providing a sharp, reedy, distinctly rural flavor. The Oud is played
+    aggressively with highly rhythmic, staccato plucking.
+  - Ensemble Style: Traditional Iraqi Rural Ensemble (الفرقة الريفية). This
+    ensemble is stripped of lush orchestral layers and focuses purely on
+    creating a raw, loud, and acoustic environment designed for rural
+    celebrations and weddings.
+
+5. Vocal Character:
+
+  - Texture: A robust, unpolished, and earthy Baritone. Nasim Ouda possesses a
+    raw, guttural texture that is the absolute signature of Southern Iraqi rural
+    singers (Al-Tawr Al-Reefi).
+  - Emotional Delivery: Pure Farah (Joy) and Flirtation. It is an upbeat,
+    celebratory, and deeply affectionate performance. The delivery is welcoming
+    and highly danceable, completely shedding the typical Southern grief in
+    favor of pure romantic ecstasy.
+
+6. Lyrics with Tashkeel:
+
+  - Dialect: Iraqi Rural / Southern Folkloric (fast-paced and rhythmically
+    simplified for dancing, featuring the "گ" [G] for Qaf).
+
+عَلَى شَانَه عَلَى شَانَه .. أَخَلِّي الدِّنْيَا فَرْحَانَة عَلَى شَانَه عَلَى
+شَانَه .. أَحِبّ أَهْلَه وَخِلَّانَه حَبِيبِي وْيَاخِذْ عْيُونِي .. وَعَنَّه لَا
+تِبْعِدُونِي وَأَرِيدْ أَرْتَاحْ بِأَحْضَانَه .. عَلَى شَانَه عَلَى شَانَه
+أَمُوتْ أَنَا عَلَى شَانَه .. أَمُوتْ أَنَا عَلَى شَانَه الْگَمَرْ لَوْ
+بِيدِي خَلِّيتَه .. عَلَى شَانَه عَلَى شَانَه يِضَوِّي بَسْ عَلَى بِيتَه ..
+عَلَى شَانَه عَلَى شَانَه أَنَا مَا أَعِيشْ مِنْ دُونَهُ .. وَفِدْوَة عْيُونِي
+لْعْيُونَهُ
+
+(Translation context for the AI agent: "For his sake, for his sake... I will
+make the world joyous. For his sake, I love his family and friends. My love, he
+takes my eyes, do not keep me away from him. I want to rest in his embrace... I
+would die for his sake. If I had the moon in my hand, I would make it shine only
+on his house.")
+
+7. Technical Lyria Descriptor:
+
+1980s authentic Iraqi rural (Reefi) broadcast recording, fast and highly
+energetic 4/4 Chobi and rural Basta rhythm at 115 BPM. The acoustic
+instrumentation features a sharp double-reed Mutbaq, a rhythmic weeping Kamanja
+(violin), and aggressively plucked acoustic Oud, all driven by a massive,
+danceable percussion section centered around the rapid snapping of a Khashaba
+wooden drum and a heavy Daf. The scale is a bright, festive Maqam Bayati
+utilizing quarter-tones to give it an authentic Southern Iraqi flavor. A raw,
+earthy, and guttural male baritone vocal delivers joyful, flirtatious rural
+Arabic lyrics utilizing tight, bouncy glottal Tahrir (rural ornamentation). The
+emotional tone is celebratory, romantic, and highly danceable, processed with
+vintage analog cassette tape warmth, slight saturation, and an open, natural
+acoustic room reverberation.

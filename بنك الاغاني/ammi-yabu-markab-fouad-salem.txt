@@ -1,0 +1,91 @@
+tags: maqam=bayati, iqa=hacha, vocal_ornament=tahrir, gender=male, dialect=basri, era=orchestra70
+
+عمي يابو مركب — فؤاد سالم. Technical breakdown for the Lyria RAG system:
+
+Historically, this is one of the most famous upbeat Iraqi folkloric tracks of
+the 1970s. Written by the legendary poet Karim Al-Iraqi and composed by Taleb
+Ghali, the song draws heavy inspiration from the maritime culture of Basra and
+the Nahham (sailor/pearl-diver) musical heritage of the Shatt al-Arab.
+
+1. Metadata:
+
+  - Artist/Title: Fouad Salem (فؤاد سالم) - "Ammi Yabu Markab" (عمي يابو مركب)
+  - Estimated Era: Mid-to-Late 1970s (The zenith of the Iraqi Radio and
+    Television Folkloric Revival).
+
+2. Maqam & Scale Analysis:
+
+  - Primary Maqam: Maqam Bayati (D - E-half-flat - F - G - A - Bb - C). The
+    scale is utilized here in its brightest, most energetic folkloric form,
+    avoiding the deep melancholy typically associated with Southern Iraqi
+    Bayati.
+  - Melodic Behavior: The Sair (melodic path) is incredibly bouncy, cyclical,
+    and built on a call-and-response structure (singer vs. choir) that mimics a
+    sailor's work song. Rather than long, drawn-out improvisations, Fouad Salem
+    uses a staccato, rhythmic Tahrir (ornamentation). The melody continuously
+    jumps back to the tonic, keeping the momentum forward, and utilizes tight,
+    syllabic phrasing that invites the listener to clap along.
+
+3. Rhythm & Tempo (Iqa'):
+
+  - Iqa' Name: A fast, heavily swung Iraqi Basta blended with a maritime Hacha3
+    (a driving, syncopated 4/4 meter heavily associated with the sailors of
+    Basra).
+  - BPM: ~110-115 BPM.
+  - Percussion Texture: Highly energetic and communal. The rhythm is driven by
+    the sharp, cracking snare-like sound of the Khashaba (the traditional
+    Basrawi wooden drum), a heavy, resonant Daf (frame drum) on the downbeats,
+    and continuous Safga (rhythmic, syncopated communal handclapping) which
+    gives the track a massive, open-air nautical feel.
+
+4. Instrumentation:
+
+  - Lead Instruments: The Accordion is a massive standout in this arrangement,
+    giving it a distinct 1970s folkloric pop flavor. It is supported by a
+    vigorously plucked Oud and bright, rapid Qanun flourishes that punctuate the
+    end of each vocal phrase.
+  - Ensemble Style: 1970s Iraqi Radio Folkloric Orchestra (الفرقة الموسيقية
+    للإذاعة), featuring a traditional acoustic band backed by a robust,
+    mixed-gender choir answering the lead singer.
+
+5. Vocal Character:
+
+  - Texture: A powerful, earthy, and warm Baritone. Fouad Salem relies on his
+    deep chest resonance to project a voice that sounds both commanding and
+    incredibly welcoming.
+  - Emotional Delivery: Pure Farah (Joy), Nostalgia, and Patriotic Excitement.
+    The song is a joyful anthem about traveling by boat to see loved ones and
+    the homeland. The delivery is uplifting, energetic, and completely free of
+    sorrow—capturing the essence of an Iraqi sailor returning home.
+
+6. Lyrics with Tashkeel:
+
+  - Dialect: Basrawi / Southern Iraqi Folkloric (Maritime dialect, utilizing "گ"
+    [G] for Qaf and "چ" [Ch] where applicable).
+
+عَمِّي عَمِّي يَابُو مَرْكَبْ .. يَابُو شْرَاعِ الْعَالِي بِالْهَوَى يْرَفْرِفْ
+قَمِيصَكْ .. وَالْهَوَى شْگَدْ عَالِي رَايْحِينْ رَايْحِينْ رَايْحِينْ ..
+نْشُوفْ أَهَلْنَا شْلُونْهُمْ وَاللَّهْ مُشْتَاگِينْ .. مُشْتَاگِينْ نُورَ
+عْيُونْهُمْ عَمِّي ذَاكْ طْوَيْرْ جَنَّة .. جَايْ مِنْ نَخْلَةْ أَهَلْنَا
+إِكْبَرْ إِكْبَرْ يَا وَطَنَّا .. نِحْرِسَكْ يَالْغَالِي
+
+(Translation context for the AI agent: "Oh uncle, captain of the boat, with the
+high sail... your shirt flutters in the wind, and the wind is so strong. We are
+going, we are going to see our family... how are they? By God we miss them, we
+miss the light of their eyes. Uncle, that is a bird of paradise, coming from the
+palm trees of our family... grow, grow, oh our homeland, we will guard you, oh
+precious one.")
+
+7. Technical Lyria Descriptor:
+
+Mid-1970s Iraqi Basrawi folkloric radio broadcast, fast and energetic 4/4
+maritime Basta rhythm at 112 BPM. The ensemble blends traditional acoustic
+instruments featuring a prominent vintage accordion, rhythmic Oud, and rapid
+Qanun, backed by a massive percussion section driven by a snapping Khashaba
+wooden drum, heavy Daf, and constant syncopated communal handclapping. The
+melody is rooted in a bright, festive Maqam Bayati structured around a dynamic
+call-and-response between the lead singer and a mixed backing choir. A powerful,
+earthy male baritone vocal delivers joyful, uplifting Southern Iraqi Arabic
+lyrics about sailors returning to their homeland. The emotional tone is
+energetic, communal, and highly danceable, processed with authentic 1970s analog
+tape saturation and wide acoustic room reverb.

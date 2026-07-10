@@ -1,0 +1,57 @@
+tags: maqam=dasht, iqa=jorgina, vocal_ornament=tahrir_birit, gender=male, dialect=southern_baghdadi_blend, era=golden_age_70s, type=original_composition
+
+ومدري وين — أغنية أصلية (Original). Technical breakdown for the Lyria RAG system:
+
+An original soul-stirring Iraqi folk song of exile and spiritual wandering. The soul drifts between the Huwaiza marshes, the palms of the Euphrates, the jasmine of Baghdad, the gate of Imam Hussein in Karbala, and the graves of Najaf. It must feel as though it were written in the marshes of the south and performed in a dusty Baghdad café at dusk.
+
+1. Metadata:
+
+  - Artist/Title: أغنية أصلية | ومدري وين (Original | Wa Madri Wain — "And I Don't Know Where")
+  - Target Era: العصر الذهبي للأغنية العراقية (السبعينيات) — warm analog 1970s radio orchestra production, tape saturation, natural room reverb.
+
+2. Maqam & Scale Analysis:
+
+  - Primary Maqam: مقام الدشت (Dasht) — the quintessential maqam of Southern Iraqi sorrow, a branch of the Bayat family. Its defining neutral third (quarter-tone flat) gives a profoundly melancholic yet strong, earthy character — the exact color of الحنين (aching longing).
+  - Melodic Behavior (Sair): Opens as a free, unmetered Mawwal on "ومدري وين", the voice conversing with the Joza in a state of تأمل وحنين (contemplation and longing). Each "وساعه" verse begins low near the qarar (tonic) and climbs toward the 4th and 5th degrees, building tension like a separate vision or memory, then descends with a musical sigh (حسرة) back to the tonic. The Tahrir (vocal ornamentation) mimics weeping and the call of a wandering soul, using slides (zalaqat) and rapid turns (hili). The refrain "ومدري وين" always resolves unresolved — hovering on the neutral third, never fully landing, to embody "not knowing where."
+
+3. Rhythm & Tempo (Iqa'):
+
+  - Iqa' Name: جورجينة (Jorgina, 10/8) — the slow, limping, deeply sorrowful Iraqi meter. The Mawwal refrains ("ومدري وين") are free-time (no percussion); the Jorgina enters softly with each "وساعه" vision and dissolves again at each refrain.
+  - BPM: ~70-74 نبضة في الدقيقة. Never rushed.
+  - Percussion Texture: تعتمد على "الخشابة" العراقية بصوت عميق يشبه نبض القلب (deep heartbeat pulse), مع "رق" خفيف غير معدني (soft, non-metallic Riq). No drum kit, no Darbuka brightness — this is a folk lament, not a Basta.
+
+4. Instrumentation:
+
+  - Lead Instruments: الجوزة (Joza — Iraqi spike fiddle) is the primary voice, weeping and answering the singer phrase-by-phrase with a mournful, raw southern tone. العود (Oud) lays the melodic and rhythmic foundation with sparse, heavy plucks. الناي (Ney) enters only in the Baghdad verse, floating like wind over the city.
+  - Ensemble Style: تخت عراقي صغير (small acoustic Takht) — Joza, Oud, Ney, Khashaba, Riq — with a distant, restrained string pad (violins/cello) for symphonic depth in the shrine verses only. Subtle ambient texture of wind over marsh reeds and distant water beneath the intro and outro.
+
+5. Vocal Character:
+
+  - Texture: صوت رجالي عميق، أجش، دافئ (deep, husky, warm male voice) — Southern Iraqi/Baghdadi blend, textured and vulnerable, with the gravelly break (birit) of the rural Abudhiya tradition used on long-held notes.
+  - Emotional Delivery: أداء شجني بامتياز — a conversation with the self, not a polished performance. The voice cracks slightly on "الْحَنِين"; the marshes verse is earthy and grounded; the Baghdad verse lighter, almost floating; "اِبْبَاب الْحُسِين" rises with reverent spiritual ecstasy and long echo, as if sung in a shrine courtyard; the Najaf verse sinks to a near-whisper of grief (ونين) before the final "ومدري وين" fades into the wind.
+
+6. Lyrics with Tashkeel:
+
+  - Dialect: عراقي جنوبي/بغدادي مختلط (Southern marshes vocabulary with "گ" for Qaf: فوگ، گبور).
+
+وِمَدْرِي وِين
+يِسْحَلْ بْرُوحِي الْحَنِين
+سَاعَة ....
+يَمّ شَطّ الْحُوَيْزَة وَالْفُرَات وْنَخْلَة
+وِمْلُوحَةِ الطِّين
+وْسَاعَة ....
+مِحْتَامَة وِتْرَفْرِف فَوگ بَغْدَاد
+وِتْشَمّ بِالْيَاسَمِين
+وْسَاعَة ....
+تِقْرَه الْفَاتْحَة اِبْبَاب الْحُسِين
+وْسَاعَة ....
+بِگْبُور النَّجَف تِشْبَع وْنِين
+وِمَدْرِي وِين
+
+(Translation context for the AI agent: "And I don't know where... longing drags itself through my soul. One hour by the shore of Huwaiza and the Euphrates, a palm tree, and the saltiness of the clay. And one hour, restless, fluttering over Baghdad, breathing in the jasmine. And one hour reciting the Fatiha at the gate of Hussein. And one hour, among the graves of Najaf, it has its fill of moaning. And I don't know where.")
+
+7. Technical Lyria Descriptor:
+
+"أغنية عراقية فلكلورية حزينة بطيئة في مقام الدشت (72 BPM) بأسلوب السبعينيات التناظري الدافئ. تفتتح بموال حر بلا إيقاع: صوت رجالي عميق أجش يحاور آلة الجوزة الباكية فوق أصوات رياح خافتة تمر على قصب الأهوار وماء بعيد. يدخل إيقاع الجورجينة (10/8) بهدوء مع الخشابة العراقية بنبض عميق كنبض القلب ورق خفيف غير معدني، مع عود ثقيل النبرة وناي حزين ومسحة وترية بعيدة. الأداء الصوتي مليء بالتحرير والانكسار الصوتي (birit)، ينكسر على كلمة (الحنين) ويرتفع بخشوع روحي مع صدى واسع كصحن مرقد على (اِبْبَاب الْحُسِين)، ثم يهبط إلى همس الأنين في مقطع النجف. الأجواء العامة: غربة وحنين وتراب وماء، ياسمين وطين — صوت المنفى والعودة، ينتهي بتلاشي (وِمَدْرِي وِين) في الريح."
+
+English descriptor: A slow, mournful 1970s Iraqi folk lament in Maqam Dasht at 72 BPM with warm analog tape saturation. Opens as a free-time Mawwal: a deep, husky male voice in Southern Iraqi dialect conversing with a weeping Joza (Iraqi spike fiddle) over ambient wind through marsh reeds and distant river water. A slow Jorgina 10/8 rhythm enters softly on the deep heartbeat pulse of the Khashaba wooden drum with a light non-metallic Riq, under sparse heavy Oud, a mournful Ney, and a distant restrained string pad. The vocal is rich with Tahrir ornamentation and gravelly emotional breaks (birit), cracking on the word "الحنين" and rising with reverent spiritual ecstasy and long shrine-courtyard echo on "اباب الحسين", sinking to a whispered moan in the Najaf verse. The mood is exile and return, dust and water, jasmine and clay — the final refrain "ومدري وين" dissolves unresolved into the wind.

@@ -1,0 +1,39 @@
+Core Typographic Pillars
+The system divides typography into two strict functional categories: UI/Structural elements (for layout, navigation, and controls) and Data/Code blocks (for logic execution and outputs).
+
+System Sans-Serif (The UI Layer): Optimized for rapid scanning and interface utility. It uses a clean, highly legible grotesque or geometric sans-serif to handle density without compromising readability.
+
+Robust Monospace (The Data Layer): The primary workhorse of the interface. Reserved for code engines, terminal emulations, diff comparisons, and system metrics where character alignment and distinct glyph separation are mandatory.
+
+The Typographic Scale & Ruleset
+Rule 1: High-Density Scale Constraints
+To maximize visible real estate and maintain an information-dense canvas, font sizes are strictly controlled. Text must not bloom or occupy excessive vertical space.
+
+Display / Large Headers: 18px to 22px max. Restricted to primary landing views like the "Dashboard" welcome text. Font weight is set to Bold (700) or Semi-Bold (600) to stand out without requiring a massive font size increase.
+
+Section Headers / Panel Titles: 13px to 14px. Applied to sidebar headers, active workspace tabs, and widget titles. Weight is set to Medium (500) or Semi-Bold (600) for clear structural grouping.
+
+Body Text & UI Labels: 12px to 13px. Applied to standard buttons, sidebar links, settings descriptions, and generic label text. Weight is set to Regular (400).
+
+Code / Console / Metrics: 12px fixed. Applied strictly inside monospace environments (the editor canvas, the terminal stream, cost indicators, and token counters).
+
+Rule 2: Absolute Mono-Spacing for Critical Data
+Any string representing variables, numbers, system counts, or raw code blocks must utilize the fixed-width font stack. This guarantees that tables, columnar lists, and code scopes stack perfectly under vertical alignment.
+
+Example Application: Token counts (0), cost trackers ($0.0000), and file hierarchies must map to monospace glyphs to ensure layout predictability when numbers dynamically change.
+
+Rule 3: Visual Hierarchy via Weight and Color, Not Size
+In a dense developer tool, increasing font size to show importance breaks the grid. Hierarchy must instead be achieved by adjusting font weight and shifting the text color utility:
+
+Primary text uses high-contrast off-whites or deep blacks depending on the system theme mode.
+
+Secondary/Muted text drops down to low-contrast grays for descriptive items or inactive tab states.
+
+Accent text maps to the functional color hits (neon blue, green, purple) exclusively to signal status, errors, or syntax variables—never for standard reading text.
+
+Rule 4: Zero-Friction Line Heights
+Line heights (line-height) are strictly optimized to prevent overlapping text while keeping vertical gaps tight:
+
+UI Elements: Fixed at 1.4 to keep navigation links and dense item lists compact.
+
+Code Elements: Set to 1.5 or 1.6 inside the code editor to give characters slight breathing room horizontally and vertically, minimizing eye fatigue during long sessions.

@@ -1,0 +1,1679 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Codalla AI Coding Platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: projects
+    description: Project management
+  - name: filesystem
+    description: File and directory operations
+  - name: github
+    description: GitHub integration
+  - name: ai
+    description: AI chat and code actions
+  - name: apikeys
+    description: API key management
+  - name: usage
+    description: Usage and cost tracking
+  - name: settings
+    description: App settings
+  - name: criteria
+    description: Project success criteria
+  - name: memory
+    description: Project memory notes
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Projects ────────────────────────────────────────────────────────────────
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List all projects
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+
+  /projects/{projectId}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get a project by ID
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProject
+      tags: [projects]
+      summary: Update a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      summary: Delete a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  # ─── Success Criteria ────────────────────────────────────────────────────────
+  /projects/{projectId}/criteria:
+    get:
+      operationId: listCriteria
+      tags: [criteria]
+      summary: List success criteria for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of success criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SuccessCriterion"
+        "404":
+          description: Project not found
+    post:
+      operationId: createCriterion
+      tags: [criteria]
+      summary: Create a success criterion
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuccessCriterionInput"
+      responses:
+        "201":
+          description: Created criterion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessCriterion"
+        "404":
+          description: Project not found
+
+  /projects/{projectId}/criteria/{criterionId}:
+    patch:
+      operationId: updateCriterion
+      tags: [criteria]
+      summary: Update a success criterion (label, done, sortOrder)
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: criterionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuccessCriterionUpdate"
+      responses:
+        "200":
+          description: Updated criterion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessCriterion"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteCriterion
+      tags: [criteria]
+      summary: Delete a success criterion
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: criterionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  # ─── Memory Notes ─────────────────────────────────────────────────────────────
+  /projects/{projectId}/memory:
+    get:
+      operationId: listMemoryNotes
+      tags: [memory]
+      summary: List memory notes for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of memory notes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemoryNote"
+        "404":
+          description: Project not found
+    post:
+      operationId: createMemoryNote
+      tags: [memory]
+      summary: Create a memory note
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoryNoteInput"
+      responses:
+        "201":
+          description: Created memory note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryNote"
+        "404":
+          description: Project not found
+
+  /projects/{projectId}/memory/{noteId}:
+    get:
+      operationId: getMemoryNote
+      tags: [memory]
+      summary: Get a memory note by ID
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Memory note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryNote"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateMemoryNote
+      tags: [memory]
+      summary: Update a memory note
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoryNoteUpdate"
+      responses:
+        "200":
+          description: Updated memory note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemoryNote"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteMemoryNote
+      tags: [memory]
+      summary: Delete a memory note
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: noteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+
+  # ─── Filesystem ──────────────────────────────────────────────────────────────
+  /projects/{projectId}/tree:
+    get:
+      operationId: getFileTree
+      tags: [filesystem]
+      summary: Get the file tree for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File tree
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileTree"
+
+  /projects/{projectId}/files:
+    put:
+      operationId: saveFile
+      tags: [filesystem]
+      summary: Create or update a file
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FileSave"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileContent"
+
+  /file-contents:
+    get:
+      operationId: getFile
+      tags: [filesystem]
+      summary: Get file content by project and path
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: filePath
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileContent"
+        "404":
+          description: File not found
+    delete:
+      operationId: deleteFile
+      tags: [filesystem]
+      summary: Delete a file or directory
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: filePath
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /projects/{projectId}/directories:
+    post:
+      operationId: createDirectory
+      tags: [filesystem]
+      summary: Create a directory
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DirectoryInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileTree"
+
+  /projects/{projectId}/rename:
+    post:
+      operationId: renameFile
+      tags: [filesystem]
+      summary: Rename or move a file/directory
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RenameInput"
+      responses:
+        "200":
+          description: Renamed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileTree"
+
+  /projects/{projectId}/apply-file:
+    post:
+      operationId: applyFile
+      tags: [filesystem]
+      summary: Write AI-proposed file content to a project file (create or overwrite)
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplyFileInput"
+      responses:
+        "200":
+          description: File written
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileContent"
+        "400":
+          description: Invalid path
+        "404":
+          description: Project not found
+
+  # ─── GitHub ──────────────────────────────────────────────────────────────────
+  /github/repos:
+    get:
+      operationId: listGithubRepos
+      tags: [github]
+      summary: List GitHub repos for the authenticated user
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: perPage
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: List of repos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GithubRepo"
+
+  /projects/{projectId}/github/clone:
+    post:
+      operationId: cloneRepo
+      tags: [github]
+      summary: Clone a GitHub repo into a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloneInput"
+      responses:
+        "200":
+          description: Clone result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GitResult"
+
+  /projects/{projectId}/github/status:
+    get:
+      operationId: getGitStatus
+      tags: [github]
+      summary: Get git status (modified, added, deleted files)
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Git status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GitStatus"
+
+  /git-diff:
+    get:
+      operationId: getFileDiff
+      tags: [github]
+      summary: Get diff for a specific file
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: filePath
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File diff
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileDiff"
+
+  /projects/{projectId}/github/commit:
+    post:
+      operationId: commitAndPush
+      tags: [github]
+      summary: Stage, commit, and push changes
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommitInput"
+      responses:
+        "200":
+          description: Commit result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GitResult"
+
+  /projects/{projectId}/github/pull:
+    post:
+      operationId: pullRepo
+      tags: [github]
+      summary: Pull latest changes from remote
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PullInput"
+      responses:
+        "200":
+          description: Pull result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GitResult"
+
+  /projects/{projectId}/github/branches:
+    get:
+      operationId: listBranches
+      tags: [github]
+      summary: List branches in the repo
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Branch list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BranchList"
+
+  /projects/{projectId}/github/checkout:
+    post:
+      operationId: checkoutBranch
+      tags: [github]
+      summary: Checkout a branch
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckoutInput"
+      responses:
+        "200":
+          description: Checkout result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GitResult"
+
+  # ─── AI Models ───────────────────────────────────────────────────────────────
+  /ai/models:
+    get:
+      operationId: listModels
+      tags: [ai]
+      summary: List available AI models from all configured providers
+      responses:
+        "200":
+          description: Available models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiModel"
+
+  # ─── Conversations ───────────────────────────────────────────────────────────
+  /conversations:
+    get:
+      operationId: listConversations
+      tags: [ai]
+      summary: List all conversations
+      parameters:
+        - name: projectId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
+    post:
+      operationId: createConversation
+      tags: [ai]
+      summary: Create a conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationInput"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+  /conversations/{conversationId}:
+    get:
+      operationId: getConversation
+      tags: [ai]
+      summary: Get a conversation with messages
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationDetail"
+    delete:
+      operationId: deleteConversation
+      tags: [ai]
+      summary: Delete a conversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /conversations/{conversationId}/messages:
+    get:
+      operationId: listMessages
+      tags: [ai]
+      summary: List messages in a conversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+
+  # ─── AI Chat (non-streaming REST endpoint) ───────────────────────────────────
+  /ai/chat:
+    post:
+      operationId: sendChatMessage
+      tags: [ai]
+      summary: Send a chat message (non-streaming, stores in conversation)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatMessageInput"
+      responses:
+        "200":
+          description: AI reply
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  # ─── AI Code Actions ─────────────────────────────────────────────────────────
+  /ai/action:
+    post:
+      operationId: runCodeAction
+      tags: [ai]
+      summary: Run a code action (fix, explain, tests, optimize, diff)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CodeActionInput"
+      responses:
+        "200":
+          description: Action result with optional diff
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CodeActionResult"
+
+  # ─── API Keys ─────────────────────────────────────────────────────────────────
+  /api-keys:
+    get:
+      operationId: listApiKeys
+      tags: [apikeys]
+      summary: List all stored API keys (masked)
+      responses:
+        "200":
+          description: List of API keys
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ApiKey"
+    post:
+      operationId: createApiKey
+      tags: [apikeys]
+      summary: Add an API key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiKeyInput"
+      responses:
+        "201":
+          description: Created key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKey"
+
+  /api-keys/{keyId}:
+    patch:
+      operationId: updateApiKey
+      tags: [apikeys]
+      summary: Update an API key
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiKeyUpdate"
+      responses:
+        "200":
+          description: Updated key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiKey"
+    delete:
+      operationId: deleteApiKey
+      tags: [apikeys]
+      summary: Delete an API key
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  # ─── Usage / Cost ─────────────────────────────────────────────────────────────
+  /usage:
+    get:
+      operationId: listUsage
+      tags: [usage]
+      summary: List usage log entries
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: model
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Usage log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageList"
+
+  /usage/summary:
+    get:
+      operationId: getUsageSummary
+      tags: [usage]
+      summary: Get aggregated usage summary (totals, by model)
+      responses:
+        "200":
+          description: Usage summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageSummary"
+
+  # ─── Settings ─────────────────────────────────────────────────────────────────
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get app settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    put:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update app settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    # ─── Projects ──────────────────────────────────────────────────────────────
+    Project:
+      type: object
+      required: [id, name, localPath, createdAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        localPath:
+          type: string
+        gitRemoteUrl:
+          type: ["string", "null"]
+        currentBranch:
+          type: string
+        lastSynced:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        story:
+          type: ["string", "null"]
+        target:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    ProjectInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        gitRemoteUrl:
+          type: string
+        story:
+          type: string
+        target:
+          type: string
+
+    ProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        gitRemoteUrl:
+          type: string
+        currentBranch:
+          type: string
+        story:
+          type: string
+        target:
+          type: string
+
+    # ─── Success Criteria ──────────────────────────────────────────────────────
+    SuccessCriterion:
+      type: object
+      required: [id, projectId, label, done, sortOrder, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        label:
+          type: string
+        done:
+          type: boolean
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    SuccessCriterionInput:
+      type: object
+      required: [label]
+      properties:
+        label:
+          type: string
+        sortOrder:
+          type: integer
+
+    SuccessCriterionUpdate:
+      type: object
+      properties:
+        label:
+          type: string
+        done:
+          type: boolean
+        sortOrder:
+          type: integer
+
+    # ─── Memory Notes ──────────────────────────────────────────────────────────
+    MemoryNote:
+      type: object
+      required: [id, projectId, title, content, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    MemoryNoteInput:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+
+    MemoryNoteUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+
+    # ─── Apply File ────────────────────────────────────────────────────────────
+    ApplyFileInput:
+      type: object
+      required: [path, content]
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+
+    # ─── Filesystem ────────────────────────────────────────────────────────────
+    FileNode:
+      type: object
+      required: [name, path, type]
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        type:
+          type: string
+          enum: [file, directory]
+        size:
+          type: ["integer", "null"]
+        children:
+          type: ["array", "null"]
+          items:
+            $ref: "#/components/schemas/FileNode"
+
+    FileTree:
+      type: object
+      required: [projectId, nodes]
+      properties:
+        projectId:
+          type: string
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileNode"
+
+    FileContent:
+      type: object
+      required: [path, content]
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+        language:
+          type: string
+        size:
+          type: integer
+
+    FileSave:
+      type: object
+      required: [path, content]
+      properties:
+        path:
+          type: string
+        content:
+          type: string
+
+    DirectoryInput:
+      type: object
+      required: [path]
+      properties:
+        path:
+          type: string
+
+    RenameInput:
+      type: object
+      required: [oldPath, newPath]
+      properties:
+        oldPath:
+          type: string
+        newPath:
+          type: string
+
+    # ─── GitHub ────────────────────────────────────────────────────────────────
+    GithubRepo:
+      type: object
+      required: [id, name, fullName, cloneUrl, private, defaultBranch]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        fullName:
+          type: string
+        description:
+          type: ["string", "null"]
+        cloneUrl:
+          type: string
+        sshUrl:
+          type: string
+        private:
+          type: boolean
+        defaultBranch:
+          type: string
+        language:
+          type: ["string", "null"]
+        stargazersCount:
+          type: integer
+        updatedAt:
+          type: string
+
+    CloneInput:
+      type: object
+      required: [repoUrl]
+      properties:
+        repoUrl:
+          type: string
+        branch:
+          type: string
+        token:
+          type: string
+
+    CommitInput:
+      type: object
+      required: [message, token]
+      properties:
+        message:
+          type: string
+        token:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+
+    PullInput:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+
+    CheckoutInput:
+      type: object
+      required: [branch]
+      properties:
+        branch:
+          type: string
+        create:
+          type: boolean
+
+    GitResult:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        commitHash:
+          type: ["string", "null"]
+
+    GitStatus:
+      type: object
+      required: [modified, added, deleted, untracked]
+      properties:
+        modified:
+          type: array
+          items:
+            type: string
+        added:
+          type: array
+          items:
+            type: string
+        deleted:
+          type: array
+          items:
+            type: string
+        untracked:
+          type: array
+          items:
+            type: string
+        branch:
+          type: string
+
+    FileDiff:
+      type: object
+      required: [path, diff]
+      properties:
+        path:
+          type: string
+        diff:
+          type: string
+        additions:
+          type: integer
+        deletions:
+          type: integer
+
+    BranchList:
+      type: object
+      required: [branches, current]
+      properties:
+        branches:
+          type: array
+          items:
+            type: string
+        current:
+          type: string
+
+    # ─── AI ────────────────────────────────────────────────────────────────────
+    AiModel:
+      type: object
+      required: [id, name, provider]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        provider:
+          type: string
+          enum: [siliconflow, openrouter, runpod, custom]
+        contextLength:
+          type: ["integer", "null"]
+        description:
+          type: ["string", "null"]
+
+    Conversation:
+      type: object
+      required: [id, modelId, provider, createdAt]
+      properties:
+        id:
+          type: string
+        projectId:
+          type: ["string", "null"]
+        title:
+          type: ["string", "null"]
+        modelId:
+          type: string
+        provider:
+          type: string
+        messageCount:
+          type: integer
+        totalCost:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    ConversationInput:
+      type: object
+      required: [modelId, provider]
+      properties:
+        projectId:
+          type: string
+        title:
+          type: string
+        modelId:
+          type: string
+        provider:
+          type: string
+
+    ConversationDetail:
+      type: object
+      required: [id, modelId, provider, createdAt, messages]
+      properties:
+        id:
+          type: string
+        projectId:
+          type: ["string", "null"]
+        title:
+          type: ["string", "null"]
+        modelId:
+          type: string
+        provider:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+        createdAt:
+          type: string
+
+    Message:
+      type: object
+      required: [id, conversationId, role, content, createdAt]
+      properties:
+        id:
+          type: string
+        conversationId:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        tokensUsed:
+          type: ["integer", "null"]
+        cost:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+
+    ChatMessageInput:
+      type: object
+      required: [conversationId, content, modelId, provider]
+      properties:
+        conversationId:
+          type: string
+        content:
+          type: string
+        modelId:
+          type: string
+        provider:
+          type: string
+        context:
+          type: string
+        systemPrompt:
+          type: string
+
+    CodeActionInput:
+      type: object
+      required: [action, code, modelId, provider]
+      properties:
+        action:
+          type: string
+          enum: [fix, explain, tests, optimize, document]
+        code:
+          type: string
+        language:
+          type: string
+        filename:
+          type: string
+        modelId:
+          type: string
+        provider:
+          type: string
+        context:
+          type: string
+        conversationId:
+          type: string
+
+    CodeActionResult:
+      type: object
+      required: [action, explanation]
+      properties:
+        action:
+          type: string
+        explanation:
+          type: string
+        suggestedCode:
+          type: ["string", "null"]
+        diff:
+          type: ["string", "null"]
+        tokensUsed:
+          type: integer
+        cost:
+          type: number
+
+    # ─── API Keys ──────────────────────────────────────────────────────────────
+    ApiKey:
+      type: object
+      required: [id, provider, label, isActive, createdAt]
+      properties:
+        id:
+          type: string
+        provider:
+          type: string
+          enum: [siliconflow, openrouter, runpod, custom]
+        label:
+          type: string
+        maskedKey:
+          type: string
+        isActive:
+          type: boolean
+        baseUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    ApiKeyInput:
+      type: object
+      required: [provider, label, keyValue]
+      properties:
+        provider:
+          type: string
+          enum: [siliconflow, openrouter, runpod, custom]
+        label:
+          type: string
+        keyValue:
+          type: string
+        baseUrl:
+          type: string
+
+    ApiKeyUpdate:
+      type: object
+      properties:
+        label:
+          type: string
+        keyValue:
+          type: string
+        isActive:
+          type: boolean
+        baseUrl:
+          type: string
+
+    # ─── Usage ─────────────────────────────────────────────────────────────────
+    UsageEntry:
+      type: object
+      required: [id, model, provider, promptTokens, completionTokens, cost, createdAt]
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        provider:
+          type: string
+        promptTokens:
+          type: integer
+        completionTokens:
+          type: integer
+        cost:
+          type: number
+        action:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    UsageList:
+      type: object
+      required: [entries, total]
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/UsageEntry"
+        total:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+
+    ModelUsageStat:
+      type: object
+      required: [model, provider, totalTokens, totalCost, requestCount]
+      properties:
+        model:
+          type: string
+        provider:
+          type: string
+        totalTokens:
+          type: integer
+        totalCost:
+          type: number
+        requestCount:
+          type: integer
+
+    UsageSummary:
+      type: object
+      required: [totalCost, totalTokens, totalRequests, byModel]
+      properties:
+        totalCost:
+          type: number
+        totalTokens:
+          type: integer
+        totalRequests:
+          type: integer
+        byModel:
+          type: array
+          items:
+            $ref: "#/components/schemas/ModelUsageStat"
+        todayCost:
+          type: number
+        todayTokens:
+          type: integer
+
+    # ─── Settings ──────────────────────────────────────────────────────────────
+    Settings:
+      type: object
+      required: [defaultModelId, defaultProvider, theme, fontSize, tabSize, wordWrap]
+      properties:
+        defaultModelId:
+          type: string
+        defaultProvider:
+          type: string
+        theme:
+          type: string
+          enum: [dark, light, high-contrast]
+        fontSize:
+          type: integer
+        tabSize:
+          type: integer
+        wordWrap:
+          type: boolean
+        minimap:
+          type: boolean
+        sendContextWithMessages:
+          type: boolean
+        githubToken:
+          type: ["string", "null"]
+        runpodEndpoint:
+          type: ["string", "null"]
+
+    SettingsUpdate:
+      type: object
+      properties:
+        defaultModelId:
+          type: string
+        defaultProvider:
+          type: string
+        theme:
+          type: string
+          enum: [dark, light, high-contrast]
+        fontSize:
+          type: integer
+        tabSize:
+          type: integer
+        wordWrap:
+          type: boolean
+        minimap:
+          type: boolean
+        sendContextWithMessages:
+          type: boolean
+        githubToken:
+          type: string
+        runpodEndpoint:
+          type: string

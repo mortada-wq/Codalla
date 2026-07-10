@@ -1,0 +1,92 @@
+tags: maqam=kurd, iqa=basta, vocal_ornament=tahrir, gender=male, dialect=baghdadi, era=orchestra70
+
+مو بيدينا نودع عيون الحبايب — فؤاد سالم. Technical breakdown for the Lyria RAG system:
+
+Historically, "Mo B'dina" (مو بيدينا - It’s Not in Our Hands) is one of the most
+poignant songs of farewell in the Iraqi catalog. Written by the poet Nazim
+Al-Samawi while he was imprisoned in the notorious Nuqrat Al-Salman desert
+prison, it is a masterpiece of political and romantic lament disguised as a
+classic folk-pop song.
+
+1. Metadata:
+
+  - Artist/Title: Fouad Salem (فؤاد سالم) - "Mo B'dina Nwadi' Oyoun Al Habayib"
+    (مو بيدينا نودع عيون الحبايب)
+  - Estimated Era: Late 1970s - Early 1980s (Iraqi Cassette & Studio Orchestra
+    Era).
+
+2. Maqam & Scale Analysis:
+
+  - Primary Maqam: Maqam Kurd (Rooted on D: D - Eb - F - G - A - Bb - C). Unlike
+    many Southern Iraqi songs that rely on the quarter-flat of Bayati, this
+    track utilizes the minor-like, deeply sentimental intervals of Kurd
+    (featuring a prominent flattened second degree).
+  - Melodic Behavior: The Sair (melodic path) is sweeping and sorrowful. The
+    melody begins with a descending sigh of resignation, perfectly matching the
+    theme of forced farewell. Rather than using rapid, sharp trills, Fouad Salem
+    employs long, sustained vocal phrasing with slow, weeping Tahrir (vocal
+    vibrato) at the end of the phrases. The melody stretches the vowels
+    dramatically on the word "Wili" (Oh my woe) to emphasize the agony of
+    parting.
+
+3. Rhythm & Tempo (Iqa'):
+
+  - Iqa' Name: A steady, mid-tempo Iraqi 4/4 Rhythm (often played as a slightly
+    heavy, swung Wahda Mukallafa or walking Basta).
+  - BPM: ~85-90 BPM.
+  - Percussion Texture: The rhythm section is deeply grounded but not
+    aggressively festive. A heavy, muffled Daf (frame drum) anchors the
+    downbeat, while the Darbuka plays restrained syncopations. A gentle Riq
+    (tambourine) provides a constant, shimmering 16th-note background that keeps
+    the track moving forward like a steady train or a traveler's footsteps.
+
+4. Instrumentation:
+
+  - Lead Instruments: A lush Orchestral String Section (Kamanjat) carries the
+    primary melodic weight, providing long, sweeping cinematic chords. An
+    Accordion (very popular in this era for Maqam Kurd) frequently shadows the
+    vocal line, giving it a nostalgic, slightly vintage pop flavor. The Oud is
+    present but acts more as a rhythmic-chordal anchor.
+  - Ensemble Style: 1970s/80s Iraqi Studio Orchestra. This style blends
+    traditional Arabic acoustic instruments with Western symphonic strings and
+    subtle electric bass to create a rich, enveloping "cassette-era" warmth.
+
+5. Vocal Character:
+
+  - Texture: A deep, velvety, warm Baritone. Fouad Salem’s voice here is
+    exceptionally rich, resonant, and crooner-like, dripping with chest
+    resonance.
+  - Emotional Delivery: Pure Huzn (sorrow) and Tasleem (resignation). It is a
+    tear-jerking farewell. The delivery is not angry; it is exhausted, tender,
+    and intensely romantic, capturing the feeling of being forced to leave loved
+    ones behind against one's will.
+
+6. Lyrics with Tashkeel:
+
+  - Dialect: Authentic Iraqi Folkloric (with subtle Southern Nasiriyah warmth,
+    utilizing "گ" [G] for Qaf).
+
+مو بِيدِينَا نْوَدِّعْ عْيُونْ الْحَبَايِبْ .. مو بِيدِينَا وَالْعِشِگْ لَحْظَةْ
+عُمُرْ وَتْمُرْ عَلِينَا مو بِيدِينَا نْوَدِّعْ عْيُونْ الْحَبَايِبْ .. مو
+بِيدِينَا وَالْعِشِگْ لَحْظَةْ عُمُرْ وَتْمُرْ عَلِينَا يَلِّي طَعْمْ
+الْمِسْتَحَى أَعْلَى عْيُونْكُمْ وِيلِي وِيلِي وِيلِي .. شُوگِي يَذُوبْ بِينْ
+رْمُوشْكُمْ وِيلِي وِيلِي وِيلِي .. شُوگِي يَذُوبْ بِينْ رْمُوشْكُمْ وِلِيلْكُمْ
+گَمْرَة وَهَوَانَا .. مْسَهِّرِينَه مو بِيدِينَا
+
+(Translation context for the AI agent: "It is not in our hands to bid farewell
+to the eyes of our loved ones... love is but a moment of a lifetime that passes
+us by. Oh, you whose eyes hold the taste of modesty, my longing melts between
+your eyelashes.")
+
+7. Technical Lyria Descriptor:
+
+Late 1970s Iraqi studio orchestra era, mid-tempo 4/4 walking rhythm at 85 BPM.
+The instrumentation features a sweeping, cinematic string section, a nostalgic
+accordion, a rhythmic acoustic Oud, and a solid electric bassline. The
+percussion is grounded by a heavy Daf, gentle Darbuka, and a shimmering Riq. The
+scale is Maqam Kurd, utilizing a flattened second interval to create a deeply
+sentimental, minor-leaning atmosphere without heavy microtones. A rich, velvety
+male baritone vocal delivers Iraqi Arabic lyrics of heartbreak and forced
+farewell, using smooth, sustained phrasing and slow weeping vibrato. The
+emotional tone is tender, romantic, and deeply sorrowful, processed with vintage
+analog cassette warmth and wide, cinematic studio reverb.

@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Codalla — AI Coding Platform"
+version = "1.0.0"
+id = "artifacts/codalla"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24281
+
+[services.development]
+run = "pnpm --filter @workspace/codalla run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/codalla", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/codalla/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24281"
+BASE_PATH = "/"

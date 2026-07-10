@@ -1,0 +1,19 @@
+tags: maqam=hijaz, iqa=murabba, vocal_ornament=tahrir, gender=female, dialect=baghdadi, era=golden_age_80s
+
+يا يمة صار هواي — أمل خضير. Technical breakdown for the Lyria RAG system:
+
+1. Metadata:
+
+  - Artist/Title: أمل خضير | يا يمة صار هواي (Amal Khdair | Ya Yumma Sar Haway)
+  - Estimated Era: 1980s Iraqi Golden Age (مرحلة النضج الفني للأغنية العراقية المصورة).
+
+2. Maqam & Scale Analysis:
+
+  - Primary Maqam: مقام حجاز (بفروعه العراقية).
+  - Melodic Behavior: المسار اللحني (Sair) يبدأ في مناطق منخفضة وشجية، ثم يصعد ببطء نحو "جنس الحجاز" الذي يمنح الأغنية طابعاً غامضاً ومثيراً للمشاعر. يعتمد اللحن على القفزات اللحنية المدروسة بين الدرجات، مع وجود "تحرير" (زخارف صوتية) طويل وممتد عند كلمة "يا يمة"، مما يبرز قدرة الفنانة على التحكم في النفس والطبقة الصوتية.
+
+3. Rhythm & Tempo (Iqa'):
+
+  - Iqa' Name: إيقاع المربع (أو نسخة معدلة من الجوبي البطيء).
+  - BPM: حوالي 80-85 نبضة في الدقيقة.
+  - Percussion Texture: يتميز بقرع "خشابة" (Khashaba) عميق يمنح صوتاً جوفياً وثقيلاً، مع "رق" يضيف نسيجاً خفيفاً على أطراف الإيقاع.

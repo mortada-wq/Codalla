@@ -1,0 +1,285 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  /* Functional accents */
+  --color-info: hsl(var(--info));
+  --color-info-foreground: hsl(var(--info-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-purple: hsl(var(--purple));
+  --color-purple-foreground: hsl(var(--purple-foreground));
+
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+
+  --font-sans: var(--app-font-sans);
+  --font-mono: var(--app-font-mono);
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/*
+ * ══════════════════════════════════════════════════════════════════════
+ * CODALLA COLOR SYSTEM
+ *   Six-swatch brand palette — orange flame on cool neutrals.
+ *
+ *   1. #1E2733  Deep charcoal navy   → dark card    / light text
+ *   2. #E15A0D  Orange flame         → primary accent (both themes)
+ *   3. #6B8194  Steel blue           → muted foreground (both themes)
+ *   4. #B5B5B7  Neutral mid-grey     → secondary surfaces
+ *   5. #B7D0F5  Light periwinkle     → light highlights / info tint
+ *   6. #E5E5E5  Pale grey            → dark text / light muted surface
+ *
+ *   Dark background: near-black cool navy #0F1419 (deeper than the palette
+ *   card so orange really pops). Light background: icy #EFF3F9 (matches
+ *   the light brand card).
+ *
+ *   Radius: 6px    Base font size: 14px
+ * ══════════════════════════════════════════════════════════════════════
+ */
+
+:root {
+  /* ── Light mode — icy blue palette ───────────────────────────────── */
+  --background: 215 40% 96%;              /* #EFF3F9 — matches light brand card */
+  --foreground: 215 26% 15%;              /* #1E2733 — swatch #1 */
+
+  --card: 0 0% 100%;                      /* #FFFFFF — pure white lifts above icy bg */
+  --card-foreground: 215 26% 15%;
+  --card-border: 215 28% 86%;             /* soft blue-grey */
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 26% 15%;
+  --popover-border: 215 28% 86%;
+
+  --primary: 24 89% 47%;                  /* #E15A0D — swatch #2 (flame) */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 215 34% 93%;               /* light steel wash */
+  --secondary-foreground: 215 26% 15%;
+
+  --muted: 215 34% 93%;
+  --muted-foreground: 207 16% 50%;        /* #6B8194 — swatch #3 (steel blue) */
+
+  --accent: 215 34% 91%;
+  --accent-foreground: 215 26% 15%;
+
+  --destructive: 0 72% 46%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 215 28% 86%;
+  --input: 215 28% 86%;
+  --ring: 24 89% 47%;
+
+  /* Functional — pulled from the palette swatches for cohesion */
+  --info: 215 76% 84%;                    /* #B7D0F5 — swatch #5 (periwinkle) */
+  --info-foreground: 215 40% 25%;
+  --success: 158 68% 34%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 215 26% 15%;
+  --purple: 265 65% 55%;
+  --purple-foreground: 0 0% 100%;
+
+  --sidebar: 215 42% 92%;                 /* slightly deeper than bg for definition */
+  --sidebar-foreground: 215 24% 25%;
+  --sidebar-border: 215 28% 86%;
+  --sidebar-primary: 24 89% 47%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 215 34% 88%;
+  --sidebar-accent-foreground: 215 26% 15%;
+
+  /* Design tokens (shared with dark) */
+  --radius: 0.375rem;
+  --app-font-sans: 'IBM Plex Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --app-font-mono: 'IBM Plex Mono', 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+}
+
+.dark {
+  /* ── Dark mode — cool near-black navy ────────────────────────────── */
+  --background: 213 24% 8%;               /* #0F1419 — deeper than card so cards float */
+  --foreground: 0 0% 90%;                 /* #E5E5E5 — swatch #6 */
+
+  --card: 215 26% 15%;                    /* #1E2733 — swatch #1 (matches dark brand card) */
+  --card-foreground: 0 0% 90%;
+  --card-border: 213 20% 22%;             /* subtle outline */
+
+  --popover: 215 26% 15%;
+  --popover-foreground: 0 0% 90%;
+  --popover-border: 213 20% 22%;
+
+  --primary: 22 88% 50%;                  /* Slightly brighter for dark contrast */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 215 26% 15%;
+  --secondary-foreground: 0 0% 90%;
+
+  --muted: 215 24% 13%;
+  --muted-foreground: 207 16% 60%;        /* Same steel blue, brightened for dark */
+
+  --accent: 213 20% 20%;                  /* hover surface — between card and border */
+  --accent-foreground: 0 0% 90%;
+
+  --destructive: 0 70% 55%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 213 20% 22%;
+  --input: 213 20% 22%;
+  --ring: 22 88% 50%;
+
+  --info: 215 76% 72%;                    /* Periwinkle brightened for dark */
+  --info-foreground: 213 24% 8%;
+  --success: 158 68% 48%;
+  --success-foreground: 213 24% 8%;
+  --warning: 38 92% 58%;
+  --warning-foreground: 213 24% 8%;
+  --purple: 265 70% 68%;
+  --purple-foreground: 213 24% 8%;
+
+  --sidebar: 213 26% 6%;                  /* deepest — below background */
+  --sidebar-foreground: 0 0% 90%;
+  --sidebar-border: 213 20% 22%;
+  --sidebar-primary: 22 88% 50%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 213 20% 20%;
+  --sidebar-accent-foreground: 0 0% 90%;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    font-size: 14px;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    letter-spacing: -0.005em;
+    /* Subtle background gradient — matches the brand cards' vertical fade */
+    background-image:
+      radial-gradient(ellipse at top, hsl(var(--primary) / 0.04), transparent 60%),
+      linear-gradient(to bottom, hsl(var(--background)), hsl(var(--sidebar)));
+    background-attachment: fixed;
+  }
+
+  /* ── Scrollbars ─────────────────────────────────────────────────── */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-corner { background: transparent; }
+
+  /* Text selection uses the primary accent so the brand shows up in-context */
+  ::selection {
+    background: hsl(var(--primary) / 0.32);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .active-indicator {
+    @apply relative before:absolute before:left-0 before:top-1 before:bottom-1 before:w-[2px] before:rounded-full before:bg-primary before:opacity-0;
+  }
+  .active-indicator[data-active="true"] { @apply before:opacity-100; }
+
+  /* Typographic scale (Replit-density, unchanged) */
+  .type-display  { @apply text-xl font-semibold leading-[1.35] font-sans tracking-tight; }
+  .type-section  { @apply text-[15px] font-semibold leading-[1.4] font-sans; }
+  .type-label    { @apply text-[13px] font-normal leading-[1.5] font-sans; }
+  .type-meta     { @apply text-xs font-normal leading-[1.5] font-sans text-muted-foreground; }
+  .type-data     { @apply text-[13px] font-medium leading-[1.5] font-mono; }
+
+  .panel-header {
+    @apply h-9 flex items-center px-3 border-b border-border bg-sidebar text-xs font-semibold text-muted-foreground uppercase tracking-[0.06em] select-none;
+  }
+
+  .terminal-surface {
+    @apply bg-card border border-border rounded-md font-mono text-[13px];
+  }
+
+  /*
+   * ── Long-form prose (used by /terms and /privacy) ─────────────────
+   * A tightly-scoped typographic system for legal-style documents.
+   * Larger reading size, generous line-height, and clear heading hierarchy.
+   */
+  .prose-doc {
+    @apply text-[15px] leading-[1.75] text-foreground/90 font-sans;
+    max-width: 65ch;
+  }
+  .prose-doc h2 {
+    @apply text-xl font-semibold text-foreground mt-14 mb-3 scroll-mt-24 tracking-tight;
+  }
+  .prose-doc h2:first-child { @apply mt-0; }
+  .prose-doc h3 {
+    @apply text-[15px] font-semibold text-foreground mt-8 mb-2;
+  }
+  .prose-doc p { @apply my-4; }
+  .prose-doc ul { @apply my-4 pl-5 space-y-2 list-disc marker:text-muted-foreground/60; }
+  .prose-doc ol { @apply my-4 pl-5 space-y-2 list-decimal marker:text-muted-foreground/60; }
+  .prose-doc a { @apply text-primary hover:underline underline-offset-2; }
+  .prose-doc strong { @apply text-foreground font-semibold; }
+  .prose-doc code {
+    @apply font-mono text-[13px] bg-muted px-1.5 py-0.5 rounded border border-border;
+  }
+  .prose-doc hr { @apply my-10 border-border; }
+  .prose-doc blockquote {
+    @apply my-6 pl-4 border-l-2 border-primary/50 text-muted-foreground italic;
+  }
+}
