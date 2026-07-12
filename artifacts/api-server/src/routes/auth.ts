@@ -119,80 +119,6 @@ router.post("/auth/login", async (req: Request, res: Response) => {
   res.json(publicUser(user));
 });
 
-// ─── Public: Google session exchange (Emergent-managed auth) ──────────────
-// Frontend receives ?session_id=<x> from Emergent's OAuth callback,
-// and POSTs it here. We exchange it for user info, upsert the user,
-// and issue our own JWT cookies. The session_id is used ONCE.
-const googleSessionSchema = z.object({
-  sessionId: z.string().min(10),
-});
-
-router.post("/auth/google/session", async (req: Request, res: Response) => {
-  const parsed = googleSessionSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: "session_id is required" });
-    return;
-  }
-  const { sessionId } = parsed.data;
-
-  // Call Emergent's session-data endpoint to exchange the temporary session_id
-  // for the user's Google profile. This MUST happen server-side; the session_id
-  // grants one-time access and shouldn't be exposed to any other party.
-  let profile: { id: string; email: string; name: string; picture?: string };
-  try {
-    const upstream = await fetch(
-      "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
-      { headers: { "X-Session-ID": sessionId } }
-    );
-    if (!upstream.ok) {
-      const detail = await upstream.text();
-      logger.warn({ status: upstream.status, detail }, "Emergent session-data upstream error");
-      res.status(401).json({ error: "Google session could not be verified" });
-      return;
-    }
-    profile = await upstream.json();
-  } catch (err: any) {
-    logger.error({ err }, "Failed to reach Emergent auth service");
-    res.status(502).json({ error: "Google sign-in provider is unreachable" });
-    return;
-  }
-
-  const email = profile.email.trim().toLowerCase();
-
-  // Upsert: if we already know this googleId or email, reuse; else create.
-  let [user] = await db.select().from(usersTable).where(eq(usersTable.googleId, profile.id));
-  if (!user) {
-    [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
-    if (user) {
-      // Same email as an existing password-only account — link it.
-      [user] = await db.update(usersTable)
-        .set({ googleId: profile.id, avatarUrl: profile.picture ?? user.avatarUrl, updatedAt: new Date() })
-        .where(eq(usersTable.id, user.id))
-        .returning();
-    } else {
-      // Brand new user
-      const id = uuidv4();
-      [user] = await db.insert(usersTable).values({
-        id,
-        email,
-        googleId: profile.id,
-        name: profile.name,
-        avatarUrl: profile.picture ?? null,
-        emailVerified: true,
-        role: "owner",
-      }).returning();
-    }
-  }
-
-  await ensureUserSettings(user.id);
-
-  const accessToken = signAccessToken(user.id, user.email);
-  const refreshToken = signRefreshToken(user.id);
-  setAuthCookies(res, accessToken, refreshToken);
-
-  res.json(publicUser(user));
-});
-
 // ─── Public: refresh access token ─────────────────────────────────────────
 router.post("/auth/refresh", async (req: Request, res: Response) => {
   const token = req.cookies?.refresh_token;
@@ -261,7 +187,7 @@ router.patch("/auth/profile", requireAuth, async (req: Request, res: Response) =
 
 // ─── Authed: change password ──────────────────────────────────────────────
 const changePasswordSchema = z.object({
-  currentPassword: z.string().optional(),   // optional for Google-only accounts setting a password for the first time
+  currentPassword: z.string().optional(),   // optional for accounts setting a password for the first time
   newPassword: z.string().min(8, "Password must be at least 8 characters"),
 });
 

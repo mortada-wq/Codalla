@@ -7,7 +7,6 @@ import SettingsPage from "./pages/settings"
 import ModelsPage from "./pages/models"
 import NotFound from "./pages/not-found"
 import { AuthPage } from "./pages/auth"
-import { AuthCallback } from "./pages/auth-callback"
 import { ForgotPasswordPage } from "./pages/forgot-password"
 import TermsPage from "./pages/terms"
 import PrivacyPage from "./pages/privacy"
@@ -29,19 +28,7 @@ const queryClient = new QueryClient({
   },
 })
 
-/**
- * Detect the Emergent OAuth callback hash BEFORE regular routing runs.
- * If `#session_id=...` is present, we render AuthCallback synchronously
- * to avoid the AuthProvider firing /auth/me and racing the exchange.
- */
 function AppRouter() {
-  const [location] = useLocation()
-
-  // Cheaper than reading location.hash from wouter; window.location is stable enough
-  if (typeof window !== "undefined" && window.location.hash.includes("session_id=")) {
-    return <AuthCallback />
-  }
-
   return (
     <Switch>
       {/* ── Public auth routes ─────────────────────────────────────── */}

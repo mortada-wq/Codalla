@@ -84,17 +84,7 @@ export function ProfilePanel() {
   if (!user) return null
 
   const initials = (form.name || user.email).split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
-  const authMethods: Array<{ label: string; badge: "info" | "purple" }> = []
-  if (user.passwordHash === undefined) {
-    // passwordHash isn't exposed via /auth/me; presence is inferred by absence of googleId only
-  }
-  // Show the auth methods we know for sure from the payload
-  if (user.googleId) authMethods.push({ label: "Google", badge: "purple" })
-  // Email/password is always available if a passwordHash existed at some point;
-  // since we don't expose that, we display it as "Email" only if googleId is not set OR both.
-  // Simplest: show both unless we're certain user is Google-only. Backend hides passwordHash;
-  // for now if googleId is set we show Google; otherwise Email.
-  if (!user.googleId) authMethods.unshift({ label: "Email", badge: "info" })
+  const authMethods: Array<{ label: string; badge: "info" | "purple" }> = [{ label: "Email", badge: "info" }]
 
   return (
     <div className="space-y-6 pb-20">
@@ -251,11 +241,11 @@ export function ProfilePanel() {
                 </Badge>
               ))}
               <span className="text-[12px] text-muted-foreground">
-                {user.googleId ? "Signed in with Google" : "Password sign-in"}
+                Password sign-in
               </span>
             </div>
           </div>
-          <ChangePasswordSection isGoogleUser={Boolean(user.googleId)} />
+          <ChangePasswordSection />
         </CardContent>
       </Card>
 
@@ -280,7 +270,7 @@ export function ProfilePanel() {
   )
 }
 
-function ChangePasswordSection({ isGoogleUser }: { isGoogleUser: boolean }) {
+function ChangePasswordSection() {
   const { toast } = useToast()
   const [open, setOpen] = useState(false)
   const [current, setCurrent] = useState("")
@@ -306,7 +296,7 @@ function ChangePasswordSection({ isGoogleUser }: { isGoogleUser: boolean }) {
         const data = await res.json().catch(() => ({}))
         throw new Error(data?.error || "Couldn't change password")
       }
-      toast({ title: isGoogleUser ? "Password set" : "Password updated" })
+      toast({ title: "Password updated" })
       setCurrent(""); setNext(""); setConfirm(""); setOpen(false)
     } catch (err: any) {
       setError(err?.message)
@@ -318,19 +308,17 @@ function ChangePasswordSection({ isGoogleUser }: { isGoogleUser: boolean }) {
   if (!open) {
     return (
       <Button variant="outline" onClick={() => setOpen(true)} data-testid="change-password-button">
-        {isGoogleUser ? "Set a password" : "Change password"}
+        Change password
       </Button>
     )
   }
 
   return (
     <form onSubmit={submit} className="space-y-3 border border-border rounded-md p-4 bg-muted/20">
-      {!isGoogleUser && (
-        <div className="space-y-1.5">
-          <label className="text-[13px] font-medium">Current password</label>
-          <Input type="password" required value={current} onChange={e => setCurrent(e.target.value)} className="bg-background border-border" />
-        </div>
-      )}
+      <div className="space-y-1.5">
+        <label className="text-[13px] font-medium">Current password</label>
+        <Input type="password" required value={current} onChange={e => setCurrent(e.target.value)} className="bg-background border-border" />
+      </div>
       <div className="space-y-1.5">
         <label className="text-[13px] font-medium">New password</label>
         <Input type="password" required minLength={8} value={next} onChange={e => setNext(e.target.value)} className="bg-background border-border" />
@@ -344,7 +332,7 @@ function ChangePasswordSection({ isGoogleUser }: { isGoogleUser: boolean }) {
         <Button type="button" variant="ghost" onClick={() => { setOpen(false); setError(null); setCurrent(""); setNext(""); setConfirm("") }} disabled={busy}>Cancel</Button>
         <Button type="submit" disabled={busy}>
           {busy && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
-          {busy ? "Saving…" : isGoogleUser ? "Set password" : "Update password"}
+          {busy ? "Saving…" : "Update password"}
         </Button>
       </div>
     </form>
