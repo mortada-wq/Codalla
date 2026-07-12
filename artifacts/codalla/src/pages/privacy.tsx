@@ -48,7 +48,6 @@ export default function PrivacyPage() {
       <ul>
         <li>Email address, display name, and password hash (bcrypt — we never see your plain password);</li>
         <li>Optional profile fields you fill in: avatar URL, bio, GitHub handle, timezone, organization name;</li>
-        <li>If you sign in with Google: your Google account ID, name, email, and profile picture URL (returned to us by Google after you consent);</li>
         <li>Role and org membership (currently &ldquo;owner&rdquo; for all accounts).</li>
       </ul>
 
@@ -100,7 +99,6 @@ export default function PrivacyPage() {
         <li><strong>Infrastructure providers</strong> — our cloud host and database provider process data on our behalf under written data-processing agreements.</li>
         <li><strong>Payment processor</strong> — Stripe (see <a href="https://stripe.com/privacy" target="_blank" rel="noreferrer">stripe.com/privacy</a>) processes payments; we exchange your customer ID, plan, and email with Stripe.</li>
         <li><strong>AI model providers you configure</strong> — see the next section.</li>
-        <li><strong>Authentication provider</strong> — if you sign in with Google, Google returns your profile data to us. See <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Google&apos;s privacy policy</a>.</li>
         <li><strong>Legal or safety recipients</strong> — regulators, law enforcement, or others where we are legally compelled or where disclosure is necessary to prevent imminent harm.</li>
       </ul>
 

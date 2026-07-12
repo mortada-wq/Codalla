@@ -3,14 +3,11 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
 // ─── Users ───────────────────────────────────────────────────────────────────
-// A user can authenticate via email/password OR Google OAuth (or both).
-// passwordHash is nullable — a Google-only account has no password.
-// googleId is nullable — an email-only account has no Google link.
+// Users authenticate via email/password.
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
   email: text("email").notNull().unique(),
-  passwordHash: text("password_hash"),                    // bcrypt hash (null for Google-only)
-  googleId: text("google_id").unique(),                   // Google sub / user id (null for email-only)
+  passwordHash: text("password_hash"),                    // bcrypt hash
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
   bio: text("bio"),

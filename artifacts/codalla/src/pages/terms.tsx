@@ -53,7 +53,7 @@ export default function TermsPage() {
       </p>
 
       <h2 id="accounts">3. Your Account</h2>
-      <p>You may sign in using email + password or Google OAuth. You agree to:</p>
+      <p>You may sign in using email + password. You agree to:</p>
       <ul>
         <li>Provide accurate, current, and complete information;</li>
         <li>Keep your password confidential and choose one that is not shared with any other service;</li>
@@ -101,7 +101,7 @@ export default function TermsPage() {
       <h2 id="third-parties">6. Third-Party Services</h2>
       <p>
         The Service integrates with third-party providers, including but not limited to: OpenRouter, SiliconFlow,
-        RunPod, GitHub, Google, and Stripe. Your use of those services is governed by the respective providers&apos;
+        RunPod, GitHub, and Stripe. Your use of those services is governed by the respective providers&apos;
         terms and privacy policies. Codalla is not responsible for the availability, accuracy, or content of any
         third-party service.
       </p>
