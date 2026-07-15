@@ -21,6 +21,38 @@ const router: IRouter = Router();
 
 const PROJECTS_BASE = path.join(process.cwd(), "codalla-projects");
 
+// Folders that may be attached as projects (e.g. shared datasets on the
+// server, a cloud-synced mount). Comma-separated absolute paths; empty means
+// attaching existing folders is disabled.
+const DATA_ROOTS = (process.env["CODALLA_DATA_ROOTS"] ?? "")
+  .split(",").map((s) => s.trim()).filter(Boolean).map((p) => path.resolve(p));
+
+function isManagedPath(p: string): boolean {
+  const resolved = path.resolve(p);
+  return resolved.startsWith(path.resolve(PROJECTS_BASE) + path.sep);
+}
+
+// Resolves symlinks so an attacker can't link out of an allowed root.
+function resolveAttachablePath(input: string): { path: string } | { error: string } {
+  if (DATA_ROOTS.length === 0) {
+    return { error: "Attaching existing folders is disabled. Set CODALLA_DATA_ROOTS on the server to enable it." };
+  }
+  let real: string;
+  try {
+    real = fs.realpathSync(path.resolve(input));
+  } catch {
+    return { error: `Folder does not exist on the server: ${input}` };
+  }
+  if (!fs.statSync(real).isDirectory()) {
+    return { error: "The given path is a file, not a folder" };
+  }
+  const allowed = DATA_ROOTS.some((root) => real === root || real.startsWith(root + path.sep));
+  if (!allowed) {
+    return { error: "That folder is outside the allowed data roots (CODALLA_DATA_ROOTS)" };
+  }
+  return { path: real };
+}
+
 function ensureProjectDir(localPath: string) {
   if (!fs.existsSync(localPath)) fs.mkdirSync(localPath, { recursive: true });
 }
@@ -68,6 +100,36 @@ router.post("/projects", async (req, res): Promise<void> => {
   }
 
   const id = uuidv4();
+
+  // Attach an existing server folder (shared datasets, cloud mounts) instead
+  // of creating a managed project directory. Git clone still works the same
+  // for repo-backed projects; the two options are mutually exclusive.
+  if (parsed.data.localPath) {
+    if (parsed.data.gitRemoteUrl) {
+      res.status(400).json({ error: "Choose either a repository URL or a server folder, not both" });
+      return;
+    }
+    const resolved = resolveAttachablePath(parsed.data.localPath);
+    if ("error" in resolved) {
+      res.status(400).json({ error: resolved.error });
+      return;
+    }
+    const [project] = await db.insert(projectsTable).values({
+      id,
+      userId: req.user!.id,
+      name: parsed.data.name,
+      localPath: resolved.path,
+      gitRemoteUrl: null,
+      description: parsed.data.description ?? null,
+      story: parsed.data.story ?? null,
+      target: parsed.data.target ?? null,
+      currentBranch: git(["branch", "--show-current"], resolved.path).stdout || "main",
+      lastSynced: null,
+    }).returning();
+    res.status(201).json(CreateProjectResponse.parse(fmt(project)));
+    return;
+  }
+
   const localPath = path.join(PROJECTS_BASE, id);
   ensureProjectDir(localPath);
 
@@ -185,8 +247,10 @@ router.delete("/projects/:projectId", async (req, res): Promise<void> => {
     return;
   }
 
+  // Only remove directories Codalla created itself. Attached folders
+  // (shared datasets under CODALLA_DATA_ROOTS) must survive project deletion.
   try {
-    if (fs.existsSync(project.localPath)) {
+    if (isManagedPath(project.localPath) && fs.existsSync(project.localPath)) {
       fs.rmSync(project.localPath, { recursive: true, force: true });
     }
   } catch { /* best-effort */ }

@@ -64,6 +64,8 @@ import type {
   SuccessCriterion,
   SuccessCriterionInput,
   SuccessCriterionUpdate,
+  UploadFile201,
+  UploadFileParams,
   UsageList,
   UsageSummary
 } from './api.schemas';
@@ -1595,6 +1597,85 @@ export const useCreateDirectory = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getCreateDirectoryMutationOptions(options));
+    }
+
+export const getUploadFileUrl = (params: UploadFileParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/upload?${stringifiedParams}` : `/api/upload`
+}
+
+/**
+ * @summary Upload a file (raw request body) to a path inside a project
+ */
+export const uploadFile = async (uploadFileBody: Blob,
+    params: UploadFileParams, options?: RequestInit): Promise<UploadFile201> => {
+
+  return customFetch<UploadFile201>(getUploadFileUrl(params),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/octet-stream', ...options?.headers },
+    body: uploadFileBody
+  }
+);}
+
+
+
+
+
+export const getUploadFileMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadFile>>, TError,{data: BodyType<Blob>;params: UploadFileParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadFile>>, TError,{data: BodyType<Blob>;params: UploadFileParams}, TContext> => {
+
+const mutationKey = ['uploadFile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadFile>>, {data: BodyType<Blob>;params: UploadFileParams}> = (props) => {
+          const {data,params} = props ?? {};
+
+          return  uploadFile(data,params,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadFileMutationResult = NonNullable<Awaited<ReturnType<typeof uploadFile>>>
+    export type UploadFileMutationBody = BodyType<Blob>
+    export type UploadFileMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Upload a file (raw request body) to a path inside a project
+ */
+export const useUploadFile = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadFile>>, TError,{data: BodyType<Blob>;params: UploadFileParams}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof uploadFile>>,
+        TError,
+        {data: BodyType<Blob>;params: UploadFileParams},
+        TContext
+      > => {
+      return useMutation(getUploadFileMutationOptions(options));
     }
 
 export const getRenameFileUrl = (projectId: string,) => {

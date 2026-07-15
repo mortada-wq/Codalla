@@ -32,6 +32,8 @@ export interface ProjectInput {
   name: string;
   description?: string;
   gitRemoteUrl?: string;
+  /** Attach an existing folder on the server (must be under a CODALLA_DATA_ROOTS entry) instead of creating a new project directory */
+  localPath?: string;
   story?: string;
   target?: string;
 }
@@ -449,6 +451,16 @@ filePath: string;
 export type DeleteFileParams = {
 projectId: string;
 filePath: string;
+};
+
+export type UploadFileParams = {
+projectId: string;
+filePath: string;
+};
+
+export type UploadFile201 = {
+  path: string;
+  size: number;
 };
 
 export type ListGithubReposParams = {

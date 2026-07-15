@@ -10,6 +10,8 @@ export interface ProjectInput {
   name: string;
   description?: string;
   gitRemoteUrl?: string;
+  /** Attach an existing folder on the server (must be under a CODALLA_DATA_ROOTS entry) instead of creating a new project directory */
+  localPath?: string;
   story?: string;
   target?: string;
 }

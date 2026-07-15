@@ -71,6 +71,36 @@ export default function EditorPage() {
   const handleRename = (path: string, name: string) => setFileDialog({ kind: 'rename', oldPath: path, name })
   const handleDeleteFile = (path: string, name: string, isDir: boolean) => setFileDialog({ kind: 'delete', path, name, isDir })
 
+  // Upload real files (datasets, assets) into the project root
+  const uploadInputRef = useRef<HTMLInputElement>(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const handleUpload = async (files: FileList | null) => {
+    if (!files?.length) return
+    setIsUploading(true)
+    const failed: string[] = []
+    for (const file of Array.from(files)) {
+      try {
+        const res = await fetch(
+          `/api/upload?projectId=${encodeURIComponent(projectId!)}&filePath=${encodeURIComponent(file.name)}`,
+          { method: "POST", credentials: "include", headers: { "Content-Type": "application/octet-stream" }, body: file },
+        )
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          throw new Error(data?.error || `HTTP ${res.status}`)
+        }
+      } catch {
+        failed.push(file.name)
+      }
+    }
+    setIsUploading(false)
+    if (uploadInputRef.current) uploadInputRef.current.value = ""
+    queryClient.invalidateQueries({ queryKey: getGetFileTreeQueryKey(projectId!) })
+    const okCount = files.length - failed.length
+    toast(failed.length
+      ? { title: `Uploaded ${okCount} of ${files.length} files`, description: `Failed: ${failed.join(", ")}`, variant: "destructive" }
+      : { title: `Uploaded ${okCount} file${okCount === 1 ? "" : "s"}` })
+  }
+
   // Auto-select latest conversation
   useEffect(() => {
     if (conversations && conversations.length > 0 && !activeConversationId) {
@@ -228,8 +258,18 @@ export default function EditorPage() {
                     <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuItem onClick={() => handleNewFile('')}>New File</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleNewFolder('')}>New Folder</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => uploadInputRef.current?.click()} disabled={isUploading} data-testid="upload-files">
+                        {isUploading ? "Uploading…" : "Upload Files…"}
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+                  <input
+                    ref={uploadInputRef}
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => handleUpload(e.target.files)}
+                  />
                 </div>
               </div>
               <ScrollArea className="flex-1">

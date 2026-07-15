@@ -42,6 +42,7 @@ export const CreateProjectBody = zod.object({
   "name": zod.string(),
   "description": zod.string().optional(),
   "gitRemoteUrl": zod.string().optional(),
+  "localPath": zod.string().optional().describe('Attach an existing folder on the server (must be under a CODALLA_DATA_ROOTS entry) instead of creating a new project directory'),
   "story": zod.string().optional(),
   "target": zod.string().optional()
 })
@@ -380,6 +381,20 @@ export const CreateDirectoryResponse = zod.object({
   "size": zod.number().nullish(),
   "children": zod.array(zod.unknown()).nullish()
 }))
+})
+
+
+/**
+ * @summary Upload a file (raw request body) to a path inside a project
+ */
+export const UploadFileQueryParams = zod.object({
+  "projectId": zod.coerce.string(),
+  "filePath": zod.coerce.string()
+})
+
+export const UploadFileResponse = zod.object({
+  "path": zod.string(),
+  "size": zod.number()
 })
 
 

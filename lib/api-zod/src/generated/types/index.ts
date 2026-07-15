@@ -60,6 +60,8 @@ export * from './settingsUpdateTheme';
 export * from './successCriterion';
 export * from './successCriterionInput';
 export * from './successCriterionUpdate';
+export * from './uploadFile201';
+export * from './uploadFileParams';
 export * from './usageEntry';
 export * from './usageList';
 export * from './usageSummary';

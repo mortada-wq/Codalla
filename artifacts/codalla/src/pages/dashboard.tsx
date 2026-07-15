@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, Search, Folder, GitBranch, Clock, ArrowRight, Trash2, Github, ChevronDown, Loader2, MessageSquare, Sparkles, DollarSign, Activity, Cpu, FileText, Wand2 } from "lucide-react"
+import { Plus, Search, Folder, FolderOpen, GitBranch, Clock, ArrowRight, Trash2, Github, ChevronDown, Loader2, MessageSquare, Sparkles, DollarSign, Activity, Cpu, FileText, Wand2 } from "lucide-react"
 import { formatCurrency, formatNumber, formatDate } from "@/lib/utils"
 import { useListProjects, useGetUsageSummary, useDeleteProject, useCreateProject, useListConversations, getListProjectsQueryKey, useGetSettings } from "@workspace/api-client-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -25,6 +25,7 @@ const projectSchema = z.object({
   description: z.string().optional(),
   gitRemoteUrl: z.string().url("Must be a valid URL").optional().or(z.literal('')),
   githubToken: z.string().optional(),
+  localPath: z.string().optional(),
   aiPrompt: z.string().optional(),
   story: z.string().optional(),
   target: z.string().optional(),
@@ -317,7 +318,7 @@ function EmptyProjectsState({ hasSearch }: { hasSearch: boolean }) {
 // ═════════════════════════════════════════════════════════════════════
 // CREATE PROJECT DIALOG — tri-mode: blank | GitHub | Generate with AI
 // ═════════════════════════════════════════════════════════════════════
-type ProjectMode = "blank" | "github" | "ai"
+type ProjectMode = "blank" | "github" | "ai" | "folder"
 
 function CreateProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
   const [open, setOpen] = useState(false)
@@ -332,13 +333,15 @@ function CreateProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
 
   const form = useForm<z.infer<typeof projectSchema>>({
     resolver: zodResolver(projectSchema),
-    defaultValues: { name: "", description: "", gitRemoteUrl: "", githubToken: "", aiPrompt: "", story: "", target: "" },
+    defaultValues: { name: "", description: "", gitRemoteUrl: "", githubToken: "", localPath: "", aiPrompt: "", story: "", target: "" },
   })
 
   const gitUrl = form.watch("gitRemoteUrl")?.trim() ?? ""
   const hasGitUrl = gitUrl.length > 0
   const aiPrompt = form.watch("aiPrompt")?.trim() ?? ""
   const hasAiPrompt = aiPrompt.length >= 3
+  const localPath = form.watch("localPath")?.trim() ?? ""
+  const hasLocalPath = localPath.startsWith("/")
 
   const reset = () => {
     form.reset()
@@ -374,6 +377,7 @@ function CreateProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
       description: values.description?.trim() || undefined,
       gitRemoteUrl: mode === "github" ? (values.gitRemoteUrl?.trim() || undefined) : undefined,
       githubToken:  mode === "github" ? (values.githubToken?.trim() || undefined) : undefined,
+      localPath:    mode === "folder" ? (values.localPath?.trim() || undefined) : undefined,
       story: values.story?.trim() || undefined,
       target: values.target?.trim() || undefined,
     } as any }, {
@@ -398,7 +402,7 @@ function CreateProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
           }
         } else {
           toast({
-            title: mode === "github" ? "Repository cloned" : "Project created",
+            title: mode === "github" ? "Repository cloned" : mode === "folder" ? "Folder attached" : "Project created",
             description: "Opening the editor…",
           })
         }
@@ -421,13 +425,14 @@ function CreateProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
 
   const primaryLabel = (() => {
     if (phase === "generating") return "Generating files with AI…"
-    if (phase === "creating") return mode === "github" ? "Cloning repository…" : "Creating project…"
+    if (phase === "creating") return mode === "github" ? "Cloning repository…" : mode === "folder" ? "Attaching folder…" : "Creating project…"
     if (mode === "github") return "Create & clone repository"
     if (mode === "ai") return "Create & generate"
+    if (mode === "folder") return "Attach folder"
     return "Create project"
   })()
 
-  const canSubmit = !isBusy && form.formState.isValid !== false && (mode !== "ai" || hasAiPrompt)
+  const canSubmit = !isBusy && form.formState.isValid !== false && (mode !== "ai" || hasAiPrompt) && (mode !== "folder" || hasLocalPath)
 
   return (
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset() }}>
@@ -446,15 +451,17 @@ function CreateProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
             {mode === "blank" && "Start from scratch and add files as you go."}
             {mode === "github" && "Pull an existing repository into a fresh workspace."}
             {mode === "ai" && "Describe what you want to build — the AI drafts the initial files for you."}
+            {mode === "folder" && "Work directly on an existing folder on the server — datasets, shared drives, cloud mounts."}
           </DialogDescription>
         </DialogHeader>
 
         {/* ── Mode selector ─────────────────────────────────────── */}
         <div className="px-6 pt-2 pb-4">
-          <div className="grid grid-cols-3 gap-1 p-1 bg-muted/50 border border-border rounded-md">
+          <div className="grid grid-cols-4 gap-1 p-1 bg-muted/50 border border-border rounded-md">
             <ModeButton active={mode === "blank"} onClick={() => setMode("blank")} icon={FileText} label="Blank" testId="mode-blank" />
             <ModeButton active={mode === "github"} onClick={() => setMode("github")} icon={Github} label="From GitHub" testId="mode-github" />
             <ModeButton active={mode === "ai"} onClick={() => setMode("ai")} icon={Wand2} label="With AI" testId="mode-ai" />
+            <ModeButton active={mode === "folder"} onClick={() => setMode("folder")} icon={FolderOpen} label="Server folder" testId="mode-folder" />
           </div>
         </div>
 
@@ -539,6 +546,36 @@ function CreateProjectDialog({ trigger }: { trigger?: React.ReactNode }) {
                     )}
                   />
                 )}
+              </div>
+            )}
+
+            {mode === "folder" && (
+              <div className="px-6 py-5 border-y border-border bg-muted/40 space-y-4">
+                <div className="flex items-center gap-2">
+                  <FolderOpen className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Attach a server folder</span>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="localPath"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-[13px] font-medium">Folder path on the server</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <FolderOpen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          <Input placeholder="/data/training-sets/run-42" className="bg-background border-border pl-9 font-mono text-[13px]" {...field} />
+                        </div>
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                        Must be an absolute path under an allowed data root (ask your admin about{" "}
+                        <code className="font-mono text-[11px] bg-muted px-1 py-0.5 rounded">CODALLA_DATA_ROOTS</code>).
+                        The folder is edited in place and is never deleted when the project is removed.
+                      </p>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
               </div>
             )}
 

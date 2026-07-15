@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import express, { Router, type IRouter } from "express";
 import { and, eq } from "drizzle-orm";
 import { db, projectsTable } from "@workspace/db";
 import {
@@ -19,6 +19,8 @@ import {
   ApplyFileParams,
   ApplyFileBody,
   ApplyFileResponse,
+  UploadFileQueryParams,
+  UploadFileResponse,
 } from "@workspace/api-zod";
 import fs from "fs";
 import path from "path";
@@ -127,6 +129,36 @@ router.get("/projects/:projectId/tree", async (req, res): Promise<void> => {
 
   const nodes = buildFileTree(localPath);
   res.json(GetFileTreeResponse.parse({ projectId: params.data.projectId, nodes }));
+});
+
+// POST /upload?projectId=&filePath= — raw request body is the file content.
+// Binary-safe (datasets, images); caps at 200 MB per file.
+router.post("/upload", express.raw({ type: "*/*", limit: "200mb" }), async (req, res): Promise<void> => {
+  const parsed = UploadFileQueryParams.safeParse(req.query);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.message });
+    return;
+  }
+
+  const localPath = await getProjectPath(parsed.data.projectId, req.user!.id);
+  if (!localPath) {
+    res.status(404).json({ error: "Project not found" });
+    return;
+  }
+
+  const filePath = safePath(localPath, parsed.data.filePath);
+  if (!filePath) {
+    res.status(400).json({ error: "Invalid file path" });
+    return;
+  }
+
+  const body: Buffer = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, body);
+  res.status(201).json(UploadFileResponse.parse({
+    path: parsed.data.filePath,
+    size: body.length,
+  }));
 });
 
 // GET /file-contents?projectId=&filePath=

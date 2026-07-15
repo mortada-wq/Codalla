@@ -473,6 +473,45 @@ paths:
               schema:
                 $ref: "#/components/schemas/FileTree"
 
+  # Query-only params (like /file-contents) — a path param + query params on
+  # one operation makes orval emit two colliding *Params exports.
+  /upload:
+    post:
+      operationId: uploadFile
+      tags: [filesystem]
+      summary: Upload a file (raw request body) to a path inside a project
+      parameters:
+        - name: projectId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: filePath
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "201":
+          description: Uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [path, size]
+                properties:
+                  path:
+                    type: string
+                  size:
+                    type: number
+
   /projects/{projectId}/rename:
     post:
       operationId: renameFile
@@ -1059,6 +1098,9 @@ components:
           type: string
         gitRemoteUrl:
           type: string
+        localPath:
+          type: string
+          description: Attach an existing folder on the server (must be under a CODALLA_DATA_ROOTS entry) instead of creating a new project directory
         story:
           type: string
         target:
