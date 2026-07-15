@@ -1,6 +1,6 @@
 # Codalla
 
-Single-user AI coding IDE: create projects (optionally cloned from GitHub), browse/edit files with Monaco, and chat with AI models about the code. No authentication — all data belongs to one implicit local user.
+Team AI coding IDE: create projects (optionally cloned from GitHub), browse/edit files with Monaco, and chat with AI models about the code. Sign-in is Google-only (no passwords, no auth vendor); each user's projects, keys, and usage are scoped to their account.
 
 ## Run & Operate
 
@@ -11,6 +11,7 @@ Single-user AI coding IDE: create projects (optionally cloned from GitHub), brow
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
+- Auth env: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `APP_URL` (browser origin; the Google OAuth client must allow `${APP_URL}/api/auth/google/callback` as a redirect URI), `ALLOWED_EMAIL_DOMAINS` and/or `ALLOWED_EMAILS` (comma-separated team gate) — or `AUTH_DISABLED=true` to skip sign-in entirely for solo dev
 
 ## Stack
 
@@ -31,7 +32,7 @@ Single-user AI coding IDE: create projects (optionally cloned from GitHub), brow
 
 ## Architecture decisions
 
-- **No auth by design.** A single implicit `local` user row (created lazily by `artifacts/api-server/src/middleware/auth.ts`) anchors the `userId` FKs on all data tables. Multi-user is a non-goal.
+- **Google-only sign-in, no auth vendor.** Standard OAuth code flow via `google-auth-library` (`artifacts/api-server/src/routes/auth.ts`); sessions are DB rows (`sessions` table, SHA-256 of a random cookie token) so revoking = deleting a row. Team access is gated by `ALLOWED_EMAIL_DOMAINS`/`ALLOWED_EMAILS`. `AUTH_DISABLED=true` falls back to a single implicit `local` user for solo dev.
 - Frontend talks to the API same-origin via the Vite `/api` proxy → `localhost:4000`.
 - Git operations use `spawnSync` (never `execSync`); filesystem access goes through a separator-boundary `safePath` check.
 

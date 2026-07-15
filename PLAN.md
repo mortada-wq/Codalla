@@ -1,36 +1,50 @@
 # Plan: make Codalla work
 
-Codalla is a single-user, personal AI coding IDE. It has **no authentication,
-no billing, and no hosted-deploy config** — those were removed deliberately.
-Every request is attributed to one implicit `local` user row that the API
-creates lazily on first request.
+Codalla is a team AI coding IDE with deliberately simple sign-in: **Google
+OAuth only** — no passwords, no Clerk, no Firebase. Sessions are plain DB
+rows behind an httpOnly cookie; team access is gated by an email-domain
+allowlist. For solo development, `AUTH_DISABLED=true` skips sign-in and
+attributes everything to one implicit `local` user. Billing and hosted-deploy
+config remain out of scope.
 
-## Current state (after cleanup)
+## Google sign-in setup (one-time, ~5 minutes)
 
-- **Removed**: all auth code (JWT, bcrypt, login/register/forgot-password UI,
-  profile panel, protected routes), Railway config, Emergent OAuth,
-  test credentials, and unrelated repo content.
+1. In Google Cloud Console → APIs & Services → Credentials, create an
+   **OAuth client ID** of type "Web application".
+2. Add `${APP_URL}/api/auth/google/callback` to Authorized redirect URIs
+   (for dev: `http://localhost:5173/api/auth/google/callback`).
+3. Set env on the API server: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
+   `APP_URL`, and `ALLOWED_EMAIL_DOMAINS=yourcompany.com` (and/or
+   `ALLOWED_EMAILS=a@x.com,b@y.com`).
+4. That's it — first sign-in creates the user row; revoke any session by
+   deleting its row in the `sessions` table.
+
+## Current state
+
+- **Removed earlier**: password/JWT auth, Emergent OAuth, Stripe plans,
+  Railway config, test credentials, and unrelated repo content.
+- **Auth now**: Google-only OAuth (`google-auth-library`), DB-backed
+  sessions, email-domain team gating, per-user data scoping on every route
+  (verified: users only see their own projects/keys/usage).
 - **Working**: full workspace `pnpm run typecheck` and `pnpm run build` pass;
-  `pnpm install --frozen-lockfile` passes; API server boots and serves
-  `/api/healthz` without a database.
-- **Data model**: unchanged apart from dropping auth-only tables/columns
-  (`login_attempts`, `password_reset_tokens`, `password_hash`, `google_id`,
-  `email_verified`). All data tables still key off `users.id` via the
-  implicit `local` user.
+  chat vibe-coding loop verified end-to-end in a real browser (streamed
+  replies, file blocks, usage accounting); sign-in/sign-out lifecycle
+  verified end-to-end with sessions revoked on logout.
 
-## Phase 1 — run it locally (the only blocker is Postgres)
+## Phase 1 — run it
 
 1. Start a PostgreSQL 15+ instance and set `DATABASE_URL`, e.g.
    `postgres://postgres:postgres@localhost:5432/codalla`.
 2. Push the schema: `pnpm --filter @workspace/db run push`.
-3. Start the API: `pnpm --filter @workspace/api-server run dev`
+3. Configure Google sign-in (section above), or export `AUTH_DISABLED=true`
+   to skip it while developing alone.
+4. Start the API: `pnpm --filter @workspace/api-server run dev`
    (defaults to port 4000, matching the Vite proxy; override with `PORT`).
-4. Start the frontend: `pnpm --filter @workspace/codalla run dev`
-   and open the printed URL. The app loads straight into the Dashboard —
-   no login.
-5. In **Settings → API keys**, add a provider key (SiliconFlow / OpenRouter /
+5. Start the frontend: `pnpm --filter @workspace/codalla run dev`
+   and open the printed URL. Sign in with a team Google account.
+6. In **Settings → API keys**, add a provider key (SiliconFlow / OpenRouter /
    RunPod / custom OpenAI-compatible). AI chat won't respond without one.
-6. Create a project (optionally from a GitHub URL; private repos need a PAT
+7. Create a project (optionally from a GitHub URL; private repos need a PAT
    in Settings → General → GitHub token) and open it in the editor.
 
 ## Phase 2 — make it robust
@@ -62,7 +76,8 @@ creates lazily on first request.
 
 ## Non-goals (removed on purpose — do not reintroduce casually)
 
-- Authentication / multi-user (schema keeps `users` only as an FK anchor).
+- Password auth, Clerk, Firebase, or any auth vendor — sign-in stays
+  Google-only and boring.
 - Stripe billing.
 - Railway or any specific hosting config; deployment is "run the api-server
   next to Postgres".

@@ -3,11 +3,13 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
 // ─── Users ───────────────────────────────────────────────────────────────────
-// Codalla is a single-user personal tool with no authentication. One implicit
-// "local" user row anchors the userId FKs on all data tables.
+// Sign-in is Google-only (googleId = Google's stable `sub` claim). With
+// AUTH_DISABLED=true the server instead uses one implicit "local" user row,
+// which has no googleId — hence the column stays nullable.
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
   email: text("email").notNull().unique(),
+  googleId: text("google_id").unique(),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
   bio: text("bio"),
@@ -19,6 +21,17 @@ export const usersTable = pgTable("users", {
 export const insertUserSchema = createInsertSchema(usersTable).omit({ createdAt: true, updatedAt: true });
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof usersTable.$inferSelect;
+
+// ─── Sessions ─────────────────────────────────────────────────────────────────
+// Server-side sessions: the browser cookie holds a random token, the DB holds
+// its SHA-256 hash. Deleting a row signs that browser out immediately.
+export const sessionsTable = pgTable("sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type Session = typeof sessionsTable.$inferSelect;
 
 // ─── Projects ────────────────────────────────────────────────────────────────
 export const projectsTable = pgTable("projects", {
