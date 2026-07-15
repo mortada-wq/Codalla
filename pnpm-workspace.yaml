@@ -68,6 +68,13 @@ catalog:
 
 autoInstallPeers: false
 
+packageExtensions:
+  # resolvers imports zod without declaring it; without this, pnpm's fallback
+  # hoisting can link its types against a different zod major than the app's
+  "@hookform/resolvers":
+    peerDependencies:
+      zod: "*"
+
 onlyBuiltDependencies:
   - '@swc/core'
   - esbuild

@@ -1,5 +1,10 @@
 # Codalla PRD
 
+> **Superseded in part (2026-07-15):** authentication, Google/Emergent OAuth,
+> and Stripe billing were removed from scope. Codalla is a single-user
+> personal tool with an implicit local user. See `PLAN.md` for the current
+> roadmap; auth/billing sections below are kept as history only.
+
 ## Original problem statement
 Codalla — an AI-first "vibe coding" IDE. Built on a pnpm monorepo the user provided (Express + PostgreSQL/Drizzle + React 19/Vite + IBM Plex fonts + Replit-inspired dark UI). Progressive iterations: fix popups, apply logo blue, match Replit design, add real GitHub clone, consolidate keys+usage under Settings, apply UX principles, rebuild Models page with vibe-coding pipeline, and add strong user profile + Stripe billing.
 

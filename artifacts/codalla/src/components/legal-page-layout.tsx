@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link, useLocation } from "wouter"
-import { ArrowLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { CodallaLogo } from "@/components/logo"
-import { useAuth } from "@/contexts/auth-context"
 import { cn } from "@/lib/utils"
 
 interface Section {
@@ -21,11 +20,9 @@ interface LegalPageLayoutProps {
  * Shared layout for long-form legal documents (Terms, Privacy).
  *   • Two-column: sticky TOC on the left, prose on the right
  *   • Scroll-spy highlights the currently visible section
- *   • Header adapts to auth state (Back to app vs Sign in)
  *   • Footer with cross-links between documents
  */
 export function LegalPageLayout({ title, lastUpdated, sections, children }: LegalPageLayoutProps) {
-  const { user } = useAuth()
   const [, setLocation] = useLocation()
   const [activeId, setActiveId] = useState<string>(sections[0]?.id ?? "")
 
@@ -57,17 +54,10 @@ export function LegalPageLayout({ title, lastUpdated, sections, children }: Lega
           <nav className="flex items-center gap-6 text-[13px]">
             <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">Terms</Link>
             <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">Privacy</Link>
-            {user ? (
-              <button onClick={() => setLocation("/")} className="inline-flex items-center gap-1.5 text-foreground hover:text-primary transition-colors font-medium">
-                <ArrowLeft className="h-3.5 w-3.5" />
-                Back to app
-              </button>
-            ) : (
-              <Link href="/login" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
-                Sign in
-                <ChevronRight className="h-3.5 w-3.5" />
-              </Link>
-            )}
+            <button onClick={() => setLocation("/")} className="inline-flex items-center gap-1.5 text-foreground hover:text-primary transition-colors font-medium">
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to app
+            </button>
           </nav>
         </div>
       </header>

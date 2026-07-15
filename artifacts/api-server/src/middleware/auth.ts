@@ -1,58 +1,46 @@
 import type { Request, Response, NextFunction } from "express";
 import { eq } from "drizzle-orm";
 import { db, usersTable, type User } from "@workspace/db";
-import { verifyAccessToken } from "../lib/auth";
 
-// Extend Express types with the authenticated user
+// Codalla runs as a single-user personal tool: there is no login. Every
+// request is attributed to one implicit local user so the per-user data
+// model (userId FKs on all tables) keeps working unchanged.
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
-      user?: Omit<User, "passwordHash">;
+      user?: User;
     }
   }
 }
+
+const LOCAL_USER_ID = "local";
+const LOCAL_USER_EMAIL = "local@codalla.local";
+
+let cachedUser: User | null = null;
 
 /**
- * Extracts the bearer/cookie JWT, verifies it, loads the user, and attaches
- * to req.user. Returns 401 if any step fails.
+ * Ensures the single local user row exists (created lazily on first request)
+ * and attaches it to req.user for downstream routes.
  */
-export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const token = extractToken(req);
-  if (!token) {
-    res.status(401).json({ error: "Not authenticated" });
-    return;
-  }
-
+export async function localUser(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const payload = verifyAccessToken(token);
-    const [user] = await db.select().from(usersTable).where(eq(usersTable.id, payload.sub));
-    if (!user) {
-      res.status(401).json({ error: "User not found" });
-      return;
+    if (!cachedUser) {
+      const [existing] = await db.select().from(usersTable).where(eq(usersTable.id, LOCAL_USER_ID));
+      cachedUser =
+        existing ??
+        (
+          await db
+            .insert(usersTable)
+            .values({ id: LOCAL_USER_ID, email: LOCAL_USER_EMAIL, name: "Local User" })
+            .onConflictDoNothing()
+            .returning()
+        )[0] ??
+        (await db.select().from(usersTable).where(eq(usersTable.id, LOCAL_USER_ID)))[0];
     }
-    // Never expose the hash — strip it from the object on req.user
-    // (using object rest here rather than delete for immutability + type inference)
-    const { passwordHash: _passwordHash, ...safe } = user;
-    req.user = safe;
+    req.user = cachedUser;
     next();
-  } catch (err: any) {
-    if (err?.name === "TokenExpiredError") {
-      res.status(401).json({ error: "Token expired", code: "TOKEN_EXPIRED" });
-      return;
-    }
-    res.status(401).json({ error: "Invalid token" });
+  } catch (err) {
+    next(err);
   }
-}
-
-function extractToken(req: Request): string | null {
-  // Cookie first (browser flow); then Authorization Bearer header (curl/CLI flow).
-  const cookieToken = req.cookies?.access_token;
-  if (typeof cookieToken === "string" && cookieToken.length > 0) return cookieToken;
-
-  const authHeader = req.headers.authorization;
-  if (typeof authHeader === "string" && authHeader.startsWith("Bearer ")) {
-    return authHeader.slice(7);
-  }
-  return null;
 }
