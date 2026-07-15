@@ -534,9 +534,11 @@ router.post("/ai/chat/stream", async (req, res): Promise<void> => {
   res.setHeader("X-Accel-Buffering", "no"); // Disable nginx buffering
   res.flushHeaders();
 
-  // Track client disconnect — used to abort the upstream LLM stream
+  // Track client disconnect — used to abort the upstream LLM stream.
+  // Must watch the response: req 'close' fires as soon as the request body
+  // has been fully read (i.e. immediately), not when the client disconnects.
   let clientGone = false;
-  req.on("close", () => { clientGone = true; });
+  res.on("close", () => { if (!res.writableEnded) clientGone = true; });
 
   const send = (data: object): boolean => {
     if (clientGone) return false;
