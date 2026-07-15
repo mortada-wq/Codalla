@@ -2,21 +2,20 @@ import { useState, useEffect, useRef } from "react"
 import { useLocation } from "wouter"
 import { Layout } from "@/components/layout"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Settings2, Key, Activity, UserCog } from "lucide-react"
+import { Settings2, Key, Activity } from "lucide-react"
 import { GeneralSettingsPanel } from "@/components/settings/general-panel"
 import { ApiKeysPanel } from "@/components/settings/api-keys-panel"
 import { UsagePanel } from "@/components/settings/usage-panel"
-import { ProfilePanel } from "@/components/settings/profile-panel"
 
-type TabId = "profile" | "general" | "keys" | "usage"
+type TabId = "general" | "keys" | "usage"
 
-const VALID_TABS: TabId[] = ["profile", "general", "keys", "usage"]
+const VALID_TABS: TabId[] = ["general", "keys", "usage"]
 
 function parseTabFromUrl(): TabId {
-  if (typeof window === "undefined") return "profile"
+  if (typeof window === "undefined") return "general"
   const params = new URLSearchParams(window.location.search)
   const tab = params.get("tab") as TabId | null
-  return tab && VALID_TABS.includes(tab) ? tab : "profile"
+  return tab && VALID_TABS.includes(tab) ? tab : "general"
 }
 
 export default function SettingsPage() {
@@ -25,7 +24,7 @@ export default function SettingsPage() {
 
   // Keep the URL in sync so tabs are shareable / linkable
   useEffect(() => {
-    const nextUrl = tab === "profile" ? "/settings" : `/settings?tab=${tab}`
+    const nextUrl = tab === "general" ? "/settings" : `/settings?tab=${tab}`
     if (typeof window !== "undefined" && `${location}${window.location.search}` !== nextUrl) {
       setLocation(nextUrl, { replace: true })
     }
@@ -55,13 +54,6 @@ export default function SettingsPage() {
           <Tabs value={tab} onValueChange={(v) => setTab(v as TabId)} className="space-y-6">
             <TabsList className="border-b border-border w-full justify-start rounded-none h-auto p-0 gap-6">
               <TabsTrigger
-                value="profile"
-                className="!font-sans !text-[13px] !px-0 !py-3 h-auto data-[state=active]:font-semibold gap-2"
-              >
-                <UserCog className="h-3.5 w-3.5" />
-                Profile
-              </TabsTrigger>
-              <TabsTrigger
                 value="general"
                 className="!font-sans !text-[13px] !px-0 !py-3 h-auto data-[state=active]:font-semibold gap-2"
               >
@@ -84,9 +76,6 @@ export default function SettingsPage() {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="profile" className="mt-6">
-              <ProfilePanel />
-            </TabsContent>
             <TabsContent value="general" className="mt-6">
               <GeneralSettingsPanel />
             </TabsContent>

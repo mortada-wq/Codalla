@@ -1,11 +1,9 @@
 import * as React from "react"
 import { useLocation } from "wouter"
-import { Home, Settings, Blocks, LogOut, UserCog } from "lucide-react"
+import { Home, Settings, Blocks } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/contexts/auth-context"
 import { CodallaMark } from "@/components/logo"
 
 interface LayoutProps {
@@ -40,56 +38,6 @@ function SidebarItem({ icon: Icon, href, label }: { icon: React.ElementType; hre
   )
 }
 
-function UserMenu() {
-  const [, setLocation] = useLocation()
-  const { user, logout } = useAuth()
-  if (!user) return null
-
-  const initials = (user.name || user.email).split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          data-testid="user-menu-trigger"
-          className="relative h-9 w-9 rounded-full overflow-hidden bg-primary/15 text-primary font-semibold text-[11px] flex items-center justify-center hover:ring-2 hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-all"
-          aria-label="Open user menu"
-        >
-          {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
-          ) : initials}
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="right" align="end" className="w-56 ml-2">
-        <DropdownMenuLabel className="pb-2">
-          <div className="flex flex-col">
-            <span className="text-[13px] font-semibold truncate">{user.name}</span>
-            <span className="text-[11px] font-normal text-muted-foreground truncate">{user.email}</span>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => setLocation("/settings?tab=profile")} className="text-[13px] cursor-pointer" data-testid="user-menu-profile">
-          <UserCog className="h-3.5 w-3.5 mr-2" />
-          Profile & account
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setLocation("/settings")} className="text-[13px] cursor-pointer" data-testid="user-menu-settings">
-          <Settings className="h-3.5 w-3.5 mr-2" />
-          Settings
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={async () => { await logout(); setLocation("/login") }}
-          className="text-[13px] cursor-pointer text-destructive focus:text-destructive"
-          data-testid="user-menu-logout"
-        >
-          <LogOut className="h-3.5 w-3.5 mr-2" />
-          Sign out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
 export function Layout({ children }: LayoutProps) {
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground font-sans">
@@ -106,7 +54,6 @@ export function Layout({ children }: LayoutProps) {
 
         <div className="flex flex-col items-center gap-2">
           <SidebarItem icon={Settings} href="/settings" label="Settings" />
-          <UserMenu />
         </div>
       </div>
 

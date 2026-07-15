@@ -1,6 +1,5 @@
 import { Router, type IRouter } from "express";
 import healthRouter from "./health";
-import authRouter from "./auth";
 import projectsRouter from "./projects";
 import filesystemRouter from "./filesystem";
 import githubRouter from "./github";
@@ -12,16 +11,14 @@ import modelsRouter from "./models";
 import criteriaRouter from "./criteria";
 import memoryRouter from "./memory";
 import aiActionsRouter from "./ai-actions";
-import { requireAuth } from "../middleware/auth";
+import { localUser } from "../middleware/auth";
 
 const router: IRouter = Router();
 
-// ── Public routes: no session required ──────────────────────────
 router.use(healthRouter);
-router.use(authRouter);
 
-// ── Protected routes: everything below needs a valid session ────
-router.use(requireAuth);
+// ── Data routes: attributed to the implicit local user ──────────
+router.use(localUser);
 
 router.use(projectsRouter);
 router.use(filesystemRouter);

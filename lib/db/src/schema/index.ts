@@ -3,45 +3,22 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
 // ─── Users ───────────────────────────────────────────────────────────────────
-// A user can authenticate via email/password OR Google OAuth (or both).
-// passwordHash is nullable — a Google-only account has no password.
-// googleId is nullable — an email-only account has no Google link.
+// Codalla is a single-user personal tool with no authentication. One implicit
+// "local" user row anchors the userId FKs on all data tables.
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
   email: text("email").notNull().unique(),
-  passwordHash: text("password_hash"),                    // bcrypt hash (null for Google-only)
-  googleId: text("google_id").unique(),                   // Google sub / user id (null for email-only)
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
   bio: text("bio"),
   githubHandle: text("github_handle"),
   timezone: text("timezone").default("UTC").notNull(),
-  orgName: text("org_name"),
-  role: text("role").notNull().default("owner"),          // 'owner' | 'member' | 'admin'
-  emailVerified: boolean("email_verified").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 export const insertUserSchema = createInsertSchema(usersTable).omit({ createdAt: true, updatedAt: true });
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof usersTable.$inferSelect;
-
-// ─── Login Attempts (brute-force protection) ─────────────────────────────────
-export const loginAttemptsTable = pgTable("login_attempts", {
-  identifier: text("identifier").primaryKey(),            // '<ip>:<email>'
-  attempts: integer("attempts").notNull().default(0),
-  lockedUntil: timestamp("locked_until"),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-// ─── Password Reset Tokens ───────────────────────────────────────────────────
-export const passwordResetTokensTable = pgTable("password_reset_tokens", {
-  token: text("token").primaryKey(),
-  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  expiresAt: timestamp("expires_at").notNull(),
-  usedAt: timestamp("used_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
 
 // ─── Projects ────────────────────────────────────────────────────────────────
 export const projectsTable = pgTable("projects", {
