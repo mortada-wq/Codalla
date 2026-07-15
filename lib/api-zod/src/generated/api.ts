@@ -917,3 +917,84 @@ export const UpdateSettingsResponse = zod.object({
 })
 
 
+/**
+ * @summary List workflow presets
+ */
+export const ListWorkflowsResponseItem = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "steps": zod.array(zod.object({
+  "title": zod.string(),
+  "prompt": zod.string()
+})),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListWorkflowsResponse = zod.array(ListWorkflowsResponseItem)
+
+
+/**
+ * @summary Create a workflow preset
+ */
+export const CreateWorkflowBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "steps": zod.array(zod.object({
+  "title": zod.string(),
+  "prompt": zod.string()
+}))
+})
+
+export const CreateWorkflowResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "steps": zod.array(zod.object({
+  "title": zod.string(),
+  "prompt": zod.string()
+})),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update a workflow preset
+ */
+export const UpdateWorkflowParams = zod.object({
+  "workflowId": zod.coerce.string()
+})
+
+export const UpdateWorkflowBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "steps": zod.array(zod.object({
+  "title": zod.string(),
+  "prompt": zod.string()
+}))
+})
+
+export const UpdateWorkflowResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "steps": zod.array(zod.object({
+  "title": zod.string(),
+  "prompt": zod.string()
+})),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a workflow preset
+ */
+export const DeleteWorkflowParams = zod.object({
+  "workflowId": zod.coerce.string()
+})
+
+export const DeleteWorkflowResponse = zod.void()
+
+

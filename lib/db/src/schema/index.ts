@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, real, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, real, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -32,6 +32,23 @@ export const sessionsTable = pgTable("sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export type Session = typeof sessionsTable.$inferSelect;
+
+// ─── Workflows ────────────────────────────────────────────────────────────────
+// Reusable AI pipeline presets. Deliberately modality-agnostic: a workflow is
+// an ordered list of prompt steps run sequentially in a project's chat, so the
+// same machinery covers chat-data prep, image-dataset prep, coding, etc.
+export type WorkflowStep = { title: string; prompt: string };
+
+export const workflowsTable = pgTable("workflows", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  description: text("description"),
+  steps: jsonb("steps").$type<WorkflowStep[]>().notNull().default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+export type Workflow = typeof workflowsTable.$inferSelect;
 
 // ─── Projects ────────────────────────────────────────────────────────────────
 export const projectsTable = pgTable("projects", {

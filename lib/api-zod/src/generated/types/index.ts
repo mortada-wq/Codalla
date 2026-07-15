@@ -65,3 +65,6 @@ export * from './uploadFileParams';
 export * from './usageEntry';
 export * from './usageList';
 export * from './usageSummary';
+export * from './workflow';
+export * from './workflowInput';
+export * from './workflowStep';

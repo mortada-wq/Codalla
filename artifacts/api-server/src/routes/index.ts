@@ -12,6 +12,7 @@ import modelsRouter from "./models";
 import criteriaRouter from "./criteria";
 import memoryRouter from "./memory";
 import aiActionsRouter from "./ai-actions";
+import workflowsRouter from "./workflows";
 import { requireAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
@@ -34,5 +35,6 @@ router.use(modelsRouter);
 router.use(criteriaRouter);
 router.use(memoryRouter);
 router.use(aiActionsRouter);
+router.use(workflowsRouter);
 
 export default router;

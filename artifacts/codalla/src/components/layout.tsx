@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useLocation } from "wouter"
-import { Home, Settings, Blocks, LogOut } from "lucide-react"
+import { Home, Settings, Blocks, LogOut, Workflow } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -92,6 +92,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="w-6 h-px bg-border/50 mb-2" />
           <SidebarItem icon={Home} href="/" label="Dashboard" />
           <SidebarItem icon={Blocks} href="/models" label="Models" />
+          <SidebarItem icon={Workflow} href="/workflows" label="Workflows" />
         </div>
 
         <div className="flex flex-col items-center gap-2">

@@ -64,6 +64,22 @@ config remain out of scope.
    error handler; surface DB-connection failures as a friendly banner in the
    UI instead of failed queries.
 
+## Business workflows (data prep and beyond)
+
+Codalla is not hardcoded to one use case. Two building blocks cover the
+"team preps training data" scenario and similar ones:
+
+- **Server-folder projects**: set `CODALLA_DATA_ROOTS=/data` on the API
+  server, and teammates can attach any folder under it as a project
+  ("Server folder" in the New-project dialog). Files are edited in place;
+  Upload Files… in the editor brings datasets in; deleting the project never
+  deletes the folder. GitHub-clone projects work exactly as before.
+- **Workflows**: reusable AI pipelines defined in the UI (Workflows page) —
+  an ordered list of prompt steps run sequentially in a project's chat via
+  "Run workflow". Starter templates ship for chat fine-tune data prep,
+  image dataset prep, and vibe coding, but steps are plain prompts — teams
+  define whatever pipeline they need, no code changes.
+
 ## Phase 3 — product completeness (from the PRD, minus auth/billing)
 
 1. Editor polish: file tree refresh after git operations, unsaved-change

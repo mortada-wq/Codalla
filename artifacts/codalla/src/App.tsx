@@ -3,6 +3,7 @@ import Dashboard from "./pages/dashboard"
 import EditorPage from "./pages/editor"
 import SettingsPage from "./pages/settings"
 import ModelsPage from "./pages/models"
+import WorkflowsPage from "./pages/workflows"
 import NotFound from "./pages/not-found"
 import TermsPage from "./pages/terms"
 import PrivacyPage from "./pages/privacy"
@@ -47,6 +48,9 @@ function AppRouter() {
       </Route>
       <Route path="/models">
         <ProtectedRoute><ModelsPage /></ProtectedRoute>
+      </Route>
+      <Route path="/workflows">
+        <ProtectedRoute><WorkflowsPage /></ProtectedRoute>
       </Route>
       <Route><NotFound /></Route>
     </Switch>

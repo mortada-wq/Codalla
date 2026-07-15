@@ -12,6 +12,7 @@ Team AI coding IDE: create projects (optionally cloned from GitHub), browse/edit
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
 - Auth env: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `APP_URL` (browser origin; the Google OAuth client must allow `${APP_URL}/api/auth/google/callback` as a redirect URI), `ALLOWED_EMAIL_DOMAINS` and/or `ALLOWED_EMAILS` (comma-separated team gate) — or `AUTH_DISABLED=true` to skip sign-in entirely for solo dev
+- `CODALLA_DATA_ROOTS` — comma-separated absolute paths that may be attached as projects ("Server folder" mode); unset disables attaching
 
 ## Stack
 
@@ -38,7 +39,7 @@ Team AI coding IDE: create projects (optionally cloned from GitHub), browse/edit
 
 ## Product
 
-Dashboard (projects), Editor (Monaco + AI chat per project), Models (built-in + custom providers), Settings (general / API keys / usage).
+Dashboard (projects: blank / GitHub clone / AI-generated / attached server folder), Editor (Monaco + AI chat per project, file upload, run workflows), Workflows (reusable AI pipeline presets — ordered prompt steps, modality-agnostic), Models (built-in + custom providers), Settings (general / API keys / usage).
 
 ## User preferences
 

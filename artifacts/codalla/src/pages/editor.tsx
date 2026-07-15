@@ -1,14 +1,14 @@
 import { Layout } from "@/components/layout"
-import { useGetProject, useGetFileTree, useGetFile, useSaveFile, useCreateDirectory, useDeleteFile, useRenameFile, useListConversations, useGetConversation, useListMessages, useSendChatMessage, useCreateConversation, useRunCodeAction, getGetFileTreeQueryKey, getListConversationsQueryKey, getListMessagesQueryKey, getGetFileQueryKey, useListCriteria, useListMemoryNotes } from "@workspace/api-client-react"
+import { useGetProject, useGetFileTree, useGetFile, useSaveFile, useCreateDirectory, useDeleteFile, useRenameFile, useListConversations, useGetConversation, useListMessages, useSendChatMessage, useCreateConversation, useRunCodeAction, useListWorkflows, getGetFileTreeQueryKey, getListConversationsQueryKey, getListMessagesQueryKey, getGetFileQueryKey, useListCriteria, useListMemoryNotes } from "@workspace/api-client-react"
 import { BriefPanel } from "@/components/project/brief-panel"
 import { MemoryPanel } from "@/components/project/memory-panel"
-import { useParams } from "wouter"
+import { useParams, useLocation } from "wouter"
 import { useState, useEffect, useRef, useMemo } from "react"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup, type ImperativePanelHandle } from "@/components/ui/resizable"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { File, Folder, FolderOpen, FileCode2, ChevronRight, Plus, X, MessageSquare, Code, Play, RefreshCw, Send, Check, GitBranch, Cpu, Brain, BookOpen, Download, PanelLeft, PanelRight, Circle, Search } from "lucide-react"
+import { File, Folder, FolderOpen, FileCode2, ChevronRight, Plus, X, MessageSquare, Code, Play, RefreshCw, Send, Check, GitBranch, Cpu, Brain, BookOpen, Download, PanelLeft, PanelRight, Circle, Search, Workflow as WorkflowIcon } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from "@/components/ui/context-menu"
 import Editor, { useMonaco } from "@monaco-editor/react"
@@ -948,6 +948,7 @@ function ChatView({
   // Keep a ref to the AbortController so we can cancel on unmount or conversation change
   const abortRef = useRef<AbortController | null>(null)
   const queryClient = useQueryClient()
+  const [, setLocation] = useLocation()
   const { toast } = useToast()
 
   // Cancel in-flight stream when component unmounts or conversationId changes
@@ -981,10 +982,17 @@ function ChatView({
   }
 
   const handleSend = async () => {
-    if (!input.trim() || !conversationId || isStreaming) return
-
+    if (!input.trim()) return
     const content = input
     setInput("")
+    await sendMessage(content)
+  }
+
+  // Core send used by both manual chat and workflow runs. Resolves when the
+  // full streamed reply has been received and persisted.
+  const sendMessage = async (content: string) => {
+    if (!content.trim() || !conversationId) return
+
     setStreamingContent("")
     setIsStreaming(true)
 
@@ -1053,6 +1061,23 @@ function ChatView({
       setStreamingContent(null)
       queryClient.invalidateQueries({ queryKey: getListMessagesQueryKey(conversationId) })
     }
+  }
+
+  // ── Workflow runner: send each preset step as a chat message, in order ──
+  const { data: workflows } = useListWorkflows()
+  const [workflowRun, setWorkflowRun] = useState<{ name: string; step: number; total: number } | null>(null)
+  const workflowCancelRef = useRef(false)
+
+  const runWorkflow = async (wf: { name: string; steps: Array<{ title: string; prompt: string }> }) => {
+    if (isStreaming || workflowRun || !conversationId) return
+    workflowCancelRef.current = false
+    for (let i = 0; i < wf.steps.length; i++) {
+      if (workflowCancelRef.current) break
+      setWorkflowRun({ name: wf.name, step: i + 1, total: wf.steps.length })
+      const step = wf.steps[i]
+      await sendMessage(`**${wf.name} — step ${i + 1}/${wf.steps.length}: ${step.title}**\n\n${step.prompt}`)
+    }
+    setWorkflowRun(null)
   }
 
   return (
@@ -1128,19 +1153,61 @@ function ChatView({
           </Button>
         </div>
         <div className="flex justify-between items-center mt-2 px-1">
-          <button
-            onClick={() => setMemoryEnabled(v => !v)}
-            className={cn(
-              "flex items-center gap-1.5 text-xs font-mono transition-colors rounded px-1.5 py-0.5",
-              memoryEnabled
-                ? "text-primary bg-primary/10"
-                : "text-muted-foreground hover:text-foreground"
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setMemoryEnabled(v => !v)}
+              className={cn(
+                "flex items-center gap-1.5 text-xs font-mono transition-colors rounded px-1.5 py-0.5",
+                memoryEnabled
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Include project story, target, criteria, and memory notes as context"
+            >
+              <Brain className="w-3 h-3" />
+              {memoryEnabled ? "Memory on" : "Memory off"}
+            </button>
+
+            {workflowRun ? (
+              <button
+                onClick={() => { workflowCancelRef.current = true }}
+                className="flex items-center gap-1.5 text-xs font-mono text-primary bg-primary/10 rounded px-1.5 py-0.5"
+                title="Click to stop after the current step"
+                data-testid="workflow-progress"
+              >
+                <WorkflowIcon className="w-3 h-3" />
+                {workflowRun.name} · {workflowRun.step}/{workflowRun.total} — stop
+              </button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors rounded px-1.5 py-0.5"
+                    title="Run a saved workflow: its steps are sent to the AI one at a time"
+                    data-testid="run-workflow-trigger"
+                    disabled={isStreaming}
+                  >
+                    <WorkflowIcon className="w-3 h-3" />
+                    Run workflow
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-64">
+                  {!workflows?.length ? (
+                    <DropdownMenuItem onClick={() => setLocation("/workflows")}>
+                      No workflows yet — create one
+                    </DropdownMenuItem>
+                  ) : (
+                    (workflows as any[]).map((wf) => (
+                      <DropdownMenuItem key={wf.id} onClick={() => runWorkflow(wf)} data-testid={`run-workflow-${wf.id}`}>
+                        <span className="truncate">{wf.name}</span>
+                        <span className="ml-auto text-[11px] text-muted-foreground font-mono">{wf.steps.length} steps</span>
+                      </DropdownMenuItem>
+                    ))
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-            title="Include project story, target, criteria, and memory notes as context"
-          >
-            <Brain className="w-3 h-3" />
-            {memoryEnabled ? "Memory on" : "Memory off"}
-          </button>
+          </div>
           <span className="text-xs text-muted-foreground font-mono opacity-60">{provider}/{modelId.split("/").pop()}</span>
         </div>
       </div>

@@ -28,6 +28,26 @@ export interface Project {
   updatedAt?: string;
 }
 
+export interface WorkflowStep {
+  title: string;
+  prompt: string;
+}
+
+export interface Workflow {
+  id: string;
+  name: string;
+  description?: string | null;
+  steps: WorkflowStep[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkflowInput {
+  name: string;
+  description?: string;
+  steps: WorkflowStep[];
+}
+
 export interface ProjectInput {
   name: string;
   description?: string;
