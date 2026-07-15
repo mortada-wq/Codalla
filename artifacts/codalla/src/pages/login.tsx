@@ -41,7 +41,7 @@ export function LoginPage() {
             Continue with Google
           </a>
           <p className="mt-4 text-center text-[12px] text-muted-foreground">
-            Sign-in is limited to approved team accounts.
+            Use your Google account to continue.
           </p>
         </div>
       </div>

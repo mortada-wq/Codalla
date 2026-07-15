@@ -14,8 +14,10 @@ config remain out of scope.
 2. Add `${APP_URL}/api/auth/google/callback` to Authorized redirect URIs
    (for dev: `http://localhost:5173/api/auth/google/callback`).
 3. Set env on the API server: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
-   `APP_URL`, and `ALLOWED_EMAIL_DOMAINS=yourcompany.com` (and/or
-   `ALLOWED_EMAILS=a@x.com,b@y.com`).
+   and `APP_URL`. Optionally gate access with
+   `ALLOWED_EMAIL_DOMAINS=yourcompany.com` and/or
+   `ALLOWED_EMAILS=a@x.com,b@y.com` — leave both unset to allow any
+   Google account (open signup).
 4. That's it — first sign-in creates the user row; revoke any session by
    deleting its row in the `sessions` table.
 
