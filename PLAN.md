@@ -64,6 +64,53 @@ config remain out of scope.
    error handler; surface DB-connection failures as a friendly banner in the
    UI instead of failed queries.
 
+## Deploy to Google Cloud (Cloud Run + Cloud SQL)
+
+The repo ships a single-container `Dockerfile`: Express serves the API and
+the built frontend on one port (Cloud Run's `PORT`). One-time setup, from a
+machine with `gcloud` logged in (replace `PROJECT`, `REGION`, passwords):
+
+1. **Postgres**:
+   ```sh
+   gcloud sql instances create codalla --database-version=POSTGRES_16 \
+     --tier=db-g1-small --region=REGION
+   gcloud sql users set-password postgres --instance=codalla --password=DB_PASSWORD
+   gcloud sql databases create codalla --instance=codalla
+   ```
+2. **Bucket for project files** (Cloud Run's disk is ephemeral — project
+   workspaces must live on a mounted bucket to survive restarts):
+   ```sh
+   gcloud storage buckets create gs://PROJECT-codalla-projects --location=REGION
+   ```
+3. **Push the schema** (once, via the Cloud SQL proxy):
+   ```sh
+   cloud-sql-proxy PROJECT:REGION:codalla &   # listens on 127.0.0.1:5432
+   DATABASE_URL="postgres://postgres:DB_PASSWORD@127.0.0.1:5432/codalla" \
+     pnpm --filter @workspace/db run push
+   ```
+4. **Deploy** (from the repo root; builds with the Dockerfile):
+   ```sh
+   gcloud run deploy codalla --source . --region REGION --allow-unauthenticated \
+     --min-instances=1 --max-instances=1 \
+     --add-cloudsql-instances PROJECT:REGION:codalla \
+     --add-volume name=projects,type=cloud-storage,bucket=PROJECT-codalla-projects \
+     --add-volume-mount volume=projects,mount-path=/app/codalla-projects \
+     --set-env-vars "DATABASE_URL=postgres://postgres:DB_PASSWORD@/codalla?host=/cloudsql/PROJECT:REGION:codalla,APP_URL=https://YOUR-RUN-URL,GOOGLE_CLIENT_ID=...,GOOGLE_CLIENT_SECRET=...,ALLOWED_EMAIL_DOMAINS=yourcompany.com"
+   ```
+   First deploy prints the service URL — set `APP_URL` to it and add
+   `https://YOUR-RUN-URL/api/auth/google/callback` to the OAuth client's
+   authorized redirect URIs, then redeploy (or `gcloud run services update
+   codalla --update-env-vars APP_URL=...`).
+
+Notes:
+- `--max-instances=1` is required: project files are instance-local state.
+  The GCS volume keeps them across restarts; scaling beyond one instance
+  needs a shared-filesystem story first (Filestore or per-project GCS).
+- For shared datasets ("Server folder" projects), mount a second bucket and
+  set `CODALLA_DATA_ROOTS` to its mount path.
+- Secrets are cleaner in Secret Manager: `--set-secrets` instead of
+  `--set-env-vars` for `GOOGLE_CLIENT_SECRET` and `DATABASE_URL`.
+
 ## Business workflows (data prep and beyond)
 
 Codalla is not hardcoded to one use case. Two building blocks cover the

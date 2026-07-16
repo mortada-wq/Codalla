@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+.git
+codalla-projects
+**/codalla-projects
+*.log
+memory
+.agents
