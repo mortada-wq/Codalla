@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
-import { and, eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
+import { projectAccessWhere } from "../lib/project-access";
 import { v4 as uuidv4 } from "uuid";
 import { db, projectsTable, settingsTable } from "@workspace/db";
 import {
@@ -76,9 +77,10 @@ function withAuth(rawUrl: string, token: string | null | undefined): string {
   } catch { return rawUrl; }
 }
 
-function fmt(p: typeof projectsTable.$inferSelect) {
+function fmt(p: typeof projectsTable.$inferSelect, userId: string) {
   return {
     ...p,
+    isOwner: p.userId === userId,
     lastSynced: p.lastSynced ? p.lastSynced.toISOString() : null,
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
@@ -86,10 +88,11 @@ function fmt(p: typeof projectsTable.$inferSelect) {
 }
 
 router.get("/projects", async (req, res): Promise<void> => {
+  // Own projects plus anything a teammate shared with the team
   const projects = await db.select().from(projectsTable)
-    .where(eq(projectsTable.userId, req.user!.id))
+    .where(or(eq(projectsTable.userId, req.user!.id), eq(projectsTable.isShared, true)))
     .orderBy(projectsTable.createdAt);
-  res.json(ListProjectsResponse.parse(projects.map(fmt)));
+  res.json(ListProjectsResponse.parse(projects.map((p) => fmt(p, req.user!.id))));
 });
 
 router.post("/projects", async (req, res): Promise<void> => {
@@ -126,7 +129,7 @@ router.post("/projects", async (req, res): Promise<void> => {
       currentBranch: git(["branch", "--show-current"], resolved.path).stdout || "main",
       lastSynced: null,
     }).returning();
-    res.status(201).json(CreateProjectResponse.parse(fmt(project)));
+    res.status(201).json(CreateProjectResponse.parse(fmt(project, req.user!.id)));
     return;
   }
 
@@ -179,7 +182,7 @@ router.post("/projects", async (req, res): Promise<void> => {
     lastSynced: parsed.data.gitRemoteUrl ? new Date() : null,
   }).returning();
 
-  res.status(201).json(CreateProjectResponse.parse(fmt(project)));
+  res.status(201).json(CreateProjectResponse.parse(fmt(project, req.user!.id)));
 });
 
 router.get("/projects/:projectId", async (req, res): Promise<void> => {
@@ -190,15 +193,12 @@ router.get("/projects/:projectId", async (req, res): Promise<void> => {
   }
 
   const [project] = await db.select().from(projectsTable)
-    .where(and(
-      eq(projectsTable.id, params.data.projectId),
-      eq(projectsTable.userId, req.user!.id),
-    ));
+    .where(projectAccessWhere(params.data.projectId, req.user!.id));
   if (!project) {
     res.status(404).json({ error: "Project not found" });
     return;
   }
-  res.json(GetProjectResponse.parse(fmt(project)));
+  res.json(GetProjectResponse.parse(fmt(project, req.user!.id)));
 });
 
 router.patch("/projects/:projectId", async (req, res): Promise<void> => {
@@ -226,7 +226,7 @@ router.patch("/projects/:projectId", async (req, res): Promise<void> => {
     res.status(404).json({ error: "Project not found" });
     return;
   }
-  res.json(UpdateProjectResponse.parse(fmt(project)));
+  res.json(UpdateProjectResponse.parse(fmt(project, req.user!.id)));
 });
 
 router.delete("/projects/:projectId", async (req, res): Promise<void> => {

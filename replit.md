@@ -39,7 +39,7 @@ Team AI coding IDE: create projects (optionally cloned from GitHub), browse/edit
 
 ## Product
 
-Dashboard (projects: blank / GitHub clone / AI-generated / attached server folder), Editor (Monaco + AI chat per project, file upload, run workflows), Workflows (reusable AI pipeline presets — ordered prompt steps, modality-agnostic), Models (built-in + custom providers), Settings (general / API keys / usage).
+Dashboard (projects: blank / GitHub clone / AI-generated / attached server folder), Editor (Monaco + AI chat per project, file upload, run workflows), Workflows (reusable AI pipeline presets — ordered prompt steps, modality-agnostic), Models (built-in + custom providers), Settings (general / API keys / usage). Projects and workflows can be shared with the whole team (isShared; owner keeps edit/delete/share control; chats and keys stay private).
 
 ## User preferences
 

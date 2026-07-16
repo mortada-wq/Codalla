@@ -22,6 +22,8 @@ export const HealthCheckResponse = zod.object({
 export const ListProjectsResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
+  "isOwner": zod.boolean().optional(),
   "localPath": zod.string(),
   "gitRemoteUrl": zod.string().nullish(),
   "currentBranch": zod.string().optional(),
@@ -50,6 +52,8 @@ export const CreateProjectBody = zod.object({
 export const CreateProjectResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
+  "isOwner": zod.boolean().optional(),
   "localPath": zod.string(),
   "gitRemoteUrl": zod.string().nullish(),
   "currentBranch": zod.string().optional(),
@@ -72,6 +76,8 @@ export const GetProjectParams = zod.object({
 export const GetProjectResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
+  "isOwner": zod.boolean().optional(),
   "localPath": zod.string(),
   "gitRemoteUrl": zod.string().nullish(),
   "currentBranch": zod.string().optional(),
@@ -94,6 +100,7 @@ export const UpdateProjectParams = zod.object({
 export const UpdateProjectBody = zod.object({
   "name": zod.string().optional(),
   "description": zod.string().optional(),
+  "isShared": zod.boolean().optional(),
   "gitRemoteUrl": zod.string().optional(),
   "currentBranch": zod.string().optional(),
   "story": zod.string().optional(),
@@ -103,6 +110,8 @@ export const UpdateProjectBody = zod.object({
 export const UpdateProjectResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
+  "isOwner": zod.boolean().optional(),
   "localPath": zod.string(),
   "gitRemoteUrl": zod.string().nullish(),
   "currentBranch": zod.string().optional(),
@@ -923,6 +932,8 @@ export const UpdateSettingsResponse = zod.object({
 export const ListWorkflowsResponseItem = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
+  "isOwner": zod.boolean().optional(),
   "description": zod.string().nullish(),
   "steps": zod.array(zod.object({
   "title": zod.string(),
@@ -939,6 +950,7 @@ export const ListWorkflowsResponse = zod.array(ListWorkflowsResponseItem)
  */
 export const CreateWorkflowBody = zod.object({
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
   "description": zod.string().optional(),
   "steps": zod.array(zod.object({
   "title": zod.string(),
@@ -949,6 +961,8 @@ export const CreateWorkflowBody = zod.object({
 export const CreateWorkflowResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
+  "isOwner": zod.boolean().optional(),
   "description": zod.string().nullish(),
   "steps": zod.array(zod.object({
   "title": zod.string(),
@@ -968,6 +982,7 @@ export const UpdateWorkflowParams = zod.object({
 
 export const UpdateWorkflowBody = zod.object({
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
   "description": zod.string().optional(),
   "steps": zod.array(zod.object({
   "title": zod.string(),
@@ -978,6 +993,8 @@ export const UpdateWorkflowBody = zod.object({
 export const UpdateWorkflowResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
+  "isShared": zod.boolean().optional(),
+  "isOwner": zod.boolean().optional(),
   "description": zod.string().nullish(),
   "steps": zod.array(zod.object({
   "title": zod.string(),

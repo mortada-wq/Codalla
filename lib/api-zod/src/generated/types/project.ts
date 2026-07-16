@@ -9,6 +9,8 @@
 export interface Project {
   id: string;
   name: string;
+  isShared?: boolean;
+  isOwner?: boolean;
   localPath: string;
   /** @nullable */
   gitRemoteUrl?: string | null;

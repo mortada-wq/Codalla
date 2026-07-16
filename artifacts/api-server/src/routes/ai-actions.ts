@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
+import { projectAccessWhere } from "../lib/project-access";
 import { db, projectsTable, projectAssetsTable, apiKeysTable, settingsTable, usageLogTable } from "@workspace/db";
 import { logger } from "../lib/logger";
 
@@ -109,7 +110,7 @@ function makeClient(creds: { apiKey: string; baseURL: string }, provider: string
 
 async function getProject(projectId: string, userId: string) {
   const [p] = await db.select().from(projectsTable)
-    .where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
+    .where(projectAccessWhere(projectId, userId));
   return p ?? null;
 }
 

@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
 import { and, eq } from "drizzle-orm";
+import { projectAccessWhere } from "../lib/project-access";
 import { db, projectsTable } from "@workspace/db";
 import {
   ListGithubReposQueryParams,
@@ -31,7 +32,7 @@ const router: IRouter = Router();
 
 async function getProject(projectId: string, userId: string) {
   const [project] = await db.select().from(projectsTable)
-    .where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
+    .where(projectAccessWhere(projectId, userId));
   return project ?? null;
 }
 

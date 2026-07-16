@@ -10,6 +10,8 @@ import type { WorkflowStep } from './workflowStep';
 export interface Workflow {
   id: string;
   name: string;
+  isShared?: boolean;
+  isOwner?: boolean;
   description?: string | null;
   steps: WorkflowStep[];
   createdAt: string;

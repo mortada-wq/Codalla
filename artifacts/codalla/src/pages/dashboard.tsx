@@ -6,9 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, Search, Folder, FolderOpen, GitBranch, Clock, ArrowRight, Trash2, Github, ChevronDown, Loader2, MessageSquare, Sparkles, DollarSign, Activity, Cpu, FileText, Wand2 } from "lucide-react"
+import { Plus, Search, Folder, FolderOpen, GitBranch, Clock, ArrowRight, Trash2, Github, ChevronDown, Loader2, MessageSquare, Sparkles, DollarSign, Activity, Cpu, FileText, Wand2, Users } from "lucide-react"
 import { formatCurrency, formatNumber, formatDate } from "@/lib/utils"
-import { useListProjects, useGetUsageSummary, useDeleteProject, useCreateProject, useListConversations, getListProjectsQueryKey, useGetSettings } from "@workspace/api-client-react"
+import { useListProjects, useGetUsageSummary, useDeleteProject, useCreateProject, useUpdateProject, useListConversations, getListProjectsQueryKey, useGetSettings } from "@workspace/api-client-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -161,8 +161,23 @@ function ProjectCard({ project }: { project: any }) {
   const [, setLocation] = useLocation()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const deleteProject = useDeleteProject()
+  const updateProject = useUpdateProject()
   const queryClient = useQueryClient()
   const { toast } = useToast()
+
+  const isOwner = project.isOwner !== false
+
+  const toggleShare = () => {
+    updateProject.mutate({ projectId: project.id, data: { isShared: !project.isShared } }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getListProjectsQueryKey() })
+        toast(project.isShared
+          ? { title: "Project unshared", description: `${project.name} is private to you again.` }
+          : { title: "Shared with team", description: `Everyone can now open ${project.name}.` })
+      },
+      onError: (err: any) => toast({ title: "Couldn't update sharing", description: err.message, variant: "destructive" }),
+    })
+  }
 
   const handleDelete = () => {
     deleteProject.mutate({ projectId: project.id }, {
@@ -195,16 +210,37 @@ function ProjectCard({ project }: { project: any }) {
               <CardTitle className="text-[15px] font-semibold truncate group-hover:text-primary transition-colors">
                 {project.name}
               </CardTitle>
+              {project.isShared && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-mono uppercase tracking-wide shrink-0" data-testid="team-badge">
+                  <Users className="h-2.5 w-2.5" />
+                  Team
+                </span>
+              )}
             </div>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Delete ${project.name}`}
-              onClick={(e) => { e.stopPropagation(); setConfirmOpen(true) }}
-              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
+            {isOwner && (
+              <div className="flex items-center shrink-0">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={project.isShared ? `Stop sharing ${project.name}` : `Share ${project.name} with team`}
+                  title={project.isShared ? "Stop sharing with team" : "Share with team"}
+                  onClick={(e) => { e.stopPropagation(); toggleShare() }}
+                  className="text-muted-foreground hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                  data-testid={`share-project-${project.id}`}
+                >
+                  <Users className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Delete ${project.name}`}
+                  onClick={(e) => { e.stopPropagation(); setConfirmOpen(true) }}
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            )}
           </div>
           {project.description && (
             <CardDescription className="line-clamp-2 text-[13px] mt-2 font-sans text-muted-foreground">

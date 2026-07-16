@@ -43,6 +43,8 @@ export const workflowsTable = pgTable("workflows", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  // Shared workflows are runnable by every account; owner-only edit/delete.
+  isShared: boolean("is_shared").default(false).notNull(),
   description: text("description"),
   steps: jsonb("steps").$type<WorkflowStep[]>().notNull().default([]),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -55,6 +57,9 @@ export const projectsTable = pgTable("projects", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  // Team sharing: shared projects are visible and editable by every account;
+  // only the owner can change settings, share state, or delete.
+  isShared: boolean("is_shared").default(false).notNull(),
   localPath: text("local_path").notNull(),
   gitRemoteUrl: text("git_remote_url"),
   currentBranch: text("current_branch").default("main"),

@@ -9,6 +9,7 @@ import type { WorkflowStep } from './workflowStep';
 
 export interface WorkflowInput {
   name: string;
+  isShared?: boolean;
   description?: string;
   steps: WorkflowStep[];
 }

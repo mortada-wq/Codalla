@@ -12,6 +12,8 @@ export interface HealthStatus {
 export interface Project {
   id: string;
   name: string;
+  isShared?: boolean;
+  isOwner?: boolean;
   localPath: string;
   /** @nullable */
   gitRemoteUrl?: string | null;
@@ -36,6 +38,8 @@ export interface WorkflowStep {
 export interface Workflow {
   id: string;
   name: string;
+  isShared?: boolean;
+  isOwner?: boolean;
   description?: string | null;
   steps: WorkflowStep[];
   createdAt: string;
@@ -44,6 +48,7 @@ export interface Workflow {
 
 export interface WorkflowInput {
   name: string;
+  isShared?: boolean;
   description?: string;
   steps: WorkflowStep[];
 }
@@ -61,6 +66,7 @@ export interface ProjectInput {
 export interface ProjectUpdate {
   name?: string;
   description?: string;
+  isShared?: boolean;
   gitRemoteUrl?: string;
   currentBranch?: string;
   story?: string;

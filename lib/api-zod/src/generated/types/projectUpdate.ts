@@ -9,6 +9,7 @@
 export interface ProjectUpdate {
   name?: string;
   description?: string;
+  isShared?: boolean;
   gitRemoteUrl?: string;
   currentBranch?: string;
   story?: string;

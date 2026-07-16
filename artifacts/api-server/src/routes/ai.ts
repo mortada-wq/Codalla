@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
+import { projectAccessWhere } from "../lib/project-access";
 import { db, apiKeysTable, conversationsTable, messagesTable, usageLogTable, settingsTable, projectsTable, projectSuccessCriteriaTable, projectMemoryNotesTable } from "@workspace/db";
 import { detectProjectStack, buildSystemPrompt } from "../utils/detect-stack";
 import {
@@ -129,7 +130,7 @@ Rules: always include the complete file content; use forward slashes; you may in
 
   try {
     const [project] = await db.select().from(projectsTable)
-      .where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
+      .where(projectAccessWhere(projectId, userId));
     if (!project) return fallback;
 
     const stack = detectProjectStack(project.localPath);

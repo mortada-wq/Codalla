@@ -126,6 +126,13 @@ Codalla is not hardcoded to one use case. Two building blocks cover the
   "Run workflow". Starter templates ship for chat fine-tune data prep,
   image dataset prep, and vibe coding, but steps are plain prompts — teams
   define whatever pipeline they need, no code changes.
+- **Team sharing**: projects and workflows have a "Share with team" toggle
+  (Users icon on a project card; switch in the workflow editor). Shared
+  items show a Team badge and are open to every account — teammates can
+  browse/edit files and run shared workflows — while settings, the share
+  toggle, and deletion stay owner-only. Chats and API keys are never
+  shared. Note: on a shared hosted instance this is the sharing story;
+  local/desktop installs are single-user islands bridged by git.
 
 ## Phase 3 — product completeness (from the PRD, minus auth/billing)
 

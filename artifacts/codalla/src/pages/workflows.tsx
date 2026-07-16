@@ -8,10 +8,11 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
-import { Plus, Trash2, ArrowUp, ArrowDown, Workflow as WorkflowIcon, Pencil, ListOrdered } from "lucide-react"
+import { Switch } from "@/components/ui/switch"
+import { Plus, Trash2, ArrowUp, ArrowDown, Workflow as WorkflowIcon, Pencil, ListOrdered, Users } from "lucide-react"
 
 interface Step { title: string; prompt: string }
-interface WorkflowRow { id: string; name: string; description?: string | null; steps: Step[] }
+interface WorkflowRow { id: string; name: string; description?: string | null; steps: Step[]; isShared?: boolean; isOwner?: boolean }
 
 // Starter presets — editable examples, not hardcoded behavior. The same
 // step-runner handles any modality (chat data, images, code, docs).
@@ -47,8 +48,8 @@ const TEMPLATES: Array<{ name: string; description: string; steps: Step[] }> = [
   },
 ]
 
-const emptyDraft = (): { id: string | null; name: string; description: string; steps: Step[] } =>
-  ({ id: null, name: "", description: "", steps: [{ title: "", prompt: "" }] })
+const emptyDraft = (): { id: string | null; name: string; description: string; steps: Step[]; isShared: boolean } =>
+  ({ id: null, name: "", description: "", steps: [{ title: "", prompt: "" }], isShared: false })
 
 export default function WorkflowsPage() {
   const { data: workflows, isLoading } = useListWorkflows()
@@ -64,12 +65,12 @@ export default function WorkflowsPage() {
 
   const openNew = (tpl?: (typeof TEMPLATES)[number]) => {
     setDraft(tpl
-      ? { id: null, name: tpl.name, description: tpl.description, steps: tpl.steps.map(s => ({ ...s })) }
+      ? { id: null, name: tpl.name, description: tpl.description, steps: tpl.steps.map(s => ({ ...s })), isShared: false }
       : emptyDraft())
     setDialogOpen(true)
   }
   const openEdit = (w: WorkflowRow) => {
-    setDraft({ id: w.id, name: w.name, description: w.description ?? "", steps: w.steps.map(s => ({ ...s })) })
+    setDraft({ id: w.id, name: w.name, description: w.description ?? "", steps: w.steps.map(s => ({ ...s })), isShared: w.isShared ?? false })
     setDialogOpen(true)
   }
 
@@ -92,6 +93,7 @@ export default function WorkflowsPage() {
   const save = () => {
     const data = {
       name: draft.name.trim(),
+      isShared: draft.isShared,
       description: draft.description.trim() || undefined,
       steps: validSteps.map(s => ({ title: s.title.trim(), prompt: s.prompt.trim() })),
     }
@@ -175,18 +177,31 @@ export default function WorkflowsPage() {
                   <div key={w.id} className="flex items-center gap-4 rounded-md border border-border bg-card px-4 py-3" data-testid={`workflow-${w.id}`}>
                     <WorkflowIcon className="h-4 w-4 text-primary shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-semibold truncate">{w.name}</p>
+                      <p className="text-[13px] font-semibold truncate flex items-center gap-2">
+                        {w.name}
+                        {w.isShared && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-mono uppercase tracking-wide" data-testid="team-badge">
+                            <Users className="h-2.5 w-2.5" />
+                            Team
+                          </span>
+                        )}
+                      </p>
                       <p className="text-[12px] text-muted-foreground truncate">
                         {w.steps.length} step{w.steps.length === 1 ? "" : "s"}
                         {w.description ? ` · ${w.description}` : ""}
+                        {w.isShared && !w.isOwner ? " · shared by a teammate" : ""}
                       </p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(w)} aria-label="Edit workflow">
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleting(w)} aria-label="Delete workflow">
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
+                    {w.isOwner !== false && (
+                      <>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(w)} aria-label="Edit workflow">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleting(w)} aria-label="Delete workflow">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -217,6 +232,19 @@ export default function WorkflowsPage() {
               value={draft.description}
               onChange={(e) => setDraft(d => ({ ...d, description: e.target.value }))}
             />
+
+            <label className="flex items-center justify-between rounded-md border border-border bg-muted/30 px-3 py-2.5 cursor-pointer">
+              <span className="flex items-center gap-2 text-[13px]">
+                <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                Share with team
+                <span className="text-[12px] text-muted-foreground">— everyone can run it; only you can edit</span>
+              </span>
+              <Switch
+                checked={draft.isShared}
+                onCheckedChange={(v) => setDraft(d => ({ ...d, isShared: v }))}
+                data-testid="share-workflow-switch"
+              />
+            </label>
 
             <div className="space-y-3">
               {draft.steps.map((step, i) => (

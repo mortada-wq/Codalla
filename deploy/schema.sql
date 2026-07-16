@@ -1,5 +1,4 @@
 
-
 CREATE TABLE public.api_keys (
     id text NOT NULL,
     user_id text NOT NULL,
@@ -93,7 +92,8 @@ CREATE TABLE public.projects (
     target text,
     last_synced timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    is_shared boolean DEFAULT false NOT NULL
 );
 
 CREATE TABLE public.sessions (
@@ -149,7 +149,8 @@ CREATE TABLE public.workflows (
     description text,
     steps jsonb DEFAULT '[]'::jsonb NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    is_shared boolean DEFAULT false NOT NULL
 );
 
 ALTER TABLE ONLY public.api_keys
@@ -235,5 +236,4 @@ ALTER TABLE ONLY public.usage_log
 
 ALTER TABLE ONLY public.workflows
     ADD CONSTRAINT workflows_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-
 

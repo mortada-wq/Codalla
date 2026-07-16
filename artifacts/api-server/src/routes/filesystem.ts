@@ -1,5 +1,6 @@
 import express, { Router, type IRouter } from "express";
 import { and, eq } from "drizzle-orm";
+import { projectAccessWhere } from "../lib/project-access";
 import { db, projectsTable } from "@workspace/db";
 import {
   GetFileTreeParams,
@@ -95,7 +96,7 @@ function buildFileTree(dirPath: string, relativePath: string = ""): FileNode[] {
 
 async function getProjectPath(projectId: string, userId: string): Promise<string | null> {
   const [project] = await db.select().from(projectsTable)
-    .where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
+    .where(projectAccessWhere(projectId, userId));
   return project?.localPath ?? null;
 }
 

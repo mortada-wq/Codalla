@@ -1,6 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq, asc, and } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
+import { projectAccessWhere } from "../lib/project-access";
 import { db, projectsTable, projectMemoryNotesTable } from "@workspace/db";
 import {
   ListMemoryNotesParams,
@@ -20,7 +21,7 @@ const router: IRouter = Router();
 
 async function projectExists(projectId: string, userId: string): Promise<boolean> {
   const [p] = await db.select({ id: projectsTable.id }).from(projectsTable)
-    .where(and(eq(projectsTable.id, projectId), eq(projectsTable.userId, userId)));
+    .where(projectAccessWhere(projectId, userId));
   return !!p;
 }
 

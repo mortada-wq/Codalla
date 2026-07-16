@@ -1139,6 +1139,10 @@ components:
           type: string
         name:
           type: string
+        isShared:
+          type: boolean
+        isOwner:
+          type: boolean
         localPath:
           type: string
         gitRemoteUrl:
@@ -1175,6 +1179,10 @@ components:
           type: string
         name:
           type: string
+        isShared:
+          type: boolean
+        isOwner:
+          type: boolean
         description:
           type: string
           nullable: true
@@ -1193,6 +1201,8 @@ components:
       properties:
         name:
           type: string
+        isShared:
+          type: boolean
         description:
           type: string
         steps:
@@ -1225,6 +1235,8 @@ components:
           type: string
         description:
           type: string
+        isShared:
+          type: boolean
         gitRemoteUrl:
           type: string
         currentBranch:
