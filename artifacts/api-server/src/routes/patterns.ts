@@ -87,11 +87,13 @@ router.post("/patterns/suggest", async (req, res): Promise<void> => {
       });
     }
 
-    res.json(suggested.map(p => ({
-      ...p,
-      createdAt: p.createdAt.toISOString(),
-      updatedAt: p.updatedAt.toISOString(),
-    })));
+    res.json({
+      patterns: suggested.map(p => ({
+        ...p,
+        createdAt: p.createdAt.toISOString(),
+        updatedAt: p.updatedAt.toISOString(),
+      }))
+    });
   } catch (err: any) {
     res.status(500).json({ error: err?.message ?? "Failed to suggest patterns" });
   }

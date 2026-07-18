@@ -1,9 +1,9 @@
 import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
+import { eq, and, asc, desc } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { projectAccessWhere } from "../lib/project-access";
 import { db, apiKeysTable, conversationsTable, messagesTable, usageLogTable, settingsTable, projectsTable, projectSuccessCriteriaTable, projectMemoryNotesTable, patternsTable, patternUsageLogTable } from "@workspace/db";
-import { detectProjectStack, buildSystemPrompt } from "../utils/detect-stack";
+import { detectProjectStack, buildSystemPrompt, classifyProblem } from "../utils/detect-stack";
 import {
   ListModelsResponse,
   CreateConversationBody,
@@ -20,9 +20,7 @@ import {
   RunCodeActionBody,
   RunCodeActionResponse,
 } from "@workspace/api-zod";
-import { and, asc, desc, eq } from "drizzle-orm";
 import OpenAI from "openai";
-import { classifyProblem } from "../utils/detect-stack";
 
 const router: IRouter = Router();
 
