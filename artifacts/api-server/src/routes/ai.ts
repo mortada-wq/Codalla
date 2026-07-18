@@ -2,7 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { projectAccessWhere } from "../lib/project-access";
-import { db, apiKeysTable, conversationsTable, messagesTable, usageLogTable, settingsTable, projectsTable, projectSuccessCriteriaTable, projectMemoryNotesTable } from "@workspace/db";
+import { db, apiKeysTable, conversationsTable, messagesTable, usageLogTable, settingsTable, projectsTable, projectSuccessCriteriaTable, projectMemoryNotesTable, patternsTable, patternUsageLogTable } from "@workspace/db";
 import { detectProjectStack, buildSystemPrompt } from "../utils/detect-stack";
 import {
   ListModelsResponse,
@@ -20,8 +20,9 @@ import {
   RunCodeActionBody,
   RunCodeActionResponse,
 } from "@workspace/api-zod";
-import { and, asc, desc } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import OpenAI from "openai";
+import { classifyProblem } from "../utils/detect-stack";
 
 const router: IRouter = Router();
 
@@ -176,6 +177,107 @@ async function logUsage(userId: string, model: string, provider: string, promptT
     action,
   });
   return cost;
+}
+
+// Suggest relevant patterns based on user message/code
+async function suggestRelevantPatterns(userMessage: string): Promise<string> {
+  try {
+    // Classify the problem
+    const classification = classifyProblem(userMessage);
+
+    if (classification.confidence < 0.3) {
+      return ""; // Not confident enough to suggest patterns
+    }
+
+    // Fetch patterns for this problem type
+    const relevantPatterns = await db.select()
+      .from(patternsTable)
+      .where(and(
+        eq(patternsTable.isEnabled, true),
+        eq(patternsTable.problemType, classification.type),
+      ))
+      .limit(3); // Limit to top 3 patterns to avoid overwhelming the prompt
+
+    if (relevantPatterns.length === 0) {
+      return "";
+    }
+
+    // Format patterns for inclusion in the prompt
+    const patternSuggestions = relevantPatterns
+      .map((p) => `• ${p.title}: ${p.description}\n  Template: ${p.template.substring(0, 150)}...`)
+      .join("\n");
+
+    return `
+
+Based on your message, I detected a ${classification.type} problem (confidence: ${Math.round(classification.confidence * 100)}%).
+
+Here are proven patterns that might help:
+${patternSuggestions}
+
+Feel free to ask me to explain any of these patterns or help you apply them.`;
+  } catch (err) {
+    // Silently fail — don't break the chat if pattern suggestion fails
+    return "";
+  }
+}
+
+// Auto-generate a session summary and save it as a memory note
+async function autoSummarizeConversation(conversationId: string, projectId: string | null | undefined, userId: string, modelId: string, provider: string): Promise<void> {
+  if (!projectId) return;
+
+  try {
+    // Fetch all messages in the conversation
+    const messages = await db.select()
+      .from(messagesTable)
+      .where(eq(messagesTable.conversationId, conversationId))
+      .orderBy(asc(messagesTable.createdAt));
+
+    if (messages.length < 4) return; // Only summarize if there's meaningful interaction
+
+    // Build a conversation summary prompt
+    const conversationText = messages
+      .map(m => `${m.role.toUpperCase()}: ${m.content.substring(0, 500)}`)
+      .join("\n\n");
+
+    const summaryPrompt = `Summarize this coding session in 2-3 sentences. Include: (1) what was worked on, (2) key learnings or discoveries, (3) any issues encountered and their solutions, (4) suggested next steps. Be concise and actionable.`;
+
+    const client = await createOpenAIClient(provider, userId);
+    if (!client) return;
+
+    const completion = await client.chat.completions.create({
+      model: modelId,
+      messages: [
+        { role: "system", content: summaryPrompt },
+        { role: "user", content: conversationText },
+      ],
+      temperature: 0.5,
+      max_tokens: 300,
+    });
+
+    const summaryContent = completion.choices[0]?.message?.content ?? "";
+    if (!summaryContent) return;
+
+    // Auto-generate a title from the first few messages
+    const userMessages = messages.filter(m => m.role === "user");
+    const firstUserMessage = userMessages[0]?.content ?? "";
+    const title = `Session: ${new Date().toLocaleString()} — ${firstUserMessage.substring(0, 50)}...`;
+
+    // Create memory note with the summary
+    await db.insert(projectMemoryNotesTable).values({
+      id: uuidv4(),
+      projectId,
+      title,
+      content: summaryContent,
+    });
+
+    // Log the summary generation
+    const promptTokens = completion.usage?.prompt_tokens ?? 0;
+    const completionTokens = completion.usage?.completion_tokens ?? 0;
+    await logUsage(userId, modelId, provider, promptTokens, completionTokens, "auto-summary");
+  } catch (err) {
+    // Silently fail — don't break the user's chat if summary generation fails
+    console.error("Auto-summary failed:", err);
+  }
 }
 
 // ── Routes ───────────────────────────────────────────────────────────────────
@@ -403,6 +505,13 @@ router.post("/ai/chat", async (req, res): Promise<void> => {
   await db.update(conversationsTable)
     .set({ totalCost: (conv.totalCost ?? 0) + cost, updatedAt: new Date() })
     .where(and(eq(conversationsTable.id, conversationId), eq(conversationsTable.userId, req.user!.id)));
+
+  // Auto-generate summary in background (non-blocking)
+  if (conv.projectId) {
+    autoSummarizeConversation(conversationId, conv.projectId, req.user!.id, modelId, provider).catch(err =>
+      console.error("Background auto-summary failed:", err)
+    );
+  }
 
   res.json(SendChatMessageResponse.parse({
     ...assistantMsg,
@@ -637,6 +746,14 @@ router.post("/ai/chat/stream", async (req, res): Promise<void> => {
       await db.update(conversationsTable)
         .set({ totalCost: (conv.totalCost ?? 0) + cost, updatedAt: new Date() })
         .where(and(eq(conversationsTable.id, conversationId), eq(conversationsTable.userId, req.user!.id)));
+
+      // Auto-generate summary in background (non-blocking)
+      if (conv.projectId) {
+        autoSummarizeConversation(conversationId, conv.projectId, req.user!.id, modelId, provider).catch(err =>
+          console.error("Background auto-summary failed:", err)
+        );
+      }
+
       send({ done: true, messageId: assistantMsg.id, tokensUsed: promptTokens + completionTokens, cost });
     }
   } catch (err: any) {

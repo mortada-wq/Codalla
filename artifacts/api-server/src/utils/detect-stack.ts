@@ -384,3 +384,113 @@ export function buildSystemPrompt(opts: {
 
   return lines.join("\n");
 }
+
+// ─── Problem Classification for AI Development ───────────────────────────────
+// These functions analyze code and messages to identify the type of problem
+// the user is working on, enabling domain-specific pattern suggestions.
+
+export interface ProblemClassification {
+  type: "prompt" | "data-pipeline" | "model-integration" | "fine-tuning" | "general";
+  confidence: number; // 0-1, higher is more confident
+  indicators: string[]; // What signals were detected
+}
+
+export function classifyProblem(codeSnippet: string, errorMessage?: string, projectName?: string): ProblemClassification {
+  const combined = [codeSnippet, errorMessage, projectName].filter(Boolean).join(" ").toLowerCase();
+  const indicators: string[] = [];
+  let type: ProblemClassification["type"] = "general";
+  let confidence = 0;
+
+  // ── Prompt engineering issues ────────────────────────────────────────────
+  const promptKeywords = [
+    "prompt", "message", "system prompt", "user message", "role", "content",
+    "instruction", "request", "query", "response", "generation", "completion",
+    "token limit", "max_tokens", "temperature", "top_p", "frequency_penalty",
+  ];
+  const promptMatches = promptKeywords.filter(kw => combined.includes(kw)).length;
+
+  if (promptMatches >= 3) {
+    type = "prompt";
+    confidence = Math.min(1, promptMatches / promptKeywords.length);
+    indicators.push(`Found ${promptMatches} prompt-related keywords`);
+
+    // Specific prompt issues
+    if (combined.includes("injection") || combined.includes("escape")) {
+      indicators.push("Possible prompt injection vulnerability");
+    }
+    if (combined.includes("context length") || combined.includes("too long")) {
+      indicators.push("Token/context overflow detected");
+    }
+    if (combined.includes("not working") || combined.includes("wrong output")) {
+      indicators.push("Output quality issue");
+    }
+  }
+
+  // ── Data pipeline issues ─────────────────────────────────────────────────
+  const dataPipelineKeywords = [
+    "csv", "json", "dataframe", "pandas", "polars", "numpy", "dataset",
+    "batch", "loader", "preprocessing", "cleaning", "validation",
+    "schema", "column", "row", "transform", "normalize", "aggregate",
+  ];
+  const dataPipelineMatches = dataPipelineKeywords.filter(kw => combined.includes(kw)).length;
+
+  if (dataPipelineMatches >= 3 && confidence < 0.7) {
+    type = "data-pipeline";
+    confidence = Math.min(1, dataPipelineMatches / dataPipelineKeywords.length);
+    indicators.push(`Found ${dataPipelineMatches} data pipeline keywords`);
+
+    if (combined.includes("error") || combined.includes("fail")) {
+      indicators.push("Data processing failure");
+    }
+    if (combined.includes("missing") || combined.includes("null") || combined.includes("nan")) {
+      indicators.push("Missing or invalid data");
+    }
+  }
+
+  // ── Model integration issues ─────────────────────────────────────────────
+  const modelIntegrationKeywords = [
+    "openai", "anthropic", "claude", "gpt", "api", "endpoint", "key", "token",
+    "request", "response", "error", "timeout", "rate limit", "quota",
+    "embedding", "vector", "model", "provider", "client",
+  ];
+  const modelIntegrationMatches = modelIntegrationKeywords.filter(kw => combined.includes(kw)).length;
+
+  if (modelIntegrationMatches >= 4 && confidence < 0.7) {
+    type = "model-integration";
+    confidence = Math.min(1, modelIntegrationMatches / modelIntegrationKeywords.length);
+    indicators.push(`Found ${modelIntegrationMatches} model integration keywords`);
+
+    if (combined.includes("401") || combined.includes("403") || combined.includes("unauthorized")) {
+      indicators.push("Authentication/authorization issue");
+    }
+    if (combined.includes("dimension") || combined.includes("shape") || combined.includes("embedding")) {
+      indicators.push("Vector dimension mismatch");
+    }
+    if (combined.includes("retry") || combined.includes("async") || combined.includes("concurrency")) {
+      indicators.push("Concurrency or retry logic needed");
+    }
+  }
+
+  // ── Fine-tuning issues ───────────────────────────────────────────────────
+  const finetuneKeywords = [
+    "fine-tune", "finetune", "train", "training", "dataset", "validation",
+    "loss", "accuracy", "epoch", "batch size", "learning rate", "optimizer",
+    "overfitting", "underfitting", "bias", "weights", "model weights",
+  ];
+  const finetuneMatches = finetuneKeywords.filter(kw => combined.includes(kw)).length;
+
+  if (finetuneMatches >= 3 && confidence < 0.7) {
+    type = "fine-tuning";
+    confidence = Math.min(1, finetuneMatches / finetuneKeywords.length);
+    indicators.push(`Found ${finetuneMatches} fine-tuning keywords`);
+
+    if (combined.includes("data format") || combined.includes("jsonl")) {
+      indicators.push("Data format preparation needed");
+    }
+    if (combined.includes("performance") || combined.includes("quality")) {
+      indicators.push("Model quality/performance issue");
+    }
+  }
+
+  return { type, confidence, indicators };
+}

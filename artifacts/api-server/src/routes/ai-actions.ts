@@ -424,6 +424,119 @@ router.post("/projects/:projectId/analyze-media", async (req, res): Promise<void
 });
 
 // ═════════════════════════════════════════════════════════════════════════
+// POST /projects/:projectId/analyze-file-real-time
+// Body: { code: string, filename?: string, language?: string, modelId, provider }
+// Analyzes a single file for AI development issues in real-time.
+// Returns a list of issues with severity, description, and suggested fixes.
+// ═════════════════════════════════════════════════════════════════════════
+router.post("/projects/:projectId/analyze-file-real-time", async (req, res): Promise<void> => {
+  const { projectId } = req.params;
+  const { code, filename, language, modelId, provider } = req.body ?? {};
+
+  if (typeof code !== "string" || code.trim().length === 0) {
+    res.status(400).json({ error: "code is required and must not be empty" });
+    return;
+  }
+  if (typeof modelId !== "string" || typeof provider !== "string") {
+    res.status(400).json({ error: "modelId and provider are required" });
+    return;
+  }
+
+  const project = await getProject(projectId, req.user!.id);
+  if (!project) { res.status(404).json({ error: "Project not found" }); return; }
+
+  const creds = await getProviderCreds(provider, req.user!.id);
+  if (!creds) {
+    res.status(400).json({ error: `No API key configured for ${provider}.` });
+    return;
+  }
+
+  let client: OpenAI;
+  try {
+    client = makeClient(creds, provider);
+  } catch (err: any) {
+    res.status(400).json({ error: `Provider misconfigured: ${err?.message ?? "invalid credentials"}` });
+    return;
+  }
+
+  const analysisPrompt = `You are a senior code reviewer specialized in AI/ML development. Analyze this ${language || "code"} for common issues and anti-patterns, especially in the context of AI app development (LLM APIs, embeddings, data pipelines, prompt engineering, etc.).
+
+For each issue found, respond ONLY with JSON array (no markdown, no explanation):
+[
+  {
+    "line": <estimated line number or null>,
+    "severity": "error" | "warning" | "info",
+    "issue": "<short issue description>",
+    "fix": "<suggested fix or improvement>"
+  }
+]
+
+Look for:
+- Missing or incorrect API calls (OpenAI, Anthropic, etc.)
+- Type mismatches, especially with embeddings or vectors
+- Unhandled async/await issues
+- Missing error handling
+- Prompt injection vulnerabilities
+- Token limit overflows
+- Data validation gaps
+- Memory leaks or resource cleanup issues
+- Performance bottlenecks (e.g., sequential API calls that could be batched)
+
+If no issues found, return: []`;
+
+  try {
+    const completion = await client.chat.completions.create({
+      model: modelId,
+      messages: [
+        { role: "system", content: analysisPrompt },
+        {
+          role: "user",
+          content: filename
+            ? `File: ${filename}\n\n\`\`\`${language || ""}\n${code}\n\`\`\``
+            : `\`\`\`${language || ""}\n${code}\n\`\`\``,
+        },
+      ],
+      temperature: 0.1,
+      max_tokens: 1000,
+    });
+
+    const responseText = completion.choices?.[0]?.message?.content ?? "[]";
+    let issues: any[] = [];
+
+    try {
+      // Try to parse JSON response
+      const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        issues = JSON.parse(jsonMatch[0]);
+      }
+    } catch {
+      // If parsing fails, return empty issues list and log the raw response
+      logger.warn({ response: responseText }, "Failed to parse analysis response as JSON");
+    }
+
+    if (completion.usage) {
+      await logUsage(
+        req.user!.id, modelId, provider,
+        completion.usage.prompt_tokens ?? 0,
+        completion.usage.completion_tokens ?? 0,
+        "analyze-file-real-time",
+      );
+    }
+
+    res.json({
+      issues: Array.isArray(issues) ? issues : [],
+      filename: filename || "untitled",
+    });
+  } catch (err: any) {
+    logger.warn({ err: err?.message, provider, modelId }, "analyze-file-real-time upstream error");
+    res.status(502).json({
+      error: `Analysis failed: ${err?.message ?? "unknown error"}`,
+      issues: [],
+    });
+  }
+});
+
+// ═════════════════════════════════════════════════════════════════════════
 // GET /projects/:projectId/assets — list every AI-generated asset for a project
 // ═════════════════════════════════════════════════════════════════════════
 router.get("/projects/:projectId/assets", async (req, res): Promise<void> => {

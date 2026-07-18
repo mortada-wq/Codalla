@@ -202,7 +202,107 @@ export const insertCustomModelSchema = createInsertSchema(customModelsTable).omi
 export type InsertCustomModel = z.infer<typeof insertCustomModelSchema>;
 export type CustomModel = typeof customModelsTable.$inferSelect;
 
-// ─── Settings (per-user) ─────────────────────────────────────────────────────
+// ─── AI Development Patterns ──────────────────────────────────────────────────
+// Reusable patterns, solutions, and best practices for AI development.
+export type PatternProblemType = "prompt" | "data-pipeline" | "model-integration" | "fine-tuning" | "general";
+
+export const patternsTable = pgTable("patterns", {
+  id: text("id").primaryKey(),
+  // null userId = built-in pattern; otherwise team-owned pattern
+  userId: text("user_id").references(() => usersTable.id, { onDelete: "cascade" }),
+  problemType: text("problem_type").$type<PatternProblemType>().notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  // Keywords that signal this pattern should be suggested
+  triggers: jsonb("triggers").$type<string[]>().notNull().default([]),
+  // The pattern content: template, steps, example code
+  template: text("template").notNull(),
+  // Example code snippet demonstrating the pattern
+  example: text("example"),
+  // Related resources or links
+  resources: jsonb("resources").$type<Array<{ title: string; url: string }>>().notNull().default([]),
+  isEnabled: boolean("is_enabled").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+export const insertPatternSchema = createInsertSchema(patternsTable).omit({ createdAt: true, updatedAt: true });
+export type InsertPattern = z.infer<typeof insertPatternSchema>;
+export type Pattern = typeof patternsTable.$inferSelect;
+
+// ─── Pattern Usage Log ──────────────────────────────────────────────────────────
+// Track which patterns were suggested and whether they were helpful.
+export const patternUsageLogTable = pgTable("pattern_usage_log", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  projectId: text("project_id").references(() => projectsTable.id, { onDelete: "set null" }),
+  patternId: text("pattern_id").notNull().references(() => patternsTable.id, { onDelete: "cascade" }),
+  // Was this pattern suggested to the user?
+  wasSuggested: boolean("was_suggested").default(false).notNull(),
+  // Did the user adopt it?
+  wasAdopted: boolean("was_adopted").default(false).notNull(),
+  // Did it solve the problem?
+  helpful: boolean("helpful"),
+  // User feedback
+  feedback: text("feedback"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export const insertPatternUsageLogSchema = createInsertSchema(patternUsageLogTable).omit({ createdAt: true });
+export type InsertPatternUsageLog = z.infer<typeof insertPatternUsageLogSchema>;
+export type PatternUsageLog = typeof patternUsageLogTable.$inferSelect;
+
+// ─── Workflow Executions ──────────────────────────────────────────────────────
+// Track runs of workflow templates: design → implement → test → deploy, etc.
+// Enables checkpointing and resumability for multi-step problem solving.
+export type WorkflowExecutionStatus = "pending" | "running" | "completed" | "failed";
+
+export const workflowExecutionTable = pgTable("workflow_execution", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  projectId: text("project_id").references(() => projectsTable.id, { onDelete: "cascade" }),
+  workflowId: text("workflow_id").notNull().references(() => workflowsTable.id, { onDelete: "cascade" }),
+  status: text("status").$type<WorkflowExecutionStatus>().notNull().default("pending"),
+  // Current step index in the workflow steps array
+  currentStepIndex: integer("current_step_index").default(0).notNull(),
+  // Total cost accumulated during this execution
+  totalCost: real("total_cost").default(0).notNull(),
+  // Overall context/results from the execution
+  context: jsonb("context").$type<Record<string, any>>().notNull().default({}),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+export const insertWorkflowExecutionSchema = createInsertSchema(workflowExecutionTable).omit({ createdAt: true, updatedAt: true });
+export type InsertWorkflowExecution = z.infer<typeof insertWorkflowExecutionSchema>;
+export type WorkflowExecution = typeof workflowExecutionTable.$inferSelect;
+
+// ─── Workflow Step Execution ───────────────────────────────────────────────────
+// Log each step's execution: input, output, errors, token usage, and timing.
+export type StepExecutionStatus = "pending" | "running" | "completed" | "failed";
+
+export const workflowStepExecutionTable = pgTable("workflow_step_execution", {
+  id: text("id").primaryKey(),
+  executionId: text("execution_id").notNull().references(() => workflowExecutionTable.id, { onDelete: "cascade" }),
+  stepIndex: integer("step_index").notNull(),
+  status: text("status").$type<StepExecutionStatus>().notNull().default("pending"),
+  // The step prompt/title
+  title: text("title").notNull(),
+  // Input context for this step (from previous step or user)
+  input: jsonb("input").$type<Record<string, any>>().notNull().default({}),
+  // Output/result from this step
+  output: text("output"),
+  // Error message if step failed
+  error: text("error"),
+  // Token usage for this step
+  tokensUsed: integer("tokens_used").default(0),
+  cost: real("cost").default(0),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+});
+export const insertWorkflowStepExecutionSchema = createInsertSchema(workflowStepExecutionTable).omit({ createdAt: true });
+export type InsertWorkflowStepExecution = z.infer<typeof insertWorkflowStepExecutionSchema>;
+export type WorkflowStepExecution = typeof workflowStepExecutionTable.$inferSelect;
+
+// ─── Settings (per-user) ─────────────────────────────────────────────────────────
 export const settingsTable = pgTable("settings", {
   userId: text("user_id").primaryKey().references(() => usersTable.id, { onDelete: "cascade" }),
   defaultModelId: text("default_model_id").notNull().default("deepseek-ai/DeepSeek-V3"),
