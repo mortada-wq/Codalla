@@ -123,7 +123,15 @@ router.get("/auth/google/callback", async (req: Request, res: Response) => {
       secure: IS_PROD,
       maxAge: SESSION_TTL_MS,
     });
-    res.redirect(APP_URL);
+
+    // Check if user has verified phone; if not, redirect to phone verification
+    const { userPhonesTable } = await import("@workspace/db");
+    const [userPhone] = await db.select().from(userPhonesTable)
+      .where(eq(userPhonesTable.userId, user.id));
+
+    const isPhoneVerified = userPhone?.verifiedAt ? true : false;
+    const redirectUrl = isPhoneVerified ? APP_URL : `${APP_URL}/phone-verify`;
+    res.redirect(redirectUrl);
   } catch (err) {
     logger.error({ err }, "Google OAuth callback failed");
     res.redirect(`${APP_URL}/login?error=oauth_failed`);

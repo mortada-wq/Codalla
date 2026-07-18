@@ -16,6 +16,7 @@ import workflowsRouter from "./workflows";
 import patternsRouter from "./patterns";
 import workflowExecutionRouter from "./workflow-execution";
 import jobsRouter from "./jobs";
+import phoneAuthRouter from "./phone-auth";
 import { requireAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
@@ -27,6 +28,7 @@ router.use(authRouter);
 // ── Data routes: require a session (or AUTH_DISABLED local mode) ─
 router.use(requireAuth);
 
+router.use(phoneAuthRouter);
 router.use(projectsRouter);
 router.use(filesystemRouter);
 router.use(githubRouter);

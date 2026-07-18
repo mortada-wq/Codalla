@@ -33,6 +33,48 @@ export const sessionsTable = pgTable("sessions", {
 });
 export type Session = typeof sessionsTable.$inferSelect;
 
+// ─── Phone Verification ──────────────────────────────────────────────────────────
+// One phone number = one account. Prevents multi-accounting fraud.
+export const userPhonesTable = pgTable("user_phones", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().unique().references(() => usersTable.id, { onDelete: "cascade" }),
+  phoneNumber: text("phone_number").notNull().unique(),
+  verificationCode: text("verification_code"),  // Temporary OTP
+  verificationCodeExpiresAt: timestamp("verification_code_expires_at"),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+export type UserPhone = typeof userPhonesTable.$inferSelect;
+
+// ─── Device Fingerprints ────────────────────────────────────────────────────────
+// Detect if same device signs up with multiple accounts.
+export const deviceFingerprintsTable = pgTable("device_fingerprints", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  fingerprint: text("fingerprint").notNull().unique(),  // Hash of device props
+  userAgent: text("user_agent"),
+  screenResolution: text("screen_resolution"),
+  timezone: text("timezone"),
+  language: text("language"),
+  lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type DeviceFingerprint = typeof deviceFingerprintsTable.$inferSelect;
+
+// ─── Signup Audit (Anti-Fraud) ──────────────────────────────────────────────────
+// Track signup patterns to detect multi-accounting.
+export const signupAuditTable = pgTable("signup_audit", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  phoneNumber: text("phone_number"),
+  ipAddress: text("ip_address"),
+  deviceFingerprint: text("device_fingerprint"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export type SignupAudit = typeof signupAuditTable.$inferSelect;
+
 // ─── Workflows ────────────────────────────────────────────────────────────────
 // Reusable AI pipeline presets. Deliberately modality-agnostic: a workflow is
 // an ordered list of prompt steps run sequentially in a project's chat, so the

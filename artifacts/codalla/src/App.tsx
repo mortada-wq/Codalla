@@ -8,6 +8,7 @@ import NotFound from "./pages/not-found"
 import TermsPage from "./pages/terms"
 import PrivacyPage from "./pages/privacy"
 import { LoginPage } from "./pages/login"
+import { PhoneVerifyPage } from "./pages/phone-verify"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { Toaster } from "@/components/ui/toaster"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -31,6 +32,7 @@ function AppRouter() {
     <Switch>
       {/* ── Public routes ──────────────────────────────────────────── */}
       <Route path="/login" component={LoginPage} />
+      <Route path="/phone-verify" component={PhoneVerifyPage} />
       <Route path="/terms" component={TermsPage} />
       <Route path="/privacy" component={PrivacyPage} />
 
