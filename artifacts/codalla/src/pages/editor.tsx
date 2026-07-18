@@ -538,6 +538,8 @@ export default function EditorPage() {
 function EditorView({ projectId, filePath, content, onChange }: { projectId: string, filePath: string, content?: string, onChange: (val: string | undefined) => void }) {
   const { data: fileData, isLoading } = useGetFile({ projectId, filePath })
   const monaco = useMonaco()
+  const [editorIssues, setEditorIssues] = useState<any[]>([])
+  const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Language detection
   const language = useMemo(() => {
@@ -558,6 +560,51 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
       onChange(fileData.content)
     }
   }, [fileData, content, onChange])
+
+  // Real-time AI analysis with debouncing (1 second after user stops typing)
+  useEffect(() => {
+    if (!content || content.length === 0 || !projectId) return
+
+    // Clear previous timeout
+    if (analysisTimeoutRef.current) {
+      clearTimeout(analysisTimeoutRef.current)
+    }
+
+    // Set new timeout for debounced analysis
+    analysisTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/projects/${encodeURIComponent(projectId)}/analyze-file-real-time`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              code: content,
+              filename: filePath,
+              language,
+              modelId: "deepseek-ai/DeepSeek-V3",
+              provider: "siliconflow"
+            })
+          }
+        )
+
+        if (!res.ok) return
+
+        const { issues } = await res.json()
+        setEditorIssues(issues || [])
+      } catch (err) {
+        // Silently fail — don't disrupt editing if analysis fails
+        console.debug("Real-time analysis failed:", err)
+      }
+    }, 1000) // Debounce: wait 1 second after user stops typing
+
+    return () => {
+      if (analysisTimeoutRef.current) {
+        clearTimeout(analysisTimeoutRef.current)
+      }
+    }
+  }, [content, projectId, filePath, language])
 
   useEffect(() => {
     if (monaco) {
@@ -609,6 +656,32 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
       monaco.editor.setTheme('codalla-dark');
     }
   }, [monaco])
+
+  // Display analysis issues as Monaco diagnostics (red/yellow squiggles)
+  useEffect(() => {
+    if (!monaco || editorIssues.length === 0) return
+
+    const models = monaco.editor.getModels()
+    const model = models[0] // Current editor model
+
+    if (!model) return
+
+    // Convert issues to Monaco markers
+    const markers = editorIssues.map((issue: any) => ({
+      severity: issue.severity === "error"
+        ? monaco.MarkerSeverity.Error
+        : issue.severity === "warning"
+          ? monaco.MarkerSeverity.Warning
+          : monaco.MarkerSeverity.Information,
+      message: issue.issue,
+      startLineNumber: issue.line || 1,
+      endLineNumber: issue.line || 1,
+      startColumn: 1,
+      endColumn: 999,
+    }))
+
+    monaco.editor.setModelMarkers(model, "ai-analysis", markers)
+  }, [monaco, editorIssues])
 
   if (isLoading && content === undefined) {
     return <div className="flex h-full items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
