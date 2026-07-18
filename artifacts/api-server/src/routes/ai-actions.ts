@@ -7,6 +7,7 @@ import OpenAI from "openai";
 import { projectAccessWhere } from "../lib/project-access";
 import { db, projectsTable, projectAssetsTable, apiKeysTable, settingsTable, usageLogTable } from "@workspace/db";
 import { logger } from "../lib/logger";
+import { classifyProblem } from "../utils/detect-stack";
 
 const router: IRouter = Router();
 
@@ -533,6 +534,34 @@ If no issues found, return: []`;
       error: `Analysis failed: ${err?.message ?? "unknown error"}`,
       issues: [],
     });
+  }
+});
+
+// ═════════════════════════════════════════════════════════════════════════
+// POST /projects/:projectId/classify-problem
+// Body: { codeSnippet: string, projectName?: string }
+// Classifies a problem type based on code snippet and context.
+// Returns { type: "prompt" | "data-pipeline" | "model-integration" | "fine-tuning" | "general" }
+// ═════════════════════════════════════════════════════════════════════════
+router.post("/projects/:projectId/classify-problem", async (req, res): Promise<void> => {
+  const { projectId } = req.params;
+  const { codeSnippet, projectName } = req.body ?? {};
+
+  if (typeof codeSnippet !== "string" || codeSnippet.trim().length === 0) {
+    res.status(400).json({ error: "codeSnippet is required" });
+    return;
+  }
+
+  try {
+    const classification = classifyProblem(codeSnippet, undefined, projectName);
+    res.json({
+      type: classification.type,
+      confidence: classification.confidence,
+      indicators: classification.indicators,
+    });
+  } catch (err: any) {
+    logger.warn({ err: err?.message }, "classify-problem error");
+    res.status(500).json({ error: "Classification failed", type: "general" });
   }
 });
 

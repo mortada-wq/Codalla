@@ -672,7 +672,7 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
         ? monaco.MarkerSeverity.Error
         : issue.severity === "warning"
           ? monaco.MarkerSeverity.Warning
-          : monaco.MarkerSeverity.Information,
+          : monaco.MarkerSeverity.Info,
       message: issue.issue,
       startLineNumber: issue.line || 1,
       endLineNumber: issue.line || 1,
@@ -1017,6 +1017,7 @@ function ChatView({
   const [streamingContent, setStreamingContent] = useState<string | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
   const [memoryEnabled, setMemoryEnabled] = useState(false)
+  const [suggestedPatterns, setSuggestedPatterns] = useState<any[]>([])
   const scrollRef = useRef<HTMLDivElement>(null)
   // Keep a ref to the AbortController so we can cancel on unmount or conversation change
   const abortRef = useRef<AbortController | null>(null)
@@ -1058,6 +1059,7 @@ function ChatView({
     if (!input.trim()) return
     const content = input
     setInput("")
+    setSuggestedPatterns([])
     await sendMessage(content)
   }
 
@@ -1133,6 +1135,35 @@ function ChatView({
       setIsStreaming(false)
       setStreamingContent(null)
       queryClient.invalidateQueries({ queryKey: getListMessagesQueryKey(conversationId) })
+
+      // Detect problem type and suggest relevant patterns
+      try {
+        const problemRes = await fetch("/api/projects/" + encodeURIComponent(projectId) + "/classify-problem", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ codeSnippet: content, projectName: project?.name })
+        })
+
+        if (problemRes.ok) {
+          const { type: problemType } = await problemRes.json()
+
+          const patternsRes = await fetch("/api/patterns/suggest", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ problemType, keywords: content.split(/\s+/).slice(0, 10) })
+          })
+
+          if (patternsRes.ok) {
+            const { patterns } = await patternsRes.json()
+            setSuggestedPatterns(patterns || [])
+          }
+        }
+      } catch (err) {
+        // Silently fail — don't disrupt chat if pattern detection fails
+        console.debug("Pattern detection failed:", err)
+      }
     }
   }
 
@@ -1195,6 +1226,29 @@ function ChatView({
                       <span className="w-1.5 h-1.5 bg-primary/50 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Pattern suggestions */}
+          {!isStreaming && suggestedPatterns.length > 0 && (
+            <div className="py-3 px-4 bg-primary/5 border-t border-primary/20">
+              <div className="max-w-4xl mx-auto">
+                <p className="text-xs font-medium text-primary mb-2 flex items-center gap-1.5">
+                  <BookOpen className="w-3 h-3" />
+                  Suggested Patterns
+                </p>
+                <div className="space-y-2">
+                  {suggestedPatterns.slice(0, 3).map((pattern: any) => (
+                    <div key={pattern.id} className="text-xs bg-background/50 rounded p-2 border border-primary/20">
+                      <p className="font-mono font-medium text-foreground">{pattern.title}</p>
+                      <p className="text-muted-foreground text-xs mt-0.5">{pattern.description}</p>
+                      {pattern.example && (
+                        <p className="text-muted-foreground/60 text-xs mt-1 italic">Example: {pattern.example.substring(0, 80)}...</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
