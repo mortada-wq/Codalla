@@ -66,6 +66,10 @@ config remain out of scope.
 
 ## Deploy to Google Cloud (Cloud Run + Cloud SQL)
 
+> Scripted version: `deploy/gcp/setup.sh` + `deploy/gcp/deploy.sh`, with CI
+> builds via `cloudbuild.yaml` — see `deploy/gcp/README.md`. The manual
+> commands below remain as the reference for what those scripts do.
+
 The repo ships a single-container `Dockerfile`: Express serves the API and
 the built frontend on one port (Cloud Run's `PORT`). One-time setup, from a
 machine with `gcloud` logged in (replace `PROJECT`, `REGION`, passwords):

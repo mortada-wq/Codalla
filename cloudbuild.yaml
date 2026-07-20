@@ -1,0 +1,54 @@
+# Cloud Build pipeline: build the single-container image (root Dockerfile),
+# push it to Artifact Registry, roll it out to the existing Cloud Run service.
+#
+# The deploy step only swaps the image — env vars, secrets, Cloud SQL
+# attachment, and the GCS volume set up by deploy/gcp/deploy.sh are preserved.
+# Run deploy/gcp/setup.sh + deploy/gcp/deploy.sh once before the first build.
+#
+# Manual run from the repo root:
+#   gcloud builds submit --config cloudbuild.yaml
+#
+# Or wire it to GitHub with a Cloud Build trigger (see deploy/gcp/README.md).
+# Images are tagged with $BUILD_ID (always set, unlike $COMMIT_SHA on manual
+# submits) plus "latest".
+
+substitutions:
+  _REGION: europe-west1 # me-central1 (Doha) / me-central2 (Dammam) are closest to Iraq
+  _SERVICE: codalla
+  _REPOSITORY: codalla # Artifact Registry Docker repo, created by deploy/gcp/setup.sh
+
+steps:
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --tag=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID
+      - --tag=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:latest
+      - .
+
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - --all-tags
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}
+
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID
+      - --region=${_REGION}
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:$BUILD_ID
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE}:latest
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+timeout: 1800s

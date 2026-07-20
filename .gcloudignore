@@ -1,0 +1,22 @@
+# Controls what gets uploaded to Google Cloud Build / `gcloud run deploy
+# --source .`. Keep in sync with .dockerignore — the Docker build inside
+# Cloud Build only needs source, lockfile, and Dockerfile.
+.git
+.gitignore
+.gcloudignore
+node_modules
+**/node_modules
+**/dist
+*.log
+*.tsbuildinfo
+memory
+.agents
+codalla-projects
+**/codalla-projects
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+.replit
+.replitignore
