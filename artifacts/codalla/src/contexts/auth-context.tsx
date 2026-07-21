@@ -20,16 +20,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Fetch the implicit local user
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
-      .then((u) => setUser(u))
-      .catch(() => setUser(null))
+      .then((u) => setUser(u || { id: "local", email: "local@codalla.local", name: "Local User", avatarUrl: null }))
+      .catch(() => setUser({ id: "local", email: "local@codalla.local", name: "Local User", avatarUrl: null }))
       .finally(() => setLoading(false))
   }, [])
 
   const logout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" })
-    window.location.href = "/login"
+    // No-op in no-auth mode
+    console.log("Logout called (no-op)")
   }
 
   return <AuthContext.Provider value={{ user, loading, logout }}>{children}</AuthContext.Provider>
@@ -40,3 +41,4 @@ export function useAuth(): AuthContextValue {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider")
   return ctx
 }
+

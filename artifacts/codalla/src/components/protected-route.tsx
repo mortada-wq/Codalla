@@ -1,8 +1,7 @@
-import { Redirect } from "wouter"
 import { useAuth } from "@/contexts/auth-context"
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
+  const { loading } = useAuth()
 
   if (loading) {
     return (
@@ -11,6 +10,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
       </div>
     )
   }
-  if (!user) return <Redirect to="/login" />
+
+  // No-auth mode: always render children (no redirect to login)
   return <>{children}</>
 }
+
