@@ -1,8 +1,8 @@
 import app from "./app";
 import { logger } from "./lib/logger";
 
-// Default matches the Vite dev proxy target (artifacts/codalla/vite.config.ts)
-const rawPort = process.env["PORT"] ?? "4000";
+// Default to 3000 for GCP AI Studio and single-process production deployment
+const rawPort = process.env["PORT"] ?? "3000";
 
 const port = Number(rawPort);
 
