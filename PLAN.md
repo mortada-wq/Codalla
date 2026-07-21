@@ -115,6 +115,19 @@ Notes:
 - Secrets are cleaner in Secret Manager: `--set-secrets` instead of
   `--set-env-vars` for `GOOGLE_CLIENT_SECRET` and `DATABASE_URL`.
 
+## Deploy to Railway
+
+> See `deploy/railway/README.md` for the full walkthrough.
+
+The same single-container `Dockerfile` builds for Railway — `railway.json`
+at the repo root pins the builder to it so Railway doesn't try to deploy
+internal workspace packages (`lib/*`, `artifacts/*`) as separate services.
+One project = one app service (built from the Dockerfile) + Railway's
+Postgres plugin + a Volume mounted at `/app/codalla-projects` for project
+files (Railway's disk is otherwise ephemeral across redeploys, same
+constraint as Cloud Run's). As with Cloud Run, keep it to a single
+replica — project files are instance-local state.
+
 ## Business workflows (data prep and beyond)
 
 Codalla is not hardcoded to one use case. Two building blocks cover the
@@ -155,5 +168,6 @@ Codalla is not hardcoded to one use case. Two building blocks cover the
 - Password auth, Clerk, Firebase, or any auth vendor — sign-in stays
   Google-only and boring.
 - Stripe billing.
-- Railway or any specific hosting config; deployment is "run the api-server
-  next to Postgres".
+- Multi-instance scaling; project files are instance-local state (see the
+  Cloud Run and Railway deploy sections), so both documented paths pin a
+  single replica/instance on purpose.
