@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter, Redirect } from "wouter"
+import { Switch, Route, Router as WouterRouter } from "wouter"
 import Dashboard from "./pages/dashboard"
 import EditorPage from "./pages/editor"
 import SettingsPage from "./pages/settings"
@@ -17,7 +17,6 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error: any) => {
-        // A 401 won't fix itself by retrying — the user needs to sign in
         if (error?.status === 401 || error?.status === 403) return false
         return failureCount < 2
       },
@@ -39,8 +38,6 @@ function AppRouter() {
       <Route path="/editor/:projectId">
         <ProtectedRoute><EditorPage /></ProtectedRoute>
       </Route>
-      <Route path="/keys">{() => <Redirect to="/settings?tab=keys" />}</Route>
-      <Route path="/usage">{() => <Redirect to="/settings?tab=usage" />}</Route>
       <Route path="/settings">
         <ProtectedRoute><SettingsPage /></ProtectedRoute>
       </Route>

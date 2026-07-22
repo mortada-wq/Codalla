@@ -11,7 +11,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // No-auth mode: always render children (no redirect to login)
+  // No auth — always render children
   return <>{children}</>
 }
 
