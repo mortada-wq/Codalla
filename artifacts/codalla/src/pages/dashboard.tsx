@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Plus, Search, Folder, FolderOpen, GitBranch, Clock, ArrowRight, Trash2, Github, ChevronDown, Loader2, MessageSquare, Sparkles, DollarSign, Activity, Cpu, FileText, Wand2, Users } from "lucide-react"
+import { Plus, Search, Folder, FolderOpen, GitBranch, Clock, ArrowRight, Trash2, Github, ChevronDown, Loader2, MessageSquare, Sparkles, DollarSign, Activity, Cpu, FileText, Wand2, Users, AlertCircle, RefreshCw } from "lucide-react"
 import { formatCurrency, formatNumber, formatDate } from "@/lib/utils"
 import { useListProjects, useGetUsageSummary, useDeleteProject, useCreateProject, useUpdateProject, useListConversations, getListProjectsQueryKey, useGetSettings } from "@workspace/api-client-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -32,8 +32,8 @@ const projectSchema = z.object({
 })
 
 export default function Dashboard() {
-  const { data: projects, isLoading: isLoadingProjects } = useListProjects()
-  const { data: usage, isLoading: isLoadingUsage } = useGetUsageSummary()
+  const { data: projects, isLoading: isLoadingProjects, isError: isProjectsError, refetch: refetchProjects } = useListProjects()
+  const { data: usage, isLoading: isLoadingUsage, isError: isUsageError } = useGetUsageSummary()
   const [search, setSearch] = useState("")
 
   const filteredProjects = useMemo(() => {
@@ -56,9 +56,11 @@ export default function Dashboard() {
             <div>
               <h1 className="type-display text-foreground">Dashboard</h1>
               <p className="text-muted-foreground mt-1 text-[13px]">
-                {projects && projects.length > 0
-                  ? `${projects.length} ${projects.length === 1 ? 'project' : 'projects'} — jump back in or start something new.`
-                  : "Welcome to Codalla. Create your first project to begin."}
+                {isProjectsError
+                  ? "Couldn't reach the server — see below."
+                  : projects && projects.length > 0
+                    ? `${projects.length} ${projects.length === 1 ? 'project' : 'projects'} — jump back in or start something new.`
+                    : "Welcome to Codalla. Create your first project to begin."}
               </p>
             </div>
             <CreateProjectDialog />
@@ -68,20 +70,20 @@ export default function Dashboard() {
           <section aria-label="Usage summary" className="grid gap-4 md:grid-cols-3">
             <StatCard
               label="Today's Cost"
-              value={isLoadingUsage ? null : formatCurrency(usage?.todayCost || 0)}
-              hint={usage ? `Total ${formatCurrency(usage.totalCost || 0)}` : undefined}
+              value={isLoadingUsage ? null : isUsageError ? "—" : formatCurrency(usage?.todayCost || 0)}
+              hint={isUsageError ? "Couldn't load usage" : usage ? `Total ${formatCurrency(usage.totalCost || 0)}` : undefined}
               icon={DollarSign}
             />
             <StatCard
               label="Tokens Processed"
-              value={isLoadingUsage ? null : formatNumber(usage?.totalTokens || 0)}
-              hint="Across all models"
+              value={isLoadingUsage ? null : isUsageError ? "—" : formatNumber(usage?.totalTokens || 0)}
+              hint={isUsageError ? "Couldn't load usage" : "Across all models"}
               icon={Activity}
             />
             <StatCard
               label="API Requests"
-              value={isLoadingUsage ? null : formatNumber(usage?.totalRequests || 0)}
-              hint="All time"
+              value={isLoadingUsage ? null : isUsageError ? "—" : formatNumber(usage?.totalRequests || 0)}
+              hint={isUsageError ? "Couldn't load usage" : "All time"}
               icon={Cpu}
             />
           </section>
@@ -104,7 +106,9 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {isLoadingProjects ? (
+              {isProjectsError ? (
+                <DashboardErrorState message="Couldn't load your projects." onRetry={() => refetchProjects()} />
+              ) : isLoadingProjects ? (
                 <div className="grid gap-4 md:grid-cols-2">
                   {[1, 2, 3, 4].map(i => <ProjectCardSkeleton key={i} />)}
                 </div>
@@ -320,6 +324,19 @@ function ProjectCardSkeleton() {
 // ═════════════════════════════════════════════════════════════════════
 // EMPTY STATE — inviting, clear next step
 // ═════════════════════════════════════════════════════════════════════
+function DashboardErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center border border-dashed border-destructive/40 rounded-lg bg-destructive/5">
+      <AlertCircle className="h-6 w-6 text-destructive mb-3" />
+      <p className="text-[13px] font-medium text-foreground">{message}</p>
+      <Button variant="outline" size="sm" onClick={onRetry} className="mt-4">
+        <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+        Try again
+      </Button>
+    </div>
+  )
+}
+
 function EmptyProjectsState({ hasSearch }: { hasSearch: boolean }) {
   if (hasSearch) {
     return (
@@ -744,13 +761,22 @@ function ModeButton({ active, onClick, icon: Icon, label, testId }: {
 // RECENT CONVERSATIONS
 // ═════════════════════════════════════════════════════════════════════
 function RecentConversations() {
-  const { data: conversations, isLoading } = useListConversations({})
+  const { data: conversations, isLoading, isError, refetch } = useListConversations({})
   const [, setLocation] = useLocation()
 
   return (
     <Card className="bg-card border-border shadow-none">
       <CardContent className="p-4">
-        {isLoading ? (
+        {isError ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <AlertCircle className="h-6 w-6 text-destructive mb-2" />
+            <p className="text-[13px] text-muted-foreground">Couldn&apos;t load recent chats.</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()} className="mt-3">
+              <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+              Try again
+            </Button>
+          </div>
+        ) : isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
               <div key={i} className="flex gap-3">

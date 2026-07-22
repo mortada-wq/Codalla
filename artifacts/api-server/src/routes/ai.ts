@@ -1,8 +1,8 @@
 import { Router, type IRouter } from "express";
-import { eq, and, asc, desc } from "drizzle-orm";
+import { eq, and, asc, desc, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { projectAccessWhere } from "../lib/project-access";
-import { db, apiKeysTable, conversationsTable, messagesTable, usageLogTable, settingsTable, projectsTable, projectSuccessCriteriaTable, projectMemoryNotesTable, patternsTable, patternUsageLogTable } from "@workspace/db";
+import { db, apiKeysTable, conversationsTable, messagesTable, usageLogTable, settingsTable, projectsTable, projectSuccessCriteriaTable, projectMemoryNotesTable, patternsTable, patternUsageLogTable, customModelsTable } from "@workspace/db";
 import { detectProjectStack, buildSystemPrompt, classifyProblem } from "../utils/detect-stack";
 import {
   ListModelsResponse,
@@ -155,14 +155,31 @@ Rules: always include the complete file content; use forward slashes; you may in
   }
 }
 
+const BUILT_IN_COST_PER_1M: Record<string, number> = {
+  "deepseek-ai/DeepSeek-V3": 1.33,
+  "deepseek-ai/DeepSeek-R1": 4.0,
+  "Qwen/Qwen2.5-Coder-32B-Instruct": 1.5,
+};
+
 async function logUsage(userId: string, model: string, provider: string, promptTokens: number, completionTokens: number, action: string) {
-  const costPer1M: Record<string, number> = {
-    "deepseek-ai/DeepSeek-V3": 1.33,
-    "deepseek-ai/DeepSeek-R1": 4.0,
-    "Qwen/Qwen2.5-Coder-32B-Instruct": 1.5,
-  };
-  const rate = costPer1M[model] ?? 2.0;
-  const cost = ((promptTokens + completionTokens) / 1_000_000) * rate;
+  // Prefer the user's own configured pricing for custom models (separate
+  // prompt/completion rates); fall back to the flat built-in-model table,
+  // then a generic default for anything else unrecognized.
+  const [customModel] = await db.select({
+    pricingPrompt: customModelsTable.pricingPrompt,
+    pricingCompletion: customModelsTable.pricingCompletion,
+  }).from(customModelsTable)
+    .where(and(eq(customModelsTable.userId, userId), eq(customModelsTable.modelId, model), eq(customModelsTable.provider, provider)));
+
+  let cost: number;
+  if (customModel) {
+    const promptRate = customModel.pricingPrompt ?? 0;
+    const completionRate = customModel.pricingCompletion ?? 0;
+    cost = (promptTokens / 1_000_000) * promptRate + (completionTokens / 1_000_000) * completionRate;
+  } else {
+    const rate = BUILT_IN_COST_PER_1M[model] ?? 2.0;
+    cost = ((promptTokens + completionTokens) / 1_000_000) * rate;
+  }
 
   await db.insert(usageLogTable).values({
     id: uuidv4(),
@@ -508,7 +525,7 @@ router.post("/ai/chat", async (req, res): Promise<void> => {
 
   // Update conversation cost + updatedAt
   await db.update(conversationsTable)
-    .set({ totalCost: (conv.totalCost ?? 0) + cost, updatedAt: new Date() })
+    .set({ totalCost: sql`${conversationsTable.totalCost} + ${cost}`, updatedAt: new Date() })
     .where(and(eq(conversationsTable.id, conversationId), eq(conversationsTable.userId, req.user!.id)));
 
   // Auto-generate summary in background (non-blocking)
@@ -714,6 +731,10 @@ router.post("/ai/chat/stream", async (req, res): Promise<void> => {
       messages: msgs,
       temperature: 0.3,
       stream: true,
+      // Without this, most OpenAI-compatible providers omit `usage` from
+      // every chunk (including the final one), so token/cost accounting
+      // below silently records 0 for every streamed reply.
+      stream_options: { include_usage: true },
     });
 
     let fullContent = "";
@@ -749,7 +770,7 @@ router.post("/ai/chat/stream", async (req, res): Promise<void> => {
         cost,
       }).returning();
       await db.update(conversationsTable)
-        .set({ totalCost: (conv.totalCost ?? 0) + cost, updatedAt: new Date() })
+        .set({ totalCost: sql`${conversationsTable.totalCost} + ${cost}`, updatedAt: new Date() })
         .where(and(eq(conversationsTable.id, conversationId), eq(conversationsTable.userId, req.user!.id)));
 
       // Auto-generate summary in background (non-blocking)

@@ -1,8 +1,8 @@
 import { Router, type IRouter } from "express";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import OpenAI from "openai";
-import { db, workflowExecutionTable, workflowStepExecutionTable, workflowsTable, projectsTable } from "@workspace/db";
+import { db, workflowExecutionTable, workflowStepExecutionTable, workflowsTable, projectsTable, customModelsTable } from "@workspace/db";
 import { projectAccessWhere } from "../lib/project-access";
 
 const router: IRouter = Router();
@@ -28,6 +28,29 @@ async function getProviderCreds(provider: string, userId: string) {
     return { apiKey: envKey, baseURL: PROVIDER_DEFAULT_BASE_URL[provider] ?? "" };
   }
   return null;
+}
+
+// Mirror of ai.ts's built-in rate table — kept in sync manually since this
+// router intentionally doesn't couple to ai.ts's internals.
+const BUILT_IN_COST_PER_1M: Record<string, number> = {
+  "deepseek-ai/DeepSeek-V3": 1.33,
+  "deepseek-ai/DeepSeek-R1": 4.0,
+  "Qwen/Qwen2.5-Coder-32B-Instruct": 1.5,
+};
+
+async function computeCost(userId: string, model: string, provider: string, promptTokens: number, completionTokens: number): Promise<number> {
+  const [customModel] = await db.select({
+    pricingPrompt: customModelsTable.pricingPrompt,
+    pricingCompletion: customModelsTable.pricingCompletion,
+  }).from(customModelsTable)
+    .where(and(eq(customModelsTable.userId, userId), eq(customModelsTable.modelId, model), eq(customModelsTable.provider, provider)));
+
+  if (customModel) {
+    return (promptTokens / 1_000_000) * (customModel.pricingPrompt ?? 0)
+      + (completionTokens / 1_000_000) * (customModel.pricingCompletion ?? 0);
+  }
+  const rate = BUILT_IN_COST_PER_1M[model] ?? 2.0;
+  return ((promptTokens + completionTokens) / 1_000_000) * rate;
 }
 
 // ── Routes ───────────────────────────────────────────────────────────────────
@@ -217,14 +240,17 @@ router.post("/workflow-executions/:executionId/step", async (req, res): Promise<
       });
 
       const output = completion.choices[0]?.message?.content ?? "";
+      const promptTokens = completion.usage?.prompt_tokens ?? 0;
+      const completionTokens = completion.usage?.completion_tokens ?? 0;
+      const stepCost = await computeCost(execution.userId, execution.context.modelId, execution.context.provider, promptTokens, completionTokens);
 
       // Update step execution
       await db.update(workflowStepExecutionTable)
         .set({
           status: "completed",
           output,
-          tokensUsed: (completion.usage?.prompt_tokens ?? 0) + (completion.usage?.completion_tokens ?? 0),
-          cost: ((completion.usage?.prompt_tokens ?? 0) + (completion.usage?.completion_tokens ?? 0)) / 1_000_000 * 2.0,
+          tokensUsed: promptTokens + completionTokens,
+          cost: stepCost,
           completedAt: new Date(),
         })
         .where(eq(workflowStepExecutionTable.id, stepId));
@@ -236,7 +262,7 @@ router.post("/workflow-executions/:executionId/step", async (req, res): Promise<
         .set({
           currentStepIndex: newIndex,
           status: isLast ? "completed" : "running",
-          totalCost: (execution.totalCost ?? 0) + (completion.usage?.total_tokens ?? 0) / 1_000_000 * 2.0,
+          totalCost: sql`${workflowExecutionTable.totalCost} + ${stepCost}`,
           updatedAt: new Date(),
           completedAt: isLast ? new Date() : null,
         })
