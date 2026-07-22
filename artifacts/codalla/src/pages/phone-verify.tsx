@@ -38,11 +38,6 @@ export function PhoneVerifyPage() {
     }
   };
 
-  // Not logged in → redirect to login
-  if (!loading && !user) {
-    return <Redirect to="/login" />;
-  }
-
   // Already verified → redirect to dashboard
   if (!isChecking && isPhoneVerified) {
     return <Redirect to="/" />;
