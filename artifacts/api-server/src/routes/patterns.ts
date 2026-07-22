@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, and, asc } from "drizzle-orm";
+import { eq, and, or, isNull, asc } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import { db, patternsTable, patternUsageLogTable, projectsTable } from "@workspace/db";
 import { projectAccessWhere } from "../lib/project-access";
@@ -19,7 +19,8 @@ router.get("/patterns", async (req, res): Promise<void> => {
       .from(patternsTable)
       .where(and(
         eq(patternsTable.isEnabled, true),
-        // Show built-in patterns (userId is null) or team's custom patterns
+        // Built-in patterns (userId is null) or this account's own custom patterns
+        or(isNull(patternsTable.userId), eq(patternsTable.userId, userId)),
       ));
 
     res.json(patterns.map(p => ({
@@ -34,12 +35,21 @@ router.get("/patterns", async (req, res): Promise<void> => {
 
 // GET /patterns/:patternId — get a specific pattern
 router.get("/patterns/:patternId", async (req, res): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
   const { patternId } = req.params;
 
   try {
     const [pattern] = await db.select()
       .from(patternsTable)
-      .where(eq(patternsTable.id, patternId));
+      .where(and(
+        eq(patternsTable.id, patternId),
+        or(isNull(patternsTable.userId), eq(patternsTable.userId, userId)),
+      ));
 
     if (!pattern) {
       res.status(404).json({ error: "Pattern not found" });
@@ -59,6 +69,12 @@ router.get("/patterns/:patternId", async (req, res): Promise<void> => {
 // POST /patterns/suggest — suggest patterns based on problem classification
 // Body: { problemType: PatternProblemType, keywords?: string[] }
 router.post("/patterns/suggest", async (req, res): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
   const { problemType, keywords } = req.body ?? {};
 
   if (!problemType) {
@@ -73,6 +89,7 @@ router.post("/patterns/suggest", async (req, res): Promise<void> => {
       .where(and(
         eq(patternsTable.isEnabled, true),
         eq(patternsTable.problemType, problemType),
+        or(isNull(patternsTable.userId), eq(patternsTable.userId, userId)),
       ))
       .orderBy(asc(patternsTable.createdAt));
 
