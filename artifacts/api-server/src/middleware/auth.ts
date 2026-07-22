@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import type { Request, Response, NextFunction } from "express";
 import { eq } from "drizzle-orm";
 import { db, usersTable, type User } from "@workspace/db";
@@ -12,10 +11,7 @@ declare global {
   }
 }
 
-export const SESSION_COOKIE = "codalla_session";
-export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
-
-// Local user for no-auth mode (always enabled)
+// Local user for open access mode
 const LOCAL_USER_ID = "local";
 const LOCAL_USER_EMAIL = "local@codalla.local";
 
@@ -23,7 +19,7 @@ let cachedUser: User | null = null;
 
 /**
  * Attach an implicit local user to every request.
- * No session validation; everyone is logged in as the same local user.
+ * No auth required; everyone has access to all routes.
  */
 export async function requireAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
@@ -45,9 +41,5 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
   } catch (err) {
     next(err);
   }
-}
-
-export function hashSessionToken(token: string): string {
-  return crypto.createHash("sha256").update(token).digest("hex");
 }
 
