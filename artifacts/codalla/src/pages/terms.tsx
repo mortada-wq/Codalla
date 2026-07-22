@@ -24,14 +24,14 @@ export default function TermsPage() {
     <LegalPageLayout title="Terms of Service" lastUpdated="July 9, 2026" sections={SECTIONS}>
       <p>
         Welcome to Codalla. These Terms of Service (&ldquo;<strong>Terms</strong>&rdquo;) govern your access to and use of
-        Codalla&apos;s website, applications, APIs, and related services (collectively, the &ldquo;<strong>Service</strong>&rdquo;).
+        Codalla's website, applications, APIs, and related services (collectively, the &ldquo;<strong>Service</strong>&rdquo;).
         By creating an account or otherwise accessing the Service, you agree to be bound by these Terms.
       </p>
 
       <h2 id="acceptance">1. Acceptance of Terms</h2>
       <p>
-        By clicking &ldquo;Create account,&rdquo; &ldquo;Sign in,&rdquo; or otherwise using the Service, you (&ldquo;<strong>you</strong>&rdquo; or
-        &ldquo;<strong>User</strong>&rdquo;) enter into a binding agreement with Codalla (&ldquo;<strong>Codalla</strong>,&rdquo; &ldquo;<strong>we</strong>,&rdquo;
+        By accessing the Service, you (&ldquo;<strong>you</strong>&rdquo; or &ldquo;<strong>User</strong>&rdquo;) enter into a
+        binding agreement with Codalla (&ldquo;<strong>Codalla</strong>,&rdquo; &ldquo;<strong>we</strong>,&rdquo;
         &ldquo;<strong>us</strong>,&rdquo; or &ldquo;<strong>our</strong>&rdquo;). If you are using the Service on behalf of an organization,
         you represent that you have authority to bind that organization to these Terms.
       </p>
@@ -53,16 +53,15 @@ export default function TermsPage() {
       </p>
 
       <h2 id="accounts">3. Your Account</h2>
-      <p>You may sign in using email + password or Google OAuth. You agree to:</p>
+      <p>The Service does not require sign-in — a local account is provisioned automatically for you. You agree to:</p>
       <ul>
-        <li>Provide accurate, current, and complete information;</li>
-        <li>Keep your password confidential and choose one that is not shared with any other service;</li>
+        <li>Provide accurate, current, and complete information where the Service asks for it;</li>
         <li>Notify us immediately at <a href="mailto:security@codalla.dev">security@codalla.dev</a> if you suspect unauthorized access to your account;</li>
         <li>Be responsible for all activity that occurs under your account.</li>
       </ul>
       <p>
-        We may suspend or terminate accounts that we reasonably believe have been compromised, are being used to
-        abuse the Service, or that violate these Terms.
+        We may suspend or terminate accounts that we reasonably believe are being used to
+        abuse the Service or that violate these Terms.
       </p>
 
       <h2 id="acceptable-use">4. Acceptable Use</h2>
@@ -72,7 +71,6 @@ export default function TermsPage() {
         <li>Circumvent, disable, or interfere with any security or usage-metering features of the Service;</li>
         <li>Reverse engineer, decompile, or attempt to extract the source code of the Service, except to the extent applicable law prohibits such restriction;</li>
         <li>Use the Service to build a product that directly replicates or competes with the Service;</li>
-        <li>Share your account credentials or your paid seat with any other individual;</li>
         <li>Upload malware, or use the Service in a manner that consumes excessive resources or degrades performance for other users;</li>
         <li>Violate the terms of any AI model provider or third-party API you access via the Service.</li>
       </ul>
@@ -101,7 +99,7 @@ export default function TermsPage() {
       <h2 id="third-parties">6. Third-Party Services</h2>
       <p>
         The Service integrates with third-party providers, including but not limited to: OpenRouter, SiliconFlow,
-        RunPod, GitHub, Google, and Stripe. Your use of those services is governed by the respective providers&apos;
+        RunPod, GitHub, and Stripe. Your use of those services is governed by the respective providers'
         terms and privacy policies. Codalla is not responsible for the availability, accuracy, or content of any
         third-party service.
       </p>
@@ -178,16 +176,15 @@ export default function TermsPage() {
       <h2 id="indemnity">12. Indemnification</h2>
       <p>
         You will defend, indemnify, and hold harmless Codalla from and against any third-party claims, damages,
-        liabilities, and expenses (including reasonable attorneys&apos; fees) arising from: (a) Your Content, (b)
+        liabilities, and expenses (including reasonable attorneys' fees) arising from: (a) Your Content, (b)
         your use of the Service in violation of these Terms, or (c) your violation of any law or the rights of a
         third party.
       </p>
 
       <h2 id="termination">13. Termination</h2>
       <p>
-        You may terminate your account at any time from the <em>Settings → Profile → Danger zone</em> section, or
-        by writing to <a href="mailto:support@codalla.dev">support@codalla.dev</a>. Upon termination, we will
-        delete Your Content in accordance with our data-retention practices described in the Privacy Policy.
+        You may request account termination by writing to <a href="mailto:support@codalla.dev">support@codalla.dev</a>.
+        Upon termination, we will delete Your Content in accordance with our data-retention practices described in the Privacy Policy.
       </p>
       <p>
         We may suspend or terminate your access if you materially breach these Terms, if required by law, or if
@@ -199,8 +196,8 @@ export default function TermsPage() {
       <p>
         We may update these Terms from time to time. If we make material changes, we will notify you by email or via
         an in-app banner at least fourteen (14) days before they take effect. Your continued use of the Service after
-        the effective date constitutes acceptance of the updated Terms. If you do not agree, you may cancel your
-        account before the effective date.
+        the effective date constitutes acceptance of the updated Terms. If you do not agree, you may request account
+        termination before the effective date.
       </p>
 
       <h2 id="governing-law">15. Governing Law & Disputes</h2>
@@ -234,3 +231,4 @@ export default function TermsPage() {
     </LegalPageLayout>
   )
 }
+

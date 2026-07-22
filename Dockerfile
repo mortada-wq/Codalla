@@ -4,6 +4,10 @@
 
 FROM node:24-slim AS build
 RUN npm install -g pnpm@10
+# Install Python and build essentials for native modules (better-sqlite3)
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 build-essential \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY . .
 RUN pnpm install --frozen-lockfile
@@ -22,3 +26,4 @@ ENV NODE_ENV=production
 # Cloud Run injects PORT; 8080 is its default
 EXPOSE 8080
 CMD ["node", "--enable-source-maps", "./dist/index.mjs"]
+
