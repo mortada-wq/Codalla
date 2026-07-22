@@ -46,9 +46,8 @@ export default function PrivacyPage() {
 
       <h3>a) Account information</h3>
       <ul>
-        <li>Email address, display name, and password hash (bcrypt — we never see your plain password);</li>
+        <li>Email address and display name;</li>
         <li>Optional profile fields you fill in: avatar URL, bio, GitHub handle, timezone, organization name;</li>
-        <li>If you sign in with Google: your Google account ID, name, email, and profile picture URL (returned to us by Google after you consent);</li>
         <li>Role and org membership (currently &ldquo;owner&rdquo; for all accounts).</li>
       </ul>
 
@@ -69,7 +68,6 @@ export default function PrivacyPage() {
       <h3>d) Usage & billing</h3>
       <ul>
         <li>Model calls: model name, provider, prompt & completion token counts, cost estimate, timestamp;</li>
-        <li>Login timestamps and IP-address-based brute-force counters (kept only while relevant);</li>
         <li>If you pay for a plan: Stripe customer ID, subscription status, transaction receipts (Stripe handles your card details — we never touch them).</li>
       </ul>
 
@@ -83,7 +81,7 @@ export default function PrivacyPage() {
       <p>We process the data above for these purposes:</p>
       <ul>
         <li><strong>Providing the Service</strong> — running your projects, forwarding prompts to model providers, saving files, syncing with GitHub. <em>Legal basis: contract performance.</em></li>
-        <li><strong>Account security</strong> — password hashing, session tokens, brute-force protection. <em>Legal basis: legitimate interests.</em></li>
+        <li><strong>Account security</strong> — session tokens, security monitoring. <em>Legal basis: legitimate interests.</em></li>
         <li><strong>Billing</strong> — processing subscriptions and top-ups via Stripe. <em>Legal basis: contract performance.</em></li>
         <li><strong>Customer support</strong> — responding to questions and diagnosing issues you report. <em>Legal basis: legitimate interests + your consent.</em></li>
         <li><strong>Product improvement (aggregated only)</strong> — analysing anonymised usage patterns to fix bugs and prioritise features. Aggregates cannot be re-associated with any individual user. <em>Legal basis: legitimate interests.</em></li>
@@ -100,7 +98,6 @@ export default function PrivacyPage() {
         <li><strong>Infrastructure providers</strong> — our cloud host and database provider process data on our behalf under written data-processing agreements.</li>
         <li><strong>Payment processor</strong> — Stripe (see <a href="https://stripe.com/privacy" target="_blank" rel="noreferrer">stripe.com/privacy</a>) processes payments; we exchange your customer ID, plan, and email with Stripe.</li>
         <li><strong>AI model providers you configure</strong> — see the next section.</li>
-        <li><strong>Authentication provider</strong> — if you sign in with Google, Google returns your profile data to us. See <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Google&apos;s privacy policy</a>.</li>
         <li><strong>Legal or safety recipients</strong> — regulators, law enforcement, or others where we are legally compelled or where disclosure is necessary to prevent imminent harm.</li>
       </ul>
 
@@ -126,12 +123,7 @@ export default function PrivacyPage() {
       </p>
 
       <h2 id="cookies">6. Cookies & sessions</h2>
-      <p>We use a small number of strictly necessary cookies. There is no advertising or analytics tracking.</p>
-      <ul>
-        <li><code>access_token</code> — HTTP-only JWT that keeps you signed in (15 minute lifetime, renewed automatically).</li>
-        <li><code>refresh_token</code> — HTTP-only JWT used to renew your session (7 day lifetime).</li>
-      </ul>
-      <p>Both cookies are <code>SameSite=Lax</code>, <code>Secure</code> in production, and cannot be read by JavaScript.</p>
+      <p>The Service does not use authentication cookies — your session is managed locally in the browser.</p>
 
       <h2 id="retention">7. Data retention</h2>
       <ul>
@@ -140,7 +132,7 @@ export default function PrivacyPage() {
         <li><strong>Third-party API keys:</strong> retained until you delete them from the API Keys tab.</li>
         <li><strong>Usage logs (billing meters):</strong> retained for up to 24 months for accurate billing and dispute resolution.</li>
         <li><strong>Payment records:</strong> retained per applicable tax law (typically 7–10 years) in Stripe and in our billing database.</li>
-        <li><strong>Security logs (login attempts, request logs):</strong> retained up to 90 days.</li>
+        <li><strong>Security logs (request logs):</strong> retained up to 90 days.</li>
       </ul>
 
       <h2 id="security">8. Security</h2>
@@ -149,9 +141,6 @@ export default function PrivacyPage() {
       </p>
       <ul>
         <li>All traffic is served over HTTPS with modern TLS;</li>
-        <li>Passwords are hashed with bcrypt (never stored in plaintext, never logged);</li>
-        <li>Session tokens are stored in HTTP-only cookies not accessible to JavaScript;</li>
-        <li>Failed logins are rate-limited with automatic lockout;</li>
         <li>Access to production systems is limited, logged, and requires MFA.</li>
       </ul>
       <p>
@@ -189,15 +178,15 @@ export default function PrivacyPage() {
       <p>
         Codalla operates globally. Your personal data may be processed in countries other than your own.
         When we transfer personal data from the European Economic Area, the United Kingdom, or Switzerland
-        to third countries, we rely on the European Commission&apos;s Standard Contractual Clauses (SCCs)
+        to third countries, we rely on the European Commission's Standard Contractual Clauses (SCCs)
         or another lawful transfer mechanism.
       </p>
 
       <h2 id="changes">12. Changes</h2>
       <p>
         We may update this Privacy Policy from time to time. If we make material changes, we will notify you
-        by email or via an in-app banner at least 14 days before the changes take effect. The &ldquo;Last
-        updated&rdquo; date at the top of this page reflects the most recent version.
+        by email or via an in-app banner at least 14 days before the changes take effect. The "Last
+        updated" date at the top of this page reflects the most recent version.
       </p>
 
       <h2 id="contact">13. Contact us</h2>
@@ -216,3 +205,4 @@ export default function PrivacyPage() {
     </LegalPageLayout>
   )
 }
+
