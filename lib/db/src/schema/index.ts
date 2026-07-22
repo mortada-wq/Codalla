@@ -3,13 +3,13 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
 // ─── Users ───────────────────────────────────────────────────────────────────
-// Sign-in is Google-only (googleId = Google's stable `sub` claim). With
-// AUTH_DISABLED=true the server instead uses one implicit "local" user row,
-// which has no googleId — hence the column stays nullable.
+// Codalla has no authentication. Every request is attributed to one implicit
+// "local" user row (see middleware/auth.ts). There is no sign-in, no session,
+// and no per-instance access control — do not deploy this beyond a trusted
+// network without adding real auth first.
 export const usersTable = pgTable("users", {
   id: text("id").primaryKey(),
   email: text("email").notNull().unique(),
-  googleId: text("google_id").unique(),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
   bio: text("bio"),
@@ -21,59 +21,6 @@ export const usersTable = pgTable("users", {
 export const insertUserSchema = createInsertSchema(usersTable).omit({ createdAt: true, updatedAt: true });
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof usersTable.$inferSelect;
-
-// ─── Sessions ─────────────────────────────────────────────────────────────────
-// Server-side sessions: the browser cookie holds a random token, the DB holds
-// its SHA-256 hash. Deleting a row signs that browser out immediately.
-export const sessionsTable = pgTable("sessions", {
-  tokenHash: text("token_hash").primaryKey(),
-  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-export type Session = typeof sessionsTable.$inferSelect;
-
-// ─── Phone Verification ──────────────────────────────────────────────────────────
-// One phone number = one account. Prevents multi-accounting fraud.
-export const userPhonesTable = pgTable("user_phones", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").notNull().unique().references(() => usersTable.id, { onDelete: "cascade" }),
-  phoneNumber: text("phone_number").notNull().unique(),
-  verificationCode: text("verification_code"),  // Temporary OTP
-  verificationCodeExpiresAt: timestamp("verification_code_expires_at"),
-  verifiedAt: timestamp("verified_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-export type UserPhone = typeof userPhonesTable.$inferSelect;
-
-// ─── Device Fingerprints ────────────────────────────────────────────────────────
-// Detect if same device signs up with multiple accounts.
-export const deviceFingerprintsTable = pgTable("device_fingerprints", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  fingerprint: text("fingerprint").notNull().unique(),  // Hash of device props
-  userAgent: text("user_agent"),
-  screenResolution: text("screen_resolution"),
-  timezone: text("timezone"),
-  language: text("language"),
-  lastSeenAt: timestamp("last_seen_at").defaultNow().notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-export type DeviceFingerprint = typeof deviceFingerprintsTable.$inferSelect;
-
-// ─── Signup Audit (Anti-Fraud) ──────────────────────────────────────────────────
-// Track signup patterns to detect multi-accounting.
-export const signupAuditTable = pgTable("signup_audit", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  email: text("email").notNull(),
-  phoneNumber: text("phone_number"),
-  ipAddress: text("ip_address"),
-  deviceFingerprint: text("device_fingerprint"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-export type SignupAudit = typeof signupAuditTable.$inferSelect;
 
 // ─── Workflows ────────────────────────────────────────────────────────────────
 // Reusable AI pipeline presets. Deliberately modality-agnostic: a workflow is
@@ -184,7 +131,10 @@ export type ApiKey = typeof apiKeysTable.$inferSelect;
 export const conversationsTable = pgTable("conversations", {
   id: text("id").primaryKey(),
   userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  projectId: text("project_id"),
+  // Nullable — a conversation can exist without a project (general chat).
+  // set null on delete: deleting a project detaches its conversations
+  // rather than destroying chat history.
+  projectId: text("project_id").references(() => projectsTable.id, { onDelete: "set null" }),
   title: text("title"),
   modelId: text("model_id").notNull(),
   provider: text("provider").notNull(),

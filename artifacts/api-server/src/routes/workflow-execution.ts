@@ -9,6 +9,11 @@ const router: IRouter = Router();
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+const PROVIDER_DEFAULT_BASE_URL: Record<string, string> = {
+  siliconflow: "https://api.siliconflow.cn/v1",
+  openrouter: "https://openrouter.ai/api/v1",
+};
+
 async function getProviderCreds(provider: string, userId: string) {
   // Reuse from ai.ts
   const { apiKeysTable, settingsTable } = await import("@workspace/db");
@@ -16,11 +21,11 @@ async function getProviderCreds(provider: string, userId: string) {
     .where(and(eq(apiKeysTable.userId, userId), eq(apiKeysTable.provider, provider)))
     .limit(1);
   if (key?.isActive) {
-    return { apiKey: key.keyValue, baseURL: key.baseUrl ?? "https://api.siliconflow.cn/v1" };
+    return { apiKey: key.keyValue, baseURL: key.baseUrl ?? PROVIDER_DEFAULT_BASE_URL[provider] ?? "" };
   }
   const envKey = process.env[`${provider.toUpperCase()}_API_KEY`];
   if (envKey) {
-    return { apiKey: envKey, baseURL: "https://api.siliconflow.cn/v1" };
+    return { apiKey: envKey, baseURL: PROVIDER_DEFAULT_BASE_URL[provider] ?? "" };
   }
   return null;
 }
@@ -89,10 +94,15 @@ router.post("/workflow-executions", async (req, res): Promise<void> => {
 // Get execution status and progress
 router.get("/workflow-executions/:executionId", async (req, res): Promise<void> => {
   const { executionId } = req.params;
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
 
   try {
     const [execution] = await db.select().from(workflowExecutionTable)
-      .where(eq(workflowExecutionTable.id, executionId));
+      .where(and(eq(workflowExecutionTable.id, executionId), eq(workflowExecutionTable.userId, userId)));
 
     if (!execution) {
       res.status(404).json({ error: "Execution not found" });
@@ -125,10 +135,15 @@ router.get("/workflow-executions/:executionId", async (req, res): Promise<void> 
 router.post("/workflow-executions/:executionId/step", async (req, res): Promise<void> => {
   const { executionId } = req.params;
   const { currentOutput } = req.body ?? {};
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
 
   try {
     const [execution] = await db.select().from(workflowExecutionTable)
-      .where(eq(workflowExecutionTable.id, executionId));
+      .where(and(eq(workflowExecutionTable.id, executionId), eq(workflowExecutionTable.userId, userId)));
 
     if (!execution) {
       res.status(404).json({ error: "Execution not found" });

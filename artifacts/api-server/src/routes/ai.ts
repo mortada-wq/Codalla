@@ -403,6 +403,13 @@ router.get("/conversations/:conversationId/messages", async (req, res): Promise<
     return;
   }
 
+  const [conv] = await db.select({ id: conversationsTable.id }).from(conversationsTable)
+    .where(and(eq(conversationsTable.id, params.data.conversationId), eq(conversationsTable.userId, req.user!.id)));
+  if (!conv) {
+    res.status(404).json({ error: "Conversation not found" });
+    return;
+  }
+
   const messages = await db.select().from(messagesTable)
     .where(eq(messagesTable.conversationId, params.data.conversationId))
     .orderBy(asc(messagesTable.createdAt));

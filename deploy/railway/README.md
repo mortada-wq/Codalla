@@ -10,7 +10,14 @@ workspace packages separately:
 | App (API + frontend) | 1 service, built from the root `Dockerfile` (`railway.json` at repo root pins this) |
 | Database | Railway's built-in PostgreSQL plugin |
 | Project workspaces (files) | a Railway Volume mounted at `/app/codalla-projects` |
-| Secrets (`GOOGLE_CLIENT_SECRET`, etc.) | service Variables (Railway encrypts these at rest) |
+
+**Codalla has no authentication of its own** — every request is attributed
+to one implicit local user (see `PLAN.md`). Unlike Cloud Run, Railway has no
+built-in IAM gate in front of a public domain: the moment you generate one
+(step 3), anyone with the URL has full read/write access to every project,
+chat history, and your configured AI provider keys. Only generate a public
+domain if that's genuinely acceptable, or put an authenticating reverse
+proxy in front of it.
 
 ## 1. Create the project
 
@@ -41,13 +48,8 @@ On the `codalla` service → Variables, add:
   `https://codalla-production.up.railway.app` (Railway assigns this once you
   enable networking under Settings → Networking → Generate Domain; fill this
   in after the first deploy, then redeploy)
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET` — mark it as a **secret** variable, never paste it
-  anywhere else (chat, issues, etc.) — if it's ever been exposed outside
-  Railway's own encrypted storage, regenerate it in Google Cloud Console
-  first
-- Optional: `ALLOWED_EMAIL_DOMAINS`, `ALLOWED_EMAILS`, `OPENROUTER_API_KEY`,
-  `SILICONFLOW_API_KEY`, `CODALLA_DATA_ROOTS` — see `.env.example`
+- Optional: `OPENROUTER_API_KEY`, `SILICONFLOW_API_KEY`, `CODALLA_DATA_ROOTS`
+  — see `.env.example`
 
 Railway injects `PORT` itself; the app already reads it (`artifacts/api-server/src/index.ts`), no need to set it.
 
@@ -75,19 +77,10 @@ DATABASE_URL="postgres://postgres:PASSWORD@HOST.proxy.rlwy.net:PORT/railway" \
   pnpm --filter @workspace/db run push
 ```
 
-## 6. Google OAuth client
-
-Sign-in is Google-only (see `PLAN.md`). In Google Cloud Console → APIs &
-Services → Credentials, create (or reuse) an **OAuth client ID** of type
-"Web application", and add
-`https://YOUR-RAILWAY-DOMAIN/api/auth/google/callback` to Authorized
-redirect URIs once the domain from step 3 is known.
-
-## 7. Deploy
+## 6. Deploy
 
 Railway deploys automatically on every push to the connected branch. First
-deploy: verify `https://YOUR-RAILWAY-DOMAIN/api/healthz` returns 200, then
-sign in with a team Google account.
+deploy: verify `https://YOUR-RAILWAY-DOMAIN/api/healthz` returns 200.
 
 ## Operational notes
 
@@ -95,5 +88,5 @@ sign in with a team Google account.
   platform healthcheck too.
 - **Logs**: service → Deployments → View Logs (JSON via pino).
 - **Custom domain**: service → Settings → Networking → Custom Domain, then
-  update `APP_URL` and the OAuth redirect URI to match.
+  update `APP_URL` to match.
 - **Env vars reference**: see `.env.example` at the repo root.

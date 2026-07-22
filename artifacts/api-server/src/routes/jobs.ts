@@ -55,10 +55,15 @@ router.get("/jobs/:projectId/status", async (req, res): Promise<void> => {
 // Get detailed status of a specific job
 router.get("/jobs/:jobId", async (req, res): Promise<void> => {
   const { jobId } = req.params;
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
 
   try {
     const job = JobQueue.get(jobId);
-    if (!job) {
+    if (!job || job.userId !== userId) {
       res.status(404).json({ error: "Job not found" });
       return;
     }
@@ -124,10 +129,15 @@ router.post("/jobs/:projectId/batch-generate", async (req, res): Promise<void> =
 // Cancel a running job
 router.post("/jobs/:jobId/cancel", async (req, res): Promise<void> => {
   const { jobId } = req.params;
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
 
   try {
     const job = JobQueue.get(jobId);
-    if (!job) {
+    if (!job || job.userId !== userId) {
       res.status(404).json({ error: "Job not found" });
       return;
     }

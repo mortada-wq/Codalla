@@ -8,11 +8,17 @@ API and the built frontend on one port. The target architecture is:
 | App (API + frontend) | Cloud Run (1 instance, gen2) |
 | Database | Cloud SQL for PostgreSQL 16 |
 | Project workspaces (files) | GCS bucket mounted as a volume at `/app/codalla-projects` |
-| Secrets (`DATABASE_URL`, OAuth secret) | Secret Manager |
+| Secrets (`DATABASE_URL`) | Secret Manager |
 | Images + CI builds | Artifact Registry + Cloud Build |
 
-Region: the scripts default to `europe-west1`; `me-central1` (Doha) and
-`me-central2` (Dammam) are closest to Iraq — set `REGION` accordingly.
+Region: the scripts default to `europe-west1` — pick whatever `REGION` is
+closest to your users.
+
+**Codalla has no authentication of its own.** Every request is attributed to
+one implicit local user (see `PLAN.md`). `deploy.sh` deploys the service
+IAM-only by default — only principals you grant the Cloud Run Invoker role
+can reach it. Only pass `PUBLIC=true` if you deliberately want the service
+open to the entire internet with no access control at all.
 
 ## 1. One-time provisioning
 
@@ -23,9 +29,10 @@ PROJECT_ID=my-project REGION=europe-west1 ./deploy/gcp/setup.sh
 ```
 
 This enables the APIs and creates: an Artifact Registry repo, the Cloud SQL
-instance + `codalla` database (generating a password), the projects bucket,
-a `codalla-run` runtime service account with least-privilege bindings, and
-the `codalla-database-url` / `codalla-google-client-secret` secrets.
+instance + `codalla` database (generating a password stored directly in
+Secret Manager, not printed to the terminal), the projects bucket, a
+`codalla-run` runtime service account with least-privilege bindings, and the
+`codalla-database-url` secret.
 
 ## 2. Push the database schema
 
@@ -33,43 +40,27 @@ Once, through the [Cloud SQL Auth Proxy](https://cloud.google.com/sql/docs/postg
 
 ```sh
 cloud-sql-proxy PROJECT_ID:REGION:codalla &   # listens on 127.0.0.1:5432
-DATABASE_URL="postgres://postgres:DB_PASSWORD@127.0.0.1:5432/codalla" \
+DATABASE_URL="$(gcloud secrets versions access latest --secret=codalla-database-url)" \
   pnpm --filter @workspace/db run push
 ```
 
-(`DB_PASSWORD` was printed by `setup.sh`. `deploy/schema.sql` is a reference
-snapshot; drizzle-kit push is the source of truth.)
+(`deploy/schema.sql` is a reference snapshot; drizzle-kit push is the source
+of truth.)
 
-## 3. Google OAuth client
-
-Sign-in is Google-only (see `PLAN.md`). In Google Cloud Console → APIs &
-Services → Credentials, create an **OAuth client ID** of type "Web
-application". Store its secret if `setup.sh` didn't already:
+## 3. First deploy
 
 ```sh
-printf '%s' 'THE_CLIENT_SECRET' | gcloud secrets create codalla-google-client-secret --data-file=-
+PROJECT_ID=my-project REGION=europe-west1 ./deploy/gcp/deploy.sh
 ```
 
-The redirect URI is added in step 4 once the service URL is known.
+The script prints the service URL and, unless `PUBLIC=true` was set, the
+command to grant yourself (or your team) the Cloud Run Invoker role. Verify
+with `https://SERVICE_URL/api/healthz`.
 
-## 4. First deploy
-
-```sh
-PROJECT_ID=my-project REGION=europe-west1 \
-GOOGLE_CLIENT_ID=xxx.apps.googleusercontent.com \
-ALLOWED_EMAIL_DOMAINS=yourcompany.com \
-  ./deploy/gcp/deploy.sh
-```
-
-The script prints the service URL and the two follow-ups: add
-`https://SERVICE_URL/api/auth/google/callback` to the OAuth client's
-authorized redirect URIs, and set `APP_URL` to the service URL. Verify with
-`https://SERVICE_URL/api/healthz`.
-
-## 5. Ongoing deploys (CI/CD)
+## 4. Ongoing deploys (CI/CD)
 
 `cloudbuild.yaml` builds the image, pushes it to Artifact Registry, and rolls
-out the new image while preserving the service config set in step 4. Options:
+out the new image while preserving the service config set in step 3. Options:
 
 - **Manual**: `gcloud builds submit --config cloudbuild.yaml`
 - **Cloud Build GitHub trigger**: connect the repo in Cloud Build → Triggers
@@ -93,7 +84,7 @@ submit), and the Cloud Build service agent needs `roles/run.admin` +
 - **Shared datasets** ("Server folder" projects): mount a second bucket and
   set `CODALLA_DATA_ROOTS` to its mount path.
 - **Custom domain**: Cloud Run → Manage custom domains, then update
-  `APP_URL` and the OAuth redirect URI to match.
+  `APP_URL` to match.
 - **Logs**: `gcloud run services logs read codalla --region REGION` (the
   server logs JSON via pino, which Cloud Logging parses natively).
 - **Rough monthly cost** (small team): Cloud SQL `db-g1-small` ≈ $25–35,

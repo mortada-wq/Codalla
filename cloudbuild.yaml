@@ -13,7 +13,7 @@
 # submits) plus "latest".
 
 substitutions:
-  _REGION: europe-west1 # me-central1 (Doha) / me-central2 (Dammam) are closest to Iraq
+  _REGION: europe-west1 # pick whatever region is closest to your users
   _SERVICE: codalla
   _REPOSITORY: codalla # Artifact Registry Docker repo, created by deploy/gcp/setup.sh
 
