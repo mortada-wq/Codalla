@@ -242,58 +242,6 @@ export const insertPatternUsageLogSchema = createInsertSchema(patternUsageLogTab
 export type InsertPatternUsageLog = z.infer<typeof insertPatternUsageLogSchema>;
 export type PatternUsageLog = typeof patternUsageLogTable.$inferSelect;
 
-// ─── Workflow Executions ──────────────────────────────────────────────────────
-// Track runs of workflow templates: design → implement → test → deploy, etc.
-// Enables checkpointing and resumability for multi-step problem solving.
-export type WorkflowExecutionStatus = "pending" | "running" | "completed" | "failed";
-
-export const workflowExecutionTable = pgTable("workflow_execution", {
-  id: text("id").primaryKey(),
-  userId: text("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
-  projectId: text("project_id").references(() => projectsTable.id, { onDelete: "cascade" }),
-  workflowId: text("workflow_id").notNull().references(() => workflowsTable.id, { onDelete: "cascade" }),
-  status: text("status").$type<WorkflowExecutionStatus>().notNull().default("pending"),
-  // Current step index in the workflow steps array
-  currentStepIndex: integer("current_step_index").default(0).notNull(),
-  // Total cost accumulated during this execution
-  totalCost: real("total_cost").default(0).notNull(),
-  // Overall context/results from the execution
-  context: jsonb("context").$type<Record<string, any>>().notNull().default({}),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  completedAt: timestamp("completed_at"),
-});
-export const insertWorkflowExecutionSchema = createInsertSchema(workflowExecutionTable).omit({ createdAt: true, updatedAt: true });
-export type InsertWorkflowExecution = z.infer<typeof insertWorkflowExecutionSchema>;
-export type WorkflowExecution = typeof workflowExecutionTable.$inferSelect;
-
-// ─── Workflow Step Execution ───────────────────────────────────────────────────
-// Log each step's execution: input, output, errors, token usage, and timing.
-export type StepExecutionStatus = "pending" | "running" | "completed" | "failed";
-
-export const workflowStepExecutionTable = pgTable("workflow_step_execution", {
-  id: text("id").primaryKey(),
-  executionId: text("execution_id").notNull().references(() => workflowExecutionTable.id, { onDelete: "cascade" }),
-  stepIndex: integer("step_index").notNull(),
-  status: text("status").$type<StepExecutionStatus>().notNull().default("pending"),
-  // The step prompt/title
-  title: text("title").notNull(),
-  // Input context for this step (from previous step or user)
-  input: jsonb("input").$type<Record<string, any>>().notNull().default({}),
-  // Output/result from this step
-  output: text("output"),
-  // Error message if step failed
-  error: text("error"),
-  // Token usage for this step
-  tokensUsed: integer("tokens_used").default(0),
-  cost: real("cost").default(0),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  completedAt: timestamp("completed_at"),
-});
-export const insertWorkflowStepExecutionSchema = createInsertSchema(workflowStepExecutionTable).omit({ createdAt: true });
-export type InsertWorkflowStepExecution = z.infer<typeof insertWorkflowStepExecutionSchema>;
-export type WorkflowStepExecution = typeof workflowStepExecutionTable.$inferSelect;
-
 // ─── Settings (per-user) ─────────────────────────────────────────────────────────
 export const settingsTable = pgTable("settings", {
   userId: text("user_id").primaryKey().references(() => usersTable.id, { onDelete: "cascade" }),

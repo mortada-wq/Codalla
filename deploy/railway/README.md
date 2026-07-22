@@ -25,7 +25,7 @@ In the Railway dashboard: **New Project → Deploy from GitHub repo** and pick
 this repo. Railway detects `railway.json` and builds with the root
 `Dockerfile` automatically — delete/ignore any other service cards Railway
 may have auto-created from subfolders (`api-spec`, `api-zod`, `api-client`,
-`mockup-sandbox`, etc.); those are internal workspace packages, not
+etc.); those are internal workspace packages, not
 deployable apps, and building them standalone is why they show
 "Build failed."
 
