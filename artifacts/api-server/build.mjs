@@ -31,6 +31,7 @@ async function buildAll() {
       "*.node",
       "sharp",
       "better-sqlite3",
+      "drizzle-orm/better-sqlite3",
       "sqlite3",
       "canvas",
       "bcrypt",

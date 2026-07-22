@@ -1,7 +1,5 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { drizzle as drizzleMemory } from "drizzle-orm/better-sqlite3";
 import pg from "pg";
-import Database from "better-sqlite3";
 import * as schema from "./schema";
 
 const { Pool } = pg;
@@ -14,7 +12,12 @@ if (process.env.DATABASE_URL) {
   db = drizzle(pool, { schema });
   console.log("✓ Connected to PostgreSQL database");
 } else {
-  // Graceful fallback to in-memory SQLite for development/testing
+  // Graceful fallback to in-memory SQLite for development/testing.
+  // Loaded dynamically so that DATABASE_URL-configured environments (e.g.
+  // production, where better-sqlite3's native addon isn't shipped) never
+  // need to resolve this module.
+  const { drizzle: drizzleMemory } = await import("drizzle-orm/better-sqlite3");
+  const { default: Database } = await import("better-sqlite3");
   const memDb = new Database(":memory:");
   db = drizzleMemory(memDb, { schema });
 
