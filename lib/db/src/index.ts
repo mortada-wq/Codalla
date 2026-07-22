@@ -4,37 +4,27 @@ import * as schema from "./schema";
 
 const { Pool } = pg;
 
-let db;
-let pool;
-
-if (process.env.DATABASE_URL) {
-  pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  db = drizzle(pool, { schema });
-  console.log("✓ Connected to PostgreSQL database");
-} else {
-  // Graceful fallback to in-memory SQLite for development/testing.
-  // Loaded dynamically so that DATABASE_URL-configured environments (e.g.
-  // production, where better-sqlite3's native addon isn't shipped) never
-  // need to resolve this module.
-  const { drizzle: drizzleMemory } = await import("drizzle-orm/better-sqlite3");
-  const { default: Database } = await import("better-sqlite3");
-  const memDb = new Database(":memory:");
-  db = drizzleMemory(memDb, { schema });
-
-  // Auto-create tables on startup
-  Object.values(schema).forEach((table) => {
-    if (table._ && table._.isTable) {
-      try {
-        memDb.exec(table._.sql);
-      } catch {
-        // Table may already exist
-      }
-    }
-  });
-
-  console.log("⚠ DATABASE_URL not set. Using in-memory SQLite for development.");
-  console.log("ℹ To use PostgreSQL, set DATABASE_URL environment variable.");
+if (!process.env.DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL is required. Codalla's schema is Postgres-specific (jsonb, " +
+    "Postgres timestamp semantics) — there is no working SQLite fallback. " +
+    "Start a Postgres instance and set DATABASE_URL, e.g. " +
+    "postgres://postgres:postgres@localhost:5432/codalla, then run " +
+    "`pnpm --filter @workspace/db run push`.",
+  );
 }
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// node-postgres emits 'error' on the pool when an *idle* client's connection
+// drops (network blip, Postgres restart) — with no listener, that's an
+// unhandled 'error' event, which crashes the entire Node process. A logged
+// warning here is enough: the pool recovers the connection on the next
+// query itself.
+pool.on("error", (err) => {
+  console.error("Postgres pool error (connection to an idle client was lost):", err.message);
+});
+const db = drizzle(pool, { schema });
+console.log("✓ Connected to PostgreSQL database");
 
 export { db, pool };
 export * from "./schema";

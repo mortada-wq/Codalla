@@ -43,8 +43,9 @@ if ! gcloud sql instances describe "$SQL_INSTANCE" >/dev/null 2>&1; then
   gcloud sql instances create "$SQL_INSTANCE" \
     --database-version=POSTGRES_16 --tier="$SQL_TIER" --region="$REGION"
   gcloud sql users set-password postgres --instance="$SQL_INSTANCE" --password="$DB_PASSWORD"
-  echo "Generated postgres password (also embedded in the DATABASE_URL secret below):"
-  echo "  $DB_PASSWORD"
+  echo "Generated a postgres password and stored it in the codalla-database-url secret below."
+  echo "(not printed here — it can end up in terminal scrollback or CI logs; retrieve it with"
+  echo " 'gcloud secrets versions access latest --secret=codalla-database-url' if you need it directly)"
 else
   echo "Instance exists; skipping. Set DB_PASSWORD env var to (re)create the DATABASE_URL secret."
   DB_PASSWORD="${DB_PASSWORD:-}"
@@ -78,22 +79,13 @@ if [ -n "$DB_PASSWORD" ]; then
 else
   echo "DB_PASSWORD unset — leaving codalla-database-url secret as-is."
 fi
-if ! gcloud secrets describe codalla-google-client-secret >/dev/null 2>&1; then
-  if [ -n "${GOOGLE_CLIENT_SECRET:-}" ]; then
-    printf '%s' "$GOOGLE_CLIENT_SECRET" | gcloud secrets create codalla-google-client-secret --data-file=-
-  else
-    echo "NOTE: create the OAuth client (see README) then store its secret with:"
-    echo "  printf '%s' 'THE_SECRET' | gcloud secrets create codalla-google-client-secret --data-file=-"
-  fi
-fi
-for s in codalla-database-url codalla-google-client-secret; do
-  gcloud secrets describe "$s" >/dev/null 2>&1 &&
-    gcloud secrets add-iam-policy-binding "$s" \
-      --member="serviceAccount:$RUN_SA" --role=roles/secretmanager.secretAccessor >/dev/null
-done
+gcloud secrets describe codalla-database-url >/dev/null 2>&1 &&
+  gcloud secrets add-iam-policy-binding codalla-database-url \
+    --member="serviceAccount:$RUN_SA" --role=roles/secretmanager.secretAccessor >/dev/null
 
 echo
 echo "Done. Next steps (deploy/gcp/README.md):"
 echo "  1. Push the DB schema through the Cloud SQL proxy."
-echo "  2. Create the Google OAuth client and store its secret (if not done above)."
-echo "  3. PROJECT_ID=$PROJECT_ID REGION=$REGION ./deploy/gcp/deploy.sh"
+echo "  2. PROJECT_ID=$PROJECT_ID REGION=$REGION ./deploy/gcp/deploy.sh"
+echo "     (add PUBLIC=true only if you want the service open with no access control —"
+echo "     Codalla itself has no authentication, see PLAN.md)"

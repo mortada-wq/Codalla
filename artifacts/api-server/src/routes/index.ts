@@ -16,19 +16,17 @@ import workflowsRouter from "./workflows";
 import patternsRouter from "./patterns";
 import workflowExecutionRouter from "./workflow-execution";
 import jobsRouter from "./jobs";
-import phoneAuthRouter from "./phone-auth";
 import { requireAuth } from "../middleware/auth";
 
 const router: IRouter = Router();
 
-// ── Public: health + the sign-in flow itself ────────────────────
+// ── Public: health check + the implicit-local-user endpoint ─────
 router.use(healthRouter);
 router.use(authRouter);
 
-// ── Data routes: require a session (or AUTH_DISABLED local mode) ─
+// ── Data routes: attach the implicit local user (no real auth) ──
 router.use(requireAuth);
 
-router.use(phoneAuthRouter);
 router.use(projectsRouter);
 router.use(filesystemRouter);
 router.use(githubRouter);

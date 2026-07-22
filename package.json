@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "npm run typecheck && npm run build:all",
-    "build:all": "cd artifacts/api-server && npm run build && cd ../.. && cd lib/db && npm run build && cd ../..",
+    "build:all": "cd artifacts/api-server && npm run build && cd ../..",
     "typecheck:libs": "tsc --build",
     "typecheck": "npm run typecheck:libs && npm run typecheck:artifacts",
     "typecheck:artifacts": "cd artifacts/api-server && npm run typecheck && cd ../..",

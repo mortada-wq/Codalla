@@ -103,6 +103,11 @@ router.patch("/projects/:projectId/criteria/:criterionId", async (req, res): Pro
     return;
   }
 
+  if (!(await projectExists(params.data.projectId, req.user!.id))) {
+    res.status(404).json({ error: "Project not found" });
+    return;
+  }
+
   const [row] = await db.update(projectSuccessCriteriaTable)
     .set({ ...body.data, updatedAt: new Date() })
     .where(and(
@@ -124,6 +129,11 @@ router.delete("/projects/:projectId/criteria/:criterionId", async (req, res): Pr
   const params = DeleteCriterionParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  if (!(await projectExists(params.data.projectId, req.user!.id))) {
+    res.status(404).json({ error: "Project not found" });
     return;
   }
 

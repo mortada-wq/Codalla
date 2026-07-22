@@ -91,6 +91,11 @@ router.get("/projects/:projectId/memory/:noteId", async (req, res): Promise<void
     return;
   }
 
+  if (!(await projectExists(params.data.projectId, req.user!.id))) {
+    res.status(404).json({ error: "Project not found" });
+    return;
+  }
+
   const [row] = await db.select()
     .from(projectMemoryNotesTable)
     .where(eq(projectMemoryNotesTable.id, params.data.noteId));
@@ -117,6 +122,11 @@ router.patch("/projects/:projectId/memory/:noteId", async (req, res): Promise<vo
     return;
   }
 
+  if (!(await projectExists(params.data.projectId, req.user!.id))) {
+    res.status(404).json({ error: "Project not found" });
+    return;
+  }
+
   const [row] = await db.update(projectMemoryNotesTable)
     .set({ ...body.data, updatedAt: new Date() })
     .where(and(
@@ -138,6 +148,11 @@ router.delete("/projects/:projectId/memory/:noteId", async (req, res): Promise<v
   const params = DeleteMemoryNoteParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  if (!(await projectExists(params.data.projectId, req.user!.id))) {
+    res.status(404).json({ error: "Project not found" });
     return;
   }
 

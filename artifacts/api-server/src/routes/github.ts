@@ -154,26 +154,35 @@ router.post("/projects/:projectId/github/clone", async (req, res): Promise<void>
     }
   }
 
-  // Clean the project directory
-  if (fs.existsSync(project.localPath)) {
-    fs.rmSync(project.localPath, { recursive: true, force: true });
-  }
-  fs.mkdirSync(project.localPath, { recursive: true });
+  // Clone into a sibling temp directory first — never touch the existing
+  // working directory until the new clone has fully succeeded, so a failed
+  // re-clone (bad branch, revoked token, network blip) can't destroy
+  // whatever was there before.
+  const tempPath = `${project.localPath}.clone-tmp-${Date.now()}`;
+  fs.mkdirSync(tempPath, { recursive: true });
 
   try {
     const cloneArgs = ["clone", "--depth", "50"];
     if (branch) cloneArgs.push("--branch", branch);
     cloneArgs.push(cloneUrl, ".");
-    gitOrThrow(cloneArgs, project.localPath);
+    gitOrThrow(cloneArgs, tempPath);
 
-    const currentBranch = git(["branch", "--show-current"], project.localPath).stdout || "main";
+    const currentBranch = git(["branch", "--show-current"], tempPath).stdout || "main";
+    const commitHash = git(["rev-parse", "--short", "HEAD"], tempPath).stdout;
+
+    // Clone succeeded — now it's safe to replace the old directory.
+    if (fs.existsSync(project.localPath)) {
+      fs.rmSync(project.localPath, { recursive: true, force: true });
+    }
+    fs.renameSync(tempPath, project.localPath);
+
     await db.update(projectsTable)
       .set({ gitRemoteUrl: repoUrl, currentBranch, lastSynced: new Date(), updatedAt: new Date() })
       .where(eq(projectsTable.id, project.id));
 
-    const commitHash = git(["rev-parse", "--short", "HEAD"], project.localPath).stdout;
     res.json(CloneRepoResponse.parse({ success: true, message: "Repository cloned successfully", commitHash: commitHash || null }));
   } catch (err) {
+    fs.rmSync(tempPath, { recursive: true, force: true });
     res.status(500).json(CloneRepoResponse.parse({ success: false, message: String(err instanceof Error ? err.message : err), commitHash: null }));
   }
 });

@@ -1,6 +1,6 @@
 # Codalla
 
-Team AI coding IDE: create projects (optionally cloned from GitHub), browse/edit files with Monaco, and chat with AI models about the code. Sign-in is Google-only (no passwords, no auth vendor); each user's projects, keys, and usage are scoped to their account.
+Team AI coding IDE: create projects (optionally cloned from GitHub), browse/edit files with Monaco, and chat with AI models about the code. Codalla has no authentication — every request is attributed to one implicit "local" user; there is no login, session, or per-user access control.
 
 ## Run & Operate
 
@@ -10,8 +10,7 @@ Team AI coding IDE: create projects (optionally cloned from GitHub), browse/edit
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
-- Auth env: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `APP_URL` (browser origin; the Google OAuth client must allow `${APP_URL}/api/auth/google/callback` as a redirect URI), `ALLOWED_EMAIL_DOMAINS` and/or `ALLOWED_EMAILS` (comma-separated team gate) — or `AUTH_DISABLED=true` to skip sign-in entirely for solo dev
+- Required env: `DATABASE_URL` — Postgres connection string (no fallback; the server refuses to start without it)
 - `CODALLA_DATA_ROOTS` — comma-separated absolute paths that may be attached as projects ("Server folder" mode); unset disables attaching
 
 ## Stack
@@ -33,7 +32,7 @@ Team AI coding IDE: create projects (optionally cloned from GitHub), browse/edit
 
 ## Architecture decisions
 
-- **Google-only sign-in, no auth vendor.** Standard OAuth code flow via `google-auth-library` (`artifacts/api-server/src/routes/auth.ts`); sessions are DB rows (`sessions` table, SHA-256 of a random cookie token) so revoking = deleting a row. Team access is gated by `ALLOWED_EMAIL_DOMAINS`/`ALLOWED_EMAILS`. `AUTH_DISABLED=true` falls back to a single implicit `local` user for solo dev.
+- **No authentication.** `requireAuth` middleware (`artifacts/api-server/src/middleware/auth.ts`) attaches one implicit `local` user row to every request. See `PLAN.md` for why, and for what a deployed instance needs in front of it instead (Cloud Run IAM, an authenticating proxy, a VPN) since Codalla itself enforces no access control.
 - Frontend talks to the API same-origin via the Vite `/api` proxy → `localhost:4000`.
 - Git operations use `spawnSync` (never `execSync`); filesystem access goes through a separator-boundary `safePath` check.
 
