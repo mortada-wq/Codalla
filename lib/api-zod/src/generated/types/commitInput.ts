@@ -8,6 +8,6 @@
 
 export interface CommitInput {
   message: string;
-  token: string;
+  token?: string;
   files?: string[];
 }

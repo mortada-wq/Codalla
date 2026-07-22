@@ -28,6 +28,10 @@ tags:
     description: Project success criteria
   - name: memory
     description: Project memory notes
+  - name: workflows
+    description: Reusable AI pipeline presets
+  - name: patterns
+    description: Built-in and team AI development patterns
 
 paths:
   /healthz:
@@ -1121,6 +1125,91 @@ paths:
         "204":
           description: Deleted
 
+  # ─── AI Development Patterns ──────────────────────────────────────────────────
+  /patterns:
+    get:
+      operationId: listPatterns
+      tags: [patterns]
+      summary: List built-in and this account's own custom patterns
+      responses:
+        "200":
+          description: List of patterns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Pattern"
+
+  /patterns/{patternId}:
+    get:
+      operationId: getPattern
+      tags: [patterns]
+      summary: Get a single pattern by ID (built-in, or your own custom pattern)
+      parameters:
+        - name: patternId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Pattern
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Pattern"
+        "404":
+          description: Not found
+
+  /patterns/suggest:
+    post:
+      operationId: suggestPatterns
+      tags: [patterns]
+      summary: Suggest patterns matching a classified problem type and keywords
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestPatternsInput"
+      responses:
+        "200":
+          description: Suggested patterns
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [patterns]
+                properties:
+                  patterns:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Pattern"
+
+  /patterns/usage:
+    post:
+      operationId: logPatternUsage
+      tags: [patterns]
+      summary: Log whether a suggested pattern was adopted and helpful
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatternUsageInput"
+      responses:
+        "201":
+          description: Logged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatternUsageLog"
+        "404":
+          description: Pattern not found
+        "403":
+          description: Project not accessible
+
 components:
   schemas:
     HealthStatus:
@@ -1209,6 +1298,106 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WorkflowStep"
+
+    # ─── AI Development Patterns ────────────────────────────────────────────────
+    PatternResource:
+      type: object
+      properties:
+        title:
+          type: string
+        url:
+          type: string
+
+    Pattern:
+      type: object
+      required: [id, userId, problemType, title, description, triggers, template, resources, isEnabled, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+          nullable: true
+        problemType:
+          type: string
+          enum: [prompt, data-pipeline, model-integration, fine-tuning, general]
+        title:
+          type: string
+        description:
+          type: string
+        triggers:
+          type: array
+          items:
+            type: string
+        template:
+          type: string
+        example:
+          type: string
+          nullable: true
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/PatternResource"
+        isEnabled:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    SuggestPatternsInput:
+      type: object
+      required: [problemType]
+      properties:
+        problemType:
+          type: string
+          enum: [prompt, data-pipeline, model-integration, fine-tuning, general]
+        keywords:
+          type: array
+          items:
+            type: string
+
+    PatternUsageInput:
+      type: object
+      required: [patternId]
+      properties:
+        patternId:
+          type: string
+        projectId:
+          type: string
+        wasSuggested:
+          type: boolean
+        wasAdopted:
+          type: boolean
+        helpful:
+          type: boolean
+        feedback:
+          type: string
+
+    PatternUsageLog:
+      type: object
+      required: [id, userId, patternId, wasSuggested, wasAdopted, createdAt]
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        projectId:
+          type: string
+          nullable: true
+        patternId:
+          type: string
+        wasSuggested:
+          type: boolean
+        wasAdopted:
+          type: boolean
+        helpful:
+          type: boolean
+          nullable: true
+        feedback:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
 
     ProjectInput:
       type: object
@@ -1439,10 +1628,11 @@ components:
 
     CommitInput:
       type: object
-      required: [message, token]
+      required: [message]
       properties:
         message:
           type: string
+        # Optional — omit to commit locally without pushing (no remote token configured).
         token:
           type: string
         files:
@@ -1452,8 +1642,8 @@ components:
 
     PullInput:
       type: object
-      required: [token]
       properties:
+        # Optional — omit to pull without credentials (public repo or already-cached auth).
         token:
           type: string
 

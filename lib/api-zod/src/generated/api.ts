@@ -540,7 +540,7 @@ export const CommitAndPushParams = zod.object({
 
 export const CommitAndPushBody = zod.object({
   "message": zod.string(),
-  "token": zod.string(),
+  "token": zod.string().optional(),
   "files": zod.array(zod.string()).optional()
 })
 
@@ -559,7 +559,7 @@ export const PullRepoParams = zod.object({
 })
 
 export const PullRepoBody = zod.object({
-  "token": zod.string()
+  "token": zod.string().optional()
 })
 
 export const PullRepoResponse = zod.object({
@@ -1013,5 +1013,108 @@ export const DeleteWorkflowParams = zod.object({
 })
 
 export const DeleteWorkflowResponse = zod.void()
+
+
+/**
+ * @summary List built-in and this account's own custom patterns
+ */
+export const ListPatternsResponseItem = zod.object({
+  "id": zod.string(),
+  "userId": zod.string().nullable(),
+  "problemType": zod.enum(['prompt', 'data-pipeline', 'model-integration', 'fine-tuning', 'general']),
+  "title": zod.string(),
+  "description": zod.string(),
+  "triggers": zod.array(zod.string()),
+  "template": zod.string(),
+  "example": zod.string().nullish(),
+  "resources": zod.array(zod.object({
+  "title": zod.string().optional(),
+  "url": zod.string().optional()
+})),
+  "isEnabled": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListPatternsResponse = zod.array(ListPatternsResponseItem)
+
+
+/**
+ * @summary Get a single pattern by ID (built-in, or your own custom pattern)
+ */
+export const GetPatternParams = zod.object({
+  "patternId": zod.coerce.string()
+})
+
+export const GetPatternResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string().nullable(),
+  "problemType": zod.enum(['prompt', 'data-pipeline', 'model-integration', 'fine-tuning', 'general']),
+  "title": zod.string(),
+  "description": zod.string(),
+  "triggers": zod.array(zod.string()),
+  "template": zod.string(),
+  "example": zod.string().nullish(),
+  "resources": zod.array(zod.object({
+  "title": zod.string().optional(),
+  "url": zod.string().optional()
+})),
+  "isEnabled": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Suggest patterns matching a classified problem type and keywords
+ */
+export const SuggestPatternsBody = zod.object({
+  "problemType": zod.enum(['prompt', 'data-pipeline', 'model-integration', 'fine-tuning', 'general']),
+  "keywords": zod.array(zod.string()).optional()
+})
+
+export const SuggestPatternsResponse = zod.object({
+  "patterns": zod.array(zod.object({
+  "id": zod.string(),
+  "userId": zod.string().nullable(),
+  "problemType": zod.enum(['prompt', 'data-pipeline', 'model-integration', 'fine-tuning', 'general']),
+  "title": zod.string(),
+  "description": zod.string(),
+  "triggers": zod.array(zod.string()),
+  "template": zod.string(),
+  "example": zod.string().nullish(),
+  "resources": zod.array(zod.object({
+  "title": zod.string().optional(),
+  "url": zod.string().optional()
+})),
+  "isEnabled": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Log whether a suggested pattern was adopted and helpful
+ */
+export const LogPatternUsageBody = zod.object({
+  "patternId": zod.string(),
+  "projectId": zod.string().optional(),
+  "wasSuggested": zod.boolean().optional(),
+  "wasAdopted": zod.boolean().optional(),
+  "helpful": zod.boolean().optional(),
+  "feedback": zod.string().optional()
+})
+
+export const LogPatternUsageResponse = zod.object({
+  "id": zod.string(),
+  "userId": zod.string(),
+  "projectId": zod.string().nullish(),
+  "patternId": zod.string(),
+  "wasSuggested": zod.boolean(),
+  "wasAdopted": zod.boolean(),
+  "helpful": zod.boolean().nullish(),
+  "feedback": zod.string().nullish(),
+  "createdAt": zod.string()
+})
 
 

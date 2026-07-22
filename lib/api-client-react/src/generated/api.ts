@@ -54,6 +54,9 @@ import type {
   MemoryNoteInput,
   MemoryNoteUpdate,
   Message,
+  Pattern,
+  PatternUsageInput,
+  PatternUsageLog,
   Project,
   ProjectInput,
   ProjectUpdate,
@@ -64,6 +67,8 @@ import type {
   SuccessCriterion,
   SuccessCriterionInput,
   SuccessCriterionUpdate,
+  SuggestPatterns200,
+  SuggestPatternsInput,
   UploadFile201,
   UploadFileParams,
   UsageList,
@@ -3922,5 +3927,301 @@ export const useDeleteWorkflow = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getDeleteWorkflowMutationOptions(options));
+    }
+
+export const getListPatternsUrl = () => {
+
+
+
+
+  return `/api/patterns`
+}
+
+/**
+ * @summary List built-in and this account's own custom patterns
+ */
+export const listPatterns = async ( options?: RequestInit): Promise<Pattern[]> => {
+
+  return customFetch<Pattern[]>(getListPatternsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListPatternsQueryKey = () => {
+    return [
+    `/api/patterns`
+    ] as const;
+    }
+
+
+export const getListPatternsQueryOptions = <TData = Awaited<ReturnType<typeof listPatterns>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPatterns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListPatternsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listPatterns>>> = ({ signal }) => listPatterns({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listPatterns>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListPatternsQueryResult = NonNullable<Awaited<ReturnType<typeof listPatterns>>>
+export type ListPatternsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List built-in and this account's own custom patterns
+ */
+
+export function useListPatterns<TData = Awaited<ReturnType<typeof listPatterns>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listPatterns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListPatternsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetPatternUrl = (patternId: string,) => {
+
+
+
+
+  return `/api/patterns/${patternId}`
+}
+
+/**
+ * @summary Get a single pattern by ID (built-in, or your own custom pattern)
+ */
+export const getPattern = async (patternId: string, options?: RequestInit): Promise<Pattern> => {
+
+  return customFetch<Pattern>(getGetPatternUrl(patternId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPatternQueryKey = (patternId: string,) => {
+    return [
+    `/api/patterns/${patternId}`
+    ] as const;
+    }
+
+
+export const getGetPatternQueryOptions = <TData = Awaited<ReturnType<typeof getPattern>>, TError = ErrorType<void>>(patternId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPattern>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPatternQueryKey(patternId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPattern>>> = ({ signal }) => getPattern(patternId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: patternId !== null && patternId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPattern>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPatternQueryResult = NonNullable<Awaited<ReturnType<typeof getPattern>>>
+export type GetPatternQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a single pattern by ID (built-in, or your own custom pattern)
+ */
+
+export function useGetPattern<TData = Awaited<ReturnType<typeof getPattern>>, TError = ErrorType<void>>(
+ patternId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPattern>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPatternQueryOptions(patternId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSuggestPatternsUrl = () => {
+
+
+
+
+  return `/api/patterns/suggest`
+}
+
+/**
+ * @summary Suggest patterns matching a classified problem type and keywords
+ */
+export const suggestPatterns = async (suggestPatternsInput: SuggestPatternsInput, options?: RequestInit): Promise<SuggestPatterns200> => {
+
+  return customFetch<SuggestPatterns200>(getSuggestPatternsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(suggestPatternsInput)
+  }
+);}
+
+
+
+
+
+export const getSuggestPatternsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof suggestPatterns>>, TError,{data: BodyType<SuggestPatternsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof suggestPatterns>>, TError,{data: BodyType<SuggestPatternsInput>}, TContext> => {
+
+const mutationKey = ['suggestPatterns'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof suggestPatterns>>, {data: BodyType<SuggestPatternsInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  suggestPatterns(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SuggestPatternsMutationResult = NonNullable<Awaited<ReturnType<typeof suggestPatterns>>>
+    export type SuggestPatternsMutationBody = BodyType<SuggestPatternsInput>
+    export type SuggestPatternsMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Suggest patterns matching a classified problem type and keywords
+ */
+export const useSuggestPatterns = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof suggestPatterns>>, TError,{data: BodyType<SuggestPatternsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof suggestPatterns>>,
+        TError,
+        {data: BodyType<SuggestPatternsInput>},
+        TContext
+      > => {
+      return useMutation(getSuggestPatternsMutationOptions(options));
+    }
+
+export const getLogPatternUsageUrl = () => {
+
+
+
+
+  return `/api/patterns/usage`
+}
+
+/**
+ * @summary Log whether a suggested pattern was adopted and helpful
+ */
+export const logPatternUsage = async (patternUsageInput: PatternUsageInput, options?: RequestInit): Promise<PatternUsageLog> => {
+
+  return customFetch<PatternUsageLog>(getLogPatternUsageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(patternUsageInput)
+  }
+);}
+
+
+
+
+
+export const getLogPatternUsageMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logPatternUsage>>, TError,{data: BodyType<PatternUsageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof logPatternUsage>>, TError,{data: BodyType<PatternUsageInput>}, TContext> => {
+
+const mutationKey = ['logPatternUsage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logPatternUsage>>, {data: BodyType<PatternUsageInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  logPatternUsage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LogPatternUsageMutationResult = NonNullable<Awaited<ReturnType<typeof logPatternUsage>>>
+    export type LogPatternUsageMutationBody = BodyType<PatternUsageInput>
+    export type LogPatternUsageMutationError = ErrorType<void>
+
+    /**
+ * @summary Log whether a suggested pattern was adopted and helpful
+ */
+export const useLogPatternUsage = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logPatternUsage>>, TError,{data: BodyType<PatternUsageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof logPatternUsage>>,
+        TError,
+        {data: BodyType<PatternUsageInput>},
+        TContext
+      > => {
+      return useMutation(getLogPatternUsageMutationOptions(options));
     }
 

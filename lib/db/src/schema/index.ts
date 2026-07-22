@@ -1,4 +1,4 @@
-import { pgTable, text, boolean, real, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, real, integer, timestamp, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -38,7 +38,9 @@ export const workflowsTable = pgTable("workflows", {
   steps: jsonb("steps").$type<WorkflowStep[]>().notNull().default([]),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("workflows_user_id_idx").on(table.userId),
+]);
 export type Workflow = typeof workflowsTable.$inferSelect;
 
 // ─── Projects ────────────────────────────────────────────────────────────────
@@ -58,7 +60,9 @@ export const projectsTable = pgTable("projects", {
   lastSynced: timestamp("last_synced"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("projects_user_id_idx").on(table.userId),
+]);
 export const insertProjectSchema = createInsertSchema(projectsTable).omit({ createdAt: true, updatedAt: true });
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type Project = typeof projectsTable.$inferSelect;
@@ -80,7 +84,9 @@ export const projectAssetsTable = pgTable("project_assets", {
   provider: text("provider"),
   sizeBytes: integer("size_bytes").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("project_assets_project_id_idx").on(table.projectId),
+]);
 export const insertProjectAssetSchema = createInsertSchema(projectAssetsTable).omit({ createdAt: true });
 export type InsertProjectAsset = z.infer<typeof insertProjectAssetSchema>;
 export type ProjectAsset = typeof projectAssetsTable.$inferSelect;
@@ -94,7 +100,9 @@ export const projectSuccessCriteriaTable = pgTable("project_success_criteria", {
   sortOrder: integer("sort_order").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("project_success_criteria_project_id_idx").on(table.projectId),
+]);
 export const insertSuccessCriterionSchema = createInsertSchema(projectSuccessCriteriaTable).omit({ createdAt: true, updatedAt: true });
 export type InsertSuccessCriterion = z.infer<typeof insertSuccessCriterionSchema>;
 export type SuccessCriterion = typeof projectSuccessCriteriaTable.$inferSelect;
@@ -107,7 +115,9 @@ export const projectMemoryNotesTable = pgTable("project_memory_notes", {
   content: text("content").notNull().default(""),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("project_memory_notes_project_id_idx").on(table.projectId),
+]);
 export const insertMemoryNoteSchema = createInsertSchema(projectMemoryNotesTable).omit({ createdAt: true, updatedAt: true });
 export type InsertMemoryNote = z.infer<typeof insertMemoryNoteSchema>;
 export type MemoryNote = typeof projectMemoryNotesTable.$inferSelect;
@@ -122,7 +132,10 @@ export const apiKeysTable = pgTable("api_keys", {
   baseUrl: text("base_url"),
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  // Looked up on every AI request (getActiveKey/getProviderCreds).
+  index("api_keys_user_id_provider_idx").on(table.userId, table.provider),
+]);
 export const insertApiKeySchema = createInsertSchema(apiKeysTable).omit({ createdAt: true });
 export type InsertApiKey = z.infer<typeof insertApiKeySchema>;
 export type ApiKey = typeof apiKeysTable.$inferSelect;
@@ -141,7 +154,10 @@ export const conversationsTable = pgTable("conversations", {
   totalCost: real("total_cost").default(0).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("conversations_user_id_idx").on(table.userId),
+  index("conversations_project_id_idx").on(table.projectId),
+]);
 export const insertConversationSchema = createInsertSchema(conversationsTable).omit({ createdAt: true, updatedAt: true });
 export type InsertConversation = z.infer<typeof insertConversationSchema>;
 export type Conversation = typeof conversationsTable.$inferSelect;
@@ -155,7 +171,10 @@ export const messagesTable = pgTable("messages", {
   tokensUsed: integer("tokens_used"),
   cost: real("cost"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  // Looked up on every chat turn (message history) and list-messages call.
+  index("messages_conversation_id_idx").on(table.conversationId),
+]);
 export const insertMessageSchema = createInsertSchema(messagesTable).omit({ createdAt: true });
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messagesTable.$inferSelect;
@@ -171,7 +190,10 @@ export const usageLogTable = pgTable("usage_log", {
   cost: real("cost").notNull().default(0),
   action: text("action"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  // Usage summary/list queries filter by user and sort/range by date.
+  index("usage_log_user_id_created_at_idx").on(table.userId, table.createdAt),
+]);
 export const insertUsageLogSchema = createInsertSchema(usageLogTable).omit({ createdAt: true });
 export type InsertUsageLog = z.infer<typeof insertUsageLogSchema>;
 export type UsageLog = typeof usageLogTable.$inferSelect;
@@ -189,7 +211,10 @@ export const customModelsTable = pgTable("custom_models", {
   pricingCompletion: real("pricing_completion").default(0),
   isEnabled: boolean("is_enabled").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  // Looked up on every AI call for per-model pricing (logUsage).
+  index("custom_models_user_id_model_id_provider_idx").on(table.userId, table.modelId, table.provider),
+]);
 export const insertCustomModelSchema = createInsertSchema(customModelsTable).omit({ createdAt: true });
 export type InsertCustomModel = z.infer<typeof insertCustomModelSchema>;
 export type CustomModel = typeof customModelsTable.$inferSelect;
@@ -216,7 +241,10 @@ export const patternsTable = pgTable("patterns", {
   isEnabled: boolean("is_enabled").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("patterns_problem_type_idx").on(table.problemType),
+  index("patterns_user_id_idx").on(table.userId),
+]);
 export const insertPatternSchema = createInsertSchema(patternsTable).omit({ createdAt: true, updatedAt: true });
 export type InsertPattern = z.infer<typeof insertPatternSchema>;
 export type Pattern = typeof patternsTable.$inferSelect;
@@ -237,7 +265,10 @@ export const patternUsageLogTable = pgTable("pattern_usage_log", {
   // User feedback
   feedback: text("feedback"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  index("pattern_usage_log_user_id_idx").on(table.userId),
+  index("pattern_usage_log_pattern_id_idx").on(table.patternId),
+]);
 export const insertPatternUsageLogSchema = createInsertSchema(patternUsageLogTable).omit({ createdAt: true });
 export type InsertPatternUsageLog = z.infer<typeof insertPatternUsageLogSchema>;
 export type PatternUsageLog = typeof patternUsageLogTable.$inferSelect;

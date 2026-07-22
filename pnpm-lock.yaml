@@ -186,7 +186,7 @@ importers:
         version: 5.2.1
       openai:
         specifier: ^6.45.0
-        version: 6.45.0(zod@4.4.3)
+        version: 6.45.0(zod@3.25.76)
       pino:
         specifier: ^9.14.0
         version: 9.14.0
@@ -196,9 +196,6 @@ importers:
       uuid:
         specifier: ^14.0.1
         version: 14.0.1
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
     devDependencies:
       '@types/cookie-parser':
         specifier: ^1.4.10
@@ -2919,9 +2916,6 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
-
 snapshots:
 
   '@babel/code-frame@7.29.7':
@@ -4769,9 +4763,9 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@6.45.0(zod@4.4.3):
+  openai@6.45.0(zod@3.25.76):
     optionalDependencies:
-      zod: 4.4.3
+      zod: 3.25.76
 
   orval@8.20.0(prettier@3.9.4)(typescript@5.9.3):
     dependencies:
@@ -5363,5 +5357,3 @@ snapshots:
   yoctocolors@2.1.2: {}
 
   zod@3.25.76: {}
-
-  zod@4.4.3: {}
