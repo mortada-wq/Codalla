@@ -75,4 +75,10 @@ export default defineConfig({
     host: '0.0.0.0',
     allowedHosts: true,
   },
+  optimizeDeps: {
+    // monaco-editor ships its own web workers (ts.worker.js etc.) that
+    // Vite's dependency pre-bundler mishandles, breaking the editor with a
+    // "file does not exist ... ts.worker.js?worker_file" runtime error.
+    exclude: ['monaco-editor'],
+  },
 });

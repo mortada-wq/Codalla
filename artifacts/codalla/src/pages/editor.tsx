@@ -11,7 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { File, Folder, FolderOpen, FileCode2, ChevronRight, Plus, X, MessageSquare, Code, Play, RefreshCw, Send, Check, GitBranch, Cpu, Brain, BookOpen, Download, PanelLeft, PanelRight, Circle, Search, Workflow as WorkflowIcon } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from "@/components/ui/context-menu"
-import Editor, { useMonaco } from "@monaco-editor/react"
+import Editor, { loader, useMonaco } from "@monaco-editor/react"
+import * as monacoEditor from "monaco-editor"
+
+// Use the bundled monaco-editor package instead of @monaco-editor/react's
+// default CDN fetch — the editor must work offline / behind a firewall.
+loader.config({ monaco: monacoEditor })
 import { useQueryClient } from "@tanstack/react-query"
 import { useToast } from "@/hooks/use-toast"
 import { Textarea } from "@/components/ui/textarea"
@@ -49,6 +54,11 @@ export default function EditorPage() {
   const [activeFile, setActiveFile] = useState<string | null>(null)
   const [editorContent, setEditorContent] = useState<Record<string, string>>({})
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+  // AI-proposed file content awaiting review — nothing touches editorContent
+  // until the user explicitly confirms in the diff dialog.
+  const [pendingApply, setPendingApply] = useState<{ path: string; content: string } | null>(null)
+  // Tab close on a dirty file needs confirmation before its in-memory content is discarded.
+  const [closeConfirm, setCloseConfirm] = useState<{ path: string } | null>(null)
 
   // Collapsible panel refs and state
   const explorerRef = useRef<ImperativePanelHandle>(null)
@@ -115,24 +125,45 @@ export default function EditorPage() {
     setActiveFile(path)
   }
 
-  const handleFileClose = (e: React.MouseEvent, path: string) => {
-    e.stopPropagation()
+  const closeFileNow = (path: string) => {
     const newFiles = openFiles.filter(f => f.path !== path)
     setOpenFiles(newFiles)
-    
+
     if (activeFile === path) {
       setActiveFile(newFiles.length > 0 ? newFiles[newFiles.length - 1].path : null)
     }
-    
+
     // Clean up content memory
     const newContent = { ...editorContent }
     delete newContent[path]
     setEditorContent(newContent)
   }
 
+  const handleFileClose = (e: React.MouseEvent, path: string) => {
+    e.stopPropagation()
+    const file = openFiles.find(f => f.path === path)
+    if (file?.isDirty) {
+      setCloseConfirm({ path })
+      return
+    }
+    closeFileNow(path)
+  }
+
+  // Warn on browser close/refresh/navigating away while any tab has unsaved edits.
+  useEffect(() => {
+    const hasUnsaved = openFiles.some(f => f.isDirty)
+    if (!hasUnsaved) return
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ""
+    }
+    window.addEventListener("beforeunload", handler)
+    return () => window.removeEventListener("beforeunload", handler)
+  }, [openFiles])
+
   const handleSave = () => {
-    if (!activeFile || !editorContent[activeFile]) return
-    
+    if (!activeFile || editorContent[activeFile] === undefined) return
+
     saveFile.mutate({
       projectId: projectId!,
       data: {
@@ -354,9 +385,10 @@ export default function EditorPage() {
                 </div>
                 <div className="flex-1 relative">
                   {activeFile && (
-                    <EditorView 
-                      projectId={projectId!} 
-                      filePath={activeFile} 
+                    <EditorView
+                      key={activeFile}
+                      projectId={projectId!}
+                      filePath={activeFile}
                       content={editorContent[activeFile]}
                       onChange={(val) => {
                         setEditorContent(prev => ({ ...prev, [activeFile]: val || '' }))
@@ -430,21 +462,13 @@ export default function EditorPage() {
                   <NewConversationView projectId={projectId!} onCreated={id => setActiveConversationId(id)} />
                 ) : (
                   <ChatView
+                    key={activeConversationId}
                     conversationId={activeConversationId}
                     projectId={projectId!}
                     modelId={activeConversation?.modelId ?? "deepseek-ai/DeepSeek-V3"}
                     provider={activeConversation?.provider ?? "siliconflow"}
                     activeFileContent={activeFile ? editorContent[activeFile] : undefined}
-                    onApplyFile={(path, content) => {
-                      handleFileOpen(path, path.split('/').pop() || path)
-                      setEditorContent(prev => ({ ...prev, [path]: content }))
-                      setOpenFiles(files => {
-                        const exists = files.find(f => f.path === path)
-                        if (exists) return files.map(f => f.path === path ? { ...f, isDirty: true } : f)
-                        return [...files, { path, name: path.split('/').pop() || path, isDirty: true }]
-                      })
-                      toast({ title: "File applied", description: `${path} — press Ctrl+S to save.` })
-                    }}
+                    onApplyFile={(path, content) => setPendingApply({ path, content })}
                   />
                 )}
               </TabsContent>
@@ -531,7 +555,106 @@ export default function EditorPage() {
         fileTree={fileTree}
         onFileOpen={handleFileOpen}
       />
+      {pendingApply && (
+        <ApplyPreviewDialog
+          projectId={projectId!}
+          path={pendingApply.path}
+          proposedContent={pendingApply.content}
+          currentContent={editorContent[pendingApply.path]}
+          onCancel={() => setPendingApply(null)}
+          onConfirm={() => {
+            const { path, content } = pendingApply
+            handleFileOpen(path, path.split('/').pop() || path)
+            setEditorContent(prev => ({ ...prev, [path]: content }))
+            setOpenFiles(files => {
+              const exists = files.find(f => f.path === path)
+              if (exists) return files.map(f => f.path === path ? { ...f, isDirty: true } : f)
+              return [...files, { path, name: path.split('/').pop() || path, isDirty: true }]
+            })
+            setPendingApply(null)
+            toast({ title: "File applied", description: `${path} — press Ctrl+S to save.` })
+          }}
+        />
+      )}
+      <AlertDialog open={!!closeConfirm} onOpenChange={(open) => !open && setCloseConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-mono text-sm">Discard unsaved changes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {closeConfirm?.path} has unsaved edits. Closing this tab discards them — this can't be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep editing</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (closeConfirm) closeFileNow(closeConfirm.path)
+                setCloseConfirm(null)
+              }}
+            >
+              Discard &amp; close
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
+  )
+}
+
+/** Diff preview shown before any AI-proposed content overwrites editor state. */
+function ApplyPreviewDialog({
+  projectId,
+  path,
+  proposedContent,
+  currentContent,
+  onConfirm,
+  onCancel,
+}: {
+  projectId: string
+  path: string
+  proposedContent: string
+  currentContent?: string
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  // If the file isn't already open in the editor, diff against what's really
+  // on disk instead of treating the whole proposed file as one big addition.
+  const { data: fileData, isLoading } = useGetFile(
+    { projectId, filePath: path },
+    // The generated hook's option type demands `queryKey` even though the
+    // wrapper computes it internally — a orval/react-query typing gap, not
+    // a real requirement at runtime.
+    { query: { enabled: currentContent === undefined } as Parameters<typeof useGetFile>[1] extends { query?: infer Q } ? Q : never },
+  )
+  const original = currentContent !== undefined ? currentContent : (fileData?.content ?? "")
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className="max-w-3xl">
+        <DialogHeader>
+          <DialogTitle className="font-mono text-sm">Apply changes to {path}?</DialogTitle>
+          <DialogDescription>
+            {currentContent !== undefined
+              ? "This file has unsaved edits open in the editor — applying will overwrite them in memory (Ctrl+S still required to save to disk)."
+              : "Review the AI's proposed content before it's opened in the editor."}
+          </DialogDescription>
+        </DialogHeader>
+        {isLoading && currentContent === undefined ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+          </div>
+        ) : (
+          <InlineDiff original={original} revised={proposedContent} />
+        )}
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel}>Cancel</Button>
+          <Button variant="success" onClick={onConfirm}>
+            <Check className="w-3 h-3 mr-1.5" /> Apply
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -540,6 +663,8 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
   const monaco = useMonaco()
   const [editorIssues, setEditorIssues] = useState<any[]>([])
   const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const analysisAbortRef = useRef<AbortController | null>(null)
+  const editorRef = useRef<import("monaco-editor").editor.IStandaloneCodeEditor | null>(null)
 
   // Language detection
   const language = useMemo(() => {
@@ -572,6 +697,12 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
 
     // Set new timeout for debounced analysis
     analysisTimeoutRef.current = setTimeout(async () => {
+      // Cancel any still-in-flight analysis request so a slow, stale response
+      // can't land after a newer one and overwrite fresher issues.
+      analysisAbortRef.current?.abort()
+      const controller = new AbortController()
+      analysisAbortRef.current = controller
+
       try {
         const res = await fetch(
           `/api/projects/${encodeURIComponent(projectId)}/analyze-file-real-time`,
@@ -585,7 +716,8 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
               language,
               modelId: "deepseek-ai/DeepSeek-V3",
               provider: "siliconflow"
-            })
+            }),
+            signal: controller.signal,
           }
         )
 
@@ -594,8 +726,11 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
         const { issues } = await res.json()
         setEditorIssues(issues || [])
       } catch (err) {
-        // Silently fail — don't disrupt editing if analysis fails
-        console.debug("Real-time analysis failed:", err)
+        // Ignore aborts (superseded by a newer request); silently fail on
+        // real errors — don't disrupt editing if analysis fails.
+        if ((err as Error)?.name !== "AbortError") {
+          console.debug("Real-time analysis failed:", err)
+        }
       }
     }, 1000) // Debounce: wait 1 second after user stops typing
 
@@ -603,6 +738,7 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
       if (analysisTimeoutRef.current) {
         clearTimeout(analysisTimeoutRef.current)
       }
+      analysisAbortRef.current?.abort()
     }
   }, [content, projectId, filePath, language])
 
@@ -657,16 +793,15 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
     }
   }, [monaco])
 
-  // Display analysis issues as Monaco diagnostics (red/yellow squiggles)
+  // Display analysis issues as Monaco diagnostics (red/yellow squiggles) —
+  // targets this specific mounted editor's own model (not monaco's global
+  // model registry, which accumulates one model per file ever opened this
+  // session, so `getModels()[0]` is not reliably "the current file").
   useEffect(() => {
-    if (!monaco || editorIssues.length === 0) return
-
-    const models = monaco.editor.getModels()
-    const model = models[0] // Current editor model
-
+    if (!monaco) return
+    const model = editorRef.current?.getModel()
     if (!model) return
 
-    // Convert issues to Monaco markers
     const markers = editorIssues.map((issue: any) => ({
       severity: issue.severity === "error"
         ? monaco.MarkerSeverity.Error
@@ -690,10 +825,12 @@ function EditorView({ projectId, filePath, content, onChange }: { projectId: str
   return (
     <Editor
       height="100%"
+      path={filePath}
       language={language}
       theme="codalla-dark"
       value={content !== undefined ? content : fileData?.content || ''}
       onChange={onChange}
+      onMount={(editorInstance) => { editorRef.current = editorInstance }}
       options={{
         minimap: { enabled: false },
         fontSize: 14,
@@ -1032,6 +1169,16 @@ function ChatView({
     }
   }, [conversationId])
 
+  // ChatView is keyed by conversationId, so switching conversations unmounts
+  // this instance — stop a running workflow's step loop from continuing to
+  // send messages into the conversation the user just left.
+  const workflowCancelRef = useRef(false)
+  useEffect(() => {
+    return () => {
+      workflowCancelRef.current = true
+    }
+  }, [])
+
   // Auto-scroll to bottom whenever messages or streaming content changes
   useEffect(() => {
     if (scrollRef.current) {
@@ -1170,7 +1317,6 @@ function ChatView({
   // ── Workflow runner: send each preset step as a chat message, in order ──
   const { data: workflows } = useListWorkflows()
   const [workflowRun, setWorkflowRun] = useState<{ name: string; step: number; total: number } | null>(null)
-  const workflowCancelRef = useRef(false)
 
   const runWorkflow = async (wf: { name: string; steps: Array<{ title: string; prompt: string }> }) => {
     if (isStreaming || workflowRun || !conversationId) return
@@ -1270,14 +1416,26 @@ function ChatView({
               }
             }}
           />
-          <Button
-            size="icon"
-            className="absolute right-2 bottom-2 h-8 w-8"
-            onClick={handleSend}
-            disabled={!input.trim() || isStreaming}
-          >
-            <Send className="w-4 h-4" />
-          </Button>
+          {isStreaming ? (
+            <Button
+              size="icon"
+              variant="destructive"
+              className="absolute right-2 bottom-2 h-8 w-8"
+              onClick={() => abortRef.current?.abort()}
+              title="Stop generating"
+            >
+              <Circle className="w-3 h-3 fill-current" />
+            </Button>
+          ) : (
+            <Button
+              size="icon"
+              className="absolute right-2 bottom-2 h-8 w-8"
+              onClick={handleSend}
+              disabled={!input.trim()}
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          )}
         </div>
         <div className="flex justify-between items-center mt-2 px-1">
           <div className="flex items-center gap-2">
@@ -1556,22 +1714,35 @@ function CodeActionsView({
             </div>
           )}
 
-          {/* For tests/explain: show plain code block */}
+          {/* For tests/explain: show the diff against the current file too — this
+              still replaces activeFile's content, so the user needs to see exactly
+              what changes before confirming, same as the fix/optimize/document path. */}
           {result.suggestedCode && !hasDiff && (
             <div className="space-y-2 pt-4 border-t border-border/50">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-mono text-muted-foreground">Generated Code</span>
-                <Button
-                  variant="success"
-                  size="xs"
-                  onClick={() => onApply?.(result.suggestedCode)}
-                >
-                  <Check className="w-2.5 h-2.5 mr-1" /> Insert
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-xs border-destructive/50 text-destructive hover:bg-destructive/10"
+                    onClick={() => setResult(null)}
+                  >
+                    <X className="w-3 h-3 mr-1" /> Discard
+                  </Button>
+                  <Button
+                    variant="success"
+                    size="xs"
+                    onClick={() => {
+                      onApply?.(result.suggestedCode)
+                      setResult(null)
+                    }}
+                  >
+                    <Check className="w-2.5 h-2.5 mr-1" /> Apply
+                  </Button>
+                </div>
               </div>
-              <div className="bg-black/50 p-3 rounded-md overflow-x-auto text-xs font-mono text-foreground border border-border/50 max-h-64">
-                <pre><code>{result.suggestedCode}</code></pre>
-              </div>
+              <InlineDiff original={editorContent ?? ''} revised={result.suggestedCode} />
             </div>
           )}
         </div>

@@ -142,7 +142,7 @@ function useCustomModels() {
 // ═══════════════════════════════════════════════════════════════════════
 export default function ModelsPage() {
   const { models, isLoading, error, isOnline, refetch, optimisticUpdate } = useCustomModels()
-  const { data: builtIn } = useListModels()
+  const { data: builtIn, isError: builtInError, refetch: refetchBuiltIn } = useListModels()
   const { toast } = useToast()
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -267,7 +267,9 @@ export default function ModelsPage() {
               <h2 className="type-section text-foreground">Built-in</h2>
               <p className="text-xs text-muted-foreground">Always available · configured server-side</p>
             </div>
-            {!builtIn ? (
+            {builtInError ? (
+              <ErrorState message="Couldn't reach the server to list built-in models." onRetry={() => refetchBuiltIn()} />
+            ) : !builtIn ? (
               <div className="grid gap-2 md:grid-cols-2">
                 {[1,2,3,4].map(i => <Skeleton key={i} className="h-14 w-full" />)}
               </div>

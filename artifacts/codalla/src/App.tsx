@@ -1,9 +1,6 @@
 import { Switch, Route, Router as WouterRouter } from "wouter"
+import { Suspense, lazy } from "react"
 import Dashboard from "./pages/dashboard"
-import EditorPage from "./pages/editor"
-import SettingsPage from "./pages/settings"
-import ModelsPage from "./pages/models"
-import WorkflowsPage from "./pages/workflows"
 import NotFound from "./pages/not-found"
 import TermsPage from "./pages/terms"
 import PrivacyPage from "./pages/privacy"
@@ -12,6 +9,21 @@ import { Toaster } from "@/components/ui/toaster"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { AuthProvider } from "@/contexts/auth-context"
 import { ProtectedRoute } from "@/components/protected-route"
+
+// Code-split: the editor pulls in Monaco (and, via Settings, Recharts) —
+// both sizable — so only a visit to these routes pays for loading them.
+const EditorPage = lazy(() => import("./pages/editor"))
+const SettingsPage = lazy(() => import("./pages/settings"))
+const ModelsPage = lazy(() => import("./pages/models"))
+const WorkflowsPage = lazy(() => import("./pages/workflows"))
+
+function RouteFallback() {
+  return (
+    <div className="flex h-screen w-full items-center justify-center bg-background">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    </div>
+  )
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,16 +48,24 @@ function AppRouter() {
         <ProtectedRoute><Dashboard /></ProtectedRoute>
       </Route>
       <Route path="/editor/:projectId">
-        <ProtectedRoute><EditorPage /></ProtectedRoute>
+        <ProtectedRoute>
+          <Suspense fallback={<RouteFallback />}><EditorPage /></Suspense>
+        </ProtectedRoute>
       </Route>
       <Route path="/settings">
-        <ProtectedRoute><SettingsPage /></ProtectedRoute>
+        <ProtectedRoute>
+          <Suspense fallback={<RouteFallback />}><SettingsPage /></Suspense>
+        </ProtectedRoute>
       </Route>
       <Route path="/models">
-        <ProtectedRoute><ModelsPage /></ProtectedRoute>
+        <ProtectedRoute>
+          <Suspense fallback={<RouteFallback />}><ModelsPage /></Suspense>
+        </ProtectedRoute>
       </Route>
       <Route path="/workflows">
-        <ProtectedRoute><WorkflowsPage /></ProtectedRoute>
+        <ProtectedRoute>
+          <Suspense fallback={<RouteFallback />}><WorkflowsPage /></Suspense>
+        </ProtectedRoute>
       </Route>
       <Route><NotFound /></Route>
     </Switch>

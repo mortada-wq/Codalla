@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
 import { projectAccessWhere } from "../lib/project-access";
-import { db, projectsTable, projectAssetsTable, apiKeysTable, settingsTable, usageLogTable } from "@workspace/db";
+import { db, projectsTable, projectAssetsTable, apiKeysTable, settingsTable, usageLogTable, customModelsTable } from "@workspace/db";
 import { logger } from "../lib/logger";
 import { classifyProblem } from "../utils/detect-stack";
 
@@ -115,9 +115,30 @@ async function getProject(projectId: string, userId: string) {
   return p ?? null;
 }
 
+// Mirror of ai.ts's built-in rate table — kept in sync manually since this
+// router intentionally doesn't couple to ai.ts's internals.
+const BUILT_IN_COST_PER_1M: Record<string, number> = {
+  "deepseek-ai/DeepSeek-V3": 1.33,
+  "deepseek-ai/DeepSeek-R1": 4.0,
+  "Qwen/Qwen2.5-Coder-32B-Instruct": 1.5,
+};
+
 async function logUsage(userId: string, model: string, provider: string, promptTokens: number, completionTokens: number, action: string) {
-  const rate = 2.0; // rough default; per-model rates live in ai.ts
-  const cost = ((promptTokens + completionTokens) / 1_000_000) * rate;
+  const [customModel] = await db.select({
+    pricingPrompt: customModelsTable.pricingPrompt,
+    pricingCompletion: customModelsTable.pricingCompletion,
+  }).from(customModelsTable)
+    .where(and(eq(customModelsTable.userId, userId), eq(customModelsTable.modelId, model), eq(customModelsTable.provider, provider)));
+
+  let cost: number;
+  if (customModel) {
+    cost = (promptTokens / 1_000_000) * (customModel.pricingPrompt ?? 0)
+      + (completionTokens / 1_000_000) * (customModel.pricingCompletion ?? 0);
+  } else {
+    const rate = BUILT_IN_COST_PER_1M[model] ?? 2.0;
+    cost = ((promptTokens + completionTokens) / 1_000_000) * rate;
+  }
+
   await db.insert(usageLogTable).values({
     id: uuidv4(), userId, model, provider, promptTokens, completionTokens, cost, action,
   });
