@@ -2,6 +2,26 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { pool } from "@workspace/db";
 
+async function verifyDatabaseSchema() {
+  try {
+    const result = await pool.query(
+      `SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'workflows' AND table_schema = 'public'
+      )`
+    );
+    const workflowsTableExists = result.rows[0]?.exists;
+    if (!workflowsTableExists) {
+      logger.warn(
+        "Workflows table does not exist. " +
+        "Run `pnpm --filter @workspace/db run push` to initialize the database schema."
+      );
+    }
+  } catch (err) {
+    logger.error({ err }, "Failed to verify database schema");
+  }
+}
+
 // Default to 3000 for GCP AI Studio and single-process production deployment
 const rawPort = process.env["PORT"] ?? "3000";
 
@@ -18,6 +38,7 @@ const server = app.listen(port, (err) => {
   }
 
   logger.info({ port }, "Server listening");
+  verifyDatabaseSchema().catch((err) => logger.error({ err }, "Schema verification failed"));
 });
 
 // Cloud Run / Railway send SIGTERM before killing the container on redeploy
