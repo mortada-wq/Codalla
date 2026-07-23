@@ -5,7 +5,8 @@
  * Codalla AI Coding Platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { Pattern } from './pattern';
 
-export interface PullInput {
-  token?: string;
-}
+export type SuggestPatterns200 = {
+  patterns: Pattern[];
+};

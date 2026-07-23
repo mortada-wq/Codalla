@@ -53,6 +53,74 @@ export interface WorkflowInput {
   steps: WorkflowStep[];
 }
 
+export interface PatternResource {
+  title?: string;
+  url?: string;
+}
+
+export type PatternProblemType = typeof PatternProblemType[keyof typeof PatternProblemType];
+
+
+export const PatternProblemType = {
+  prompt: 'prompt',
+  'data-pipeline': 'data-pipeline',
+  'model-integration': 'model-integration',
+  'fine-tuning': 'fine-tuning',
+  general: 'general',
+} as const;
+
+export interface Pattern {
+  id: string;
+  userId: string | null;
+  problemType: PatternProblemType;
+  title: string;
+  description: string;
+  triggers: string[];
+  template: string;
+  example?: string | null;
+  resources: PatternResource[];
+  isEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type SuggestPatternsInputProblemType = typeof SuggestPatternsInputProblemType[keyof typeof SuggestPatternsInputProblemType];
+
+
+export const SuggestPatternsInputProblemType = {
+  prompt: 'prompt',
+  'data-pipeline': 'data-pipeline',
+  'model-integration': 'model-integration',
+  'fine-tuning': 'fine-tuning',
+  general: 'general',
+} as const;
+
+export interface SuggestPatternsInput {
+  problemType: SuggestPatternsInputProblemType;
+  keywords?: string[];
+}
+
+export interface PatternUsageInput {
+  patternId: string;
+  projectId?: string;
+  wasSuggested?: boolean;
+  wasAdopted?: boolean;
+  helpful?: boolean;
+  feedback?: string;
+}
+
+export interface PatternUsageLog {
+  id: string;
+  userId: string;
+  projectId?: string | null;
+  patternId: string;
+  wasSuggested: boolean;
+  wasAdopted: boolean;
+  helpful?: boolean | null;
+  feedback?: string | null;
+  createdAt: string;
+}
+
 export interface ProjectInput {
   name: string;
   description?: string;
@@ -186,12 +254,12 @@ export interface CloneInput {
 
 export interface CommitInput {
   message: string;
-  token: string;
+  token?: string;
   files?: string[];
 }
 
 export interface PullInput {
-  token: string;
+  token?: string;
 }
 
 export interface CheckoutInput {
@@ -508,5 +576,9 @@ export type ListUsageParams = {
 limit?: number;
 offset?: number;
 model?: string;
+};
+
+export type SuggestPatterns200 = {
+  patterns: Pattern[];
 };
 

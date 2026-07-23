@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface PullInput {
-  token?: string;
+export interface PatternResource {
+  title?: string;
+  url?: string;
 }
